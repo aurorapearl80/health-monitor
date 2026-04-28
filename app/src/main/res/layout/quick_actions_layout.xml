@@ -1,0 +1,33 @@
+<FrameLayout android:id="@+id/action_notifications_container"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:layout_margin="8dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/action_notifications"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_message"
+        android:background="@drawable/action_button_background"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:tint="@color/text_primary" />
+
+    <TextView
+        android:id="@+id/message_badge"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:gravity="center"
+        android:text="1"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@drawable/badge_red_circle"
+        android:visibility="gone" />
+</FrameLayout>

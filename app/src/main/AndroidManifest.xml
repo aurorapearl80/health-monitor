@@ -1,0 +1,303 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.monitor.health">
+    <!-- Core permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.TURN_SCREEN_ON" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" /> <!-- Bluetooth / Location for BLE on Wear -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- If you read device MAC addresses -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" /> <!-- Sensors & activity -->
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" /> <!-- Foreground service declarations (Android 12+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" /> <!-- Add these ONLY if you actually run FGS for mic/camera at runtime -->
+    <!-- Android 14+ (API 34) more specific FGS type -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" /> <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" /> -->
+    <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" /> -->
+    <!-- Only keep what you truly need from below; these often cause issues if misused -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- <uses-permission -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.type.watch"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" /> <!-- android:name="android.permission.CAMERA" -->
+    <!-- tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" /> -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission
+        android:name="android.permission.BATTERY_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
+    <application
+        android:name=".PersApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher_foreground"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        android:usesCleartextTraffic="false">
+        <activity
+            android:name=".ui.MessageDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ComposeMessageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.MessagesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.BleDeviceSelectionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
+        <activity
+            android:name=".FallAlertActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@style/Theme.DRWatch.Alert" />
+        <activity
+            android:name=".ui.VideoActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyApplication"
+            tools:ignore="IntentFilterExportedReceiver" />
+        <activity
+            android:name=".ui.graph.WeightGraphActivity"
+            android:exported="false" /> <!-- Activities (only Main is exported for launcher) -->
+        <activity
+            android:name=".ui.CallActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
+        <activity
+            android:name=".ui.IncomingCallActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Incoming Voice (Twilio Voice) full-screen UI -->
+        <activity
+            android:name=".ui.IncomingVoiceActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:taskAffinity="">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Ongoing Voice Call screen -->
+        <activity
+            android:name=".ui.VoiceCallActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
+
+        <!-- Separate FCM service for Twilio Voice push -->
+        <service
+            android:name=".voice.VoiceFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <activity
+            android:name=".TestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DashActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> <!-- Services: make them non-exported unless a 3P binds/starts them -->
+        <service
+            android:name=".services.WifiConfigurationService"
+            android:exported="false" /> <!-- Boot receiver: do MINIMAL work pre-unlock; real init on USER_UNLOCKED -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_UNLOCKED" />
+            </intent-filter>
+        </receiver> <!-- Foreground worker service (internal only) -->
+        <receiver
+            android:name=".receiver.BleWatchdogReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.monitor.health.ACTION_BLE_WATCHDOG" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".services.MyForegroundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="health" />
+        <service
+            android:name=".services.VideoCallService"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+        <service
+            android:name=".services.IncomingCallService"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+        <service
+            android:name=".services.InactivityMonitorService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="health" />
+        <service
+            android:name=".services.TestService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice|health" />
+
+        <receiver
+            android:name=".receiver.BleScanReceiver"
+            android:exported="false"
+            tools:ignore="Instantiatable" /> <!-- <service -->
+<!-- FCM -->
+        <!-- Foreground service that posts the full-screen notification -->
+        <service
+            android:name=".services.CallFgService"
+            android:exported="false"
+            android:foregroundServiceType="phoneCall" /> <!-- Your service declaration -->
+        <service
+            android:name=".services.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".receiver.CallActionReceiver"
+            android:exported="false" /> <!-- Hourly kick: internal only, and wait for unlock -->
+        <receiver
+            android:name=".receiver.HourlyKickReceiver"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.ACTION_KICK_HOURLY" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_UNLOCKED" />
+            </intent-filter>
+        </receiver> <!-- Heart services -->
+        <service
+            android:name=".services.HeartRateService"
+            android:exported="false"
+            android:foregroundServiceType="health">
+            <intent-filter>
+                <action android:name="com.monitor.health.action.HEART_START" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.KeyMonitorAccessibilityService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_key_monitor" />
+        </service>
+        <service
+            android:name=".services.BleScanService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice|location"
+            tools:ignore="ForegroundServicePermission" />
+        <service
+            android:name=".services.HeartRateServiceExternal"
+            android:exported="false" />
+        <service
+            android:name=".services.HeartRateServiceNative"
+            android:exported="false" />
+        <service
+            android:name=".services.HeartRateSensorService"
+            android:exported="false" />
+        <service
+            android:name=".services.BloodOxygenSensorService"
+            android:exported="false" />
+<!--        <service-->
+<!--            android:name=".services.StepsService"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false" />-->
+        <service
+            android:name=".services.LocationService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" /> <!-- File provider -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+
+            <!-- Remove only WorkManagerâ€™s default initializer -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+    </application>
+
+</manifest>

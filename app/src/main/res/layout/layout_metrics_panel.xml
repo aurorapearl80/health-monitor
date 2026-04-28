@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/metricsPanel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="@dimen/card_spacing"
+    android:layout_marginBottom="50dp"
+    android:showDividers="middle"
+    android:divider="@drawable/divider_space">
+
+    <!-- you can keep using your includes exactly as before -->
+    <include
+        android:id="@+id/rowGlucose"
+        layout="@layout/item_metric_compact"
+        android:layout_marginHorizontal="@dimen/metric_card_margin_h"
+        tools:ignore="IncludeLayoutParam" />
+
+    <include
+        android:id="@+id/rowBloodPressure"
+        layout="@layout/item_metric_compact"
+        android:layout_marginHorizontal="@dimen/metric_card_margin_h"
+        tools:ignore="IncludeLayoutParam" />
+
+    <include
+        android:id="@+id/rowWeight"
+        layout="@layout/item_metric_compact"
+        android:layout_marginHorizontal="@dimen/metric_card_margin_h"
+        tools:ignore="IncludeLayoutParam"/>
+
+    <include
+        android:id="@+id/rowBloodOxygen"
+        layout="@layout/item_metric_compact"
+        android:layout_marginHorizontal="@dimen/metric_card_margin_h"
+        tools:ignore="IncludeLayoutParam"/>
+
+    <include
+        android:id="@+id/rowEcg"
+        layout="@layout/item_metric_compact"
+        android:layout_marginHorizontal="@dimen/metric_card_margin_h"
+        tools:ignore="IncludeLayoutParam"/>
+
+    <include
+        android:id="@+id/temperature"
+        layout="@layout/item_metric_compact"
+        android:layout_marginHorizontal="@dimen/metric_card_margin_h"
+        tools:ignore="IncludeLayoutParam"/>
+
+</LinearLayout>

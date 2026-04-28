@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "82670809865",
+    "project_id": "monitorhealth-7198c",
+    "storage_bucket": "monitorhealth-7198c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82670809865:android:95a1c585f2764f7fa659d8",
+        "android_client_info": {
+          "package_name": "com.monitor.health"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRpQ23Xr6CvlGwachgy8UhW1O_Qyw00vU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.wear.widget.BoxInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2196F3"
+    app:boxedEdges="all">
+
+    <androidx.wear.widget.SwipeDismissFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Add inset padding so content stays readable on round screens -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/watch_inset_horizontal"
+            android:paddingRight="@dimen/watch_inset_horizontal"
+            android:paddingTop="@dimen/watch_inset_vertical"
+            android:paddingBottom="@dimen/watch_inset_vertical"
+            android:clipToPadding="false"
+            android:scrollbarStyle="outsideInset">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Blood Glucose Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/card_spacing">
+
+                    <!-- Main Value Display -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/ivConnectionStatus"
+                            android:layout_width="31dp"
+                            android:layout_height="31dp"
+                            android:layout_gravity="top|center_horizontal"
+                            android:contentDescription="Connection status"
+                            app:tint="@android:color/white"
+                            android:visibility="invisible" />
+
+                        <TextView
+                            android:id="@+id/tvTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:alpha="0.9"
+                            android:text="Blood Glucose"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvValueBG"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="---"
+                            android:textColor="@android:color/white"
+                            android:textSize="56sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvUnit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="--"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tvTimeAgo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="---"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <!-- Status Info -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvBPM"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="12sp"
+                            android:textColor="@android:color/white"
+                            android:layout_marginEnd="12dp"/>
+
+                        <ImageView
+                            android:id="@+id/heartIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_blood_drop_foreground"
+                            android:layout_marginEnd="12dp"
+                            tools:ignore="UseAppTint"/>
+
+                        <TextView
+                            android:id="@+id/tvOutcome"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="12sp"
+                            android:textColor="@android:color/white"/>
+
+                        <ImageView
+                            android:id="@+id/chartIcon"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_chart"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_marginLeft="50dp"
+                            app:tint="@android:color/white" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/white"
+                    android:alpha="0.3"
+                    android:layout_marginVertical="@dimen/card_spacing"/>
+                <include
+                    android:id="@+id/metricsPanel"
+                    layout="@layout/layout_metrics_panel" />
+
+                <!-- Add this before the closing tag of your main layout -->
+                <include layout="@layout/include_quick_actions" />
+            </LinearLayout>
+        </ScrollView>
+    </androidx.wear.widget.SwipeDismissFrameLayout>
+
+
+</androidx.wear.widget.BoxInsetLayout>

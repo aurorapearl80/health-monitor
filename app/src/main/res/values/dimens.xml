@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="metric_item_gap">10dp</dimen>          <!-- vertical space between rows -->
+    <dimen name="metric_card_margin_h">6dp</dimen>      <!-- tiny left/right breathing room -->
+</resources>

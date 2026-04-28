@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="watch_inset_horizontal" tools:ignore="MissingDefaultResource">24dp</dimen>
+    <dimen name="watch_inset_vertical" tools:ignore="MissingDefaultResource">28dp</dimen>
+    <dimen name="card_spacing" tools:ignore="MissingDefaultResource">10dp</dimen>
+    <dimen name="card_radius" tools:ignore="MissingDefaultResource">16dp</dimen>
+    <dimen name="metric_item_gap">12dp</dimen>
+    <dimen name="metric_card_margin_h">8dp</dimen>
+</resources>

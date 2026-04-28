@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Remote participant video -->
+    <com.twilio.video.VideoView
+        android:id="@+id/remote_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Local preview, small overlay -->
+    <com.twilio.video.VideoView
+        android:id="@+id/local_video"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="50dp" />
+
+    <!-- Simple controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:padding="8dp">
+
+        <!-- Decline Button -->
+        <ImageButton
+            android:id="@+id/decline_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="40dp"
+            android:background="@drawable/decline_button_background"
+            android:src="@drawable/ic_call_end"
+            android:scaleType="centerInside"
+            android:padding="12dp"
+            app:tint="@android:color/white" />
+
+        <!-- Accept Button -->
+<!--        <ImageButton-->
+<!--            android:id="@+id/accept_button"-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:background="@drawable/accept_button_background"-->
+<!--            android:src="@drawable/ic_call"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:padding="12dp"-->
+<!--            app:tint="@android:color/white" />-->
+
+    </LinearLayout>
+
+</androidx.wear.widget.BoxInsetLayout>

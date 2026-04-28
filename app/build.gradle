@@ -1,0 +1,91 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
+}
+
+android {
+    namespace 'com.monitor.health'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.monitor.health"
+        minSdk 26
+        targetSdk 36
+        versionCode 4
+        versionName "4.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    // Add this inside android block
+    applicationVariants.all { variant ->
+        variant.javaCompileProvider.get().options.compilerArgs += [
+                '--add-exports', 'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+                '--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+                '--add-exports', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'
+        ]
+    }
+
+}
+
+dependencies {
+
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
+    implementation libs.wear
+    implementation fileTree(dir: 'C:\\Users\\DeeDee\\Documents\\ReliableResponse\\FirmWare\\20-08-2025\\javalib', include: ['*.aar', '*.jar'], exclude: [])
+    implementation libs.firebase.messaging
+
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
+    implementation 'com.airbnb.android:lottie:6.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.12'
+    implementation 'org.conscrypt:conscrypt-android:2.5.1'
+
+    implementation 'androidx.work:work-runtime:2.7.1'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'  // or latest
+
+    implementation "androidx.room:room-runtime:2.4.0"
+    annotationProcessor "androidx.room:room-compiler:2.4.0"
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'com.google.android.material:material:1.12.0'
+
+
+    // Twilio Video Android SDK (from Maven Central)
+    implementation 'com.twilio:video-android:7.9.0'
+
+    // Twilio Voice Android SDK (VoIP)
+    implementation 'com.twilio:voice-android:6.3.0'
+
+    def lottieVersion = "3.4.0"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'androidx.fragment:fragment:1.6.2'
+
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="dark_background">#121212</color>
+    <color name="surface_color">#1E1E1E</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3B3B3</color>
+    <color name="accent_blue">#2196F3</color>
+    <color name="accent_green">#4CAF50</color>
+    <color name="accent_green_transparent">#334CAF50</color>
+    <color name="border_color">#333333</color>
+    <!-- Dialog Colors -->
+    <color name="dialog_background">#2D2D2D</color>
+    <color name="dialog_border">#404040</color>
+    <color name="dialog_text_primary">#FFFFFF</color>
+    <color name="dialog_text_secondary">#CCCCCC</color>
+    <color name="dialog_accent">#FF9800</color>
+
+    <!-- Button Colors -->
+    <color name="button_ok_normal">#4CAF50</color>
+    <color name="button_ok_pressed">#45A049</color>
+    <color name="button_cancel_normal">#424242</color>
+    <color name="button_cancel_pressed">#616161</color>
+
+    <!-- Video call -->
+    <color name="dark_grey">#121212</color>
+    <color name="light_grey">#BBBBBB</color>
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+    <color name="blue">#2196F3</color>
+
+    <color name="call_background">#1E1E1E</color>
+</resources>

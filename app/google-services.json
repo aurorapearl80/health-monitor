@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "171983255182",
+    "project_id": "dr-watch",
+    "storage_bucket": "dr-watch.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171983255182:android:11821a97cf1c88ee47bbdf",
+        "android_client_info": {
+          "package_name": "com.monitor.health"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7Yb52kwsK56B7F0qj83lbJW1wnnuU2KE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

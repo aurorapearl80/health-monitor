@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Use this version for a more focused weight monitoring experience -->
+
+<androidx.wear.widget.BoxInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#AA00FF"
+    app:boxedEdges="all">
+
+    <androidx.wear.widget.SwipeDismissFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Add inset padding so content stays readable on round screens -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/watch_inset_horizontal"
+            android:paddingRight="@dimen/watch_inset_horizontal"
+            android:paddingTop="@dimen/watch_inset_vertical"
+            android:paddingBottom="@dimen/watch_inset_vertical"
+            android:clipToPadding="false"
+            android:scrollbarStyle="outsideInset">
+
+            <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="20dp">
+
+            <!-- Main Weight Display -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+
+                <!-- Page Title for Focused Version -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+<!--                    <ImageView-->
+<!--                        android:layout_width="16dp"-->
+<!--                        android:layout_height="16dp"-->
+<!--                        android:src="@drawable/ic_graph_increase_foreground"-->
+<!--                        android:layout_marginEnd="6dp"-->
+<!--                        tools:ignore="UseAppTint" />-->
+
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Heart Rate"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Weight Value with Unit -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/tv_value_bg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--"
+                        android:textSize="48sp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvUnit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="bpm"
+                        android:textSize="18sp"
+                        android:textColor="@android:color/white"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+
+                <!-- Time Ago -->
+                <TextView
+                    android:id="@+id/tv_time_ago"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginTop="8dp" />
+
+                <!-- BMI Status (Optional) -->
+
+            </LinearLayout>
+
+            <!-- Status Info -->
+            <!-- Status Info -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:id="@+id/tvBPM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LENGTH: "
+                    android:textSize="12sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginEnd="16dp"
+                    android:visibility="gone"
+                    android:gravity="center" />
+
+                <ImageView
+                    android:id="@+id/heartIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_graph_increase_foreground"
+                    android:layout_marginEnd="16dp"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/tvOutcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center" />
+
+                <ImageView
+                    android:id="@+id/chartIcon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_chart"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginLeft="50dp"
+                    app:tint="@android:color/white" />
+
+            </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:visibility="gone"
+                    android:textStyle="bold"/>
+
+                <ProgressBar
+                    android:id="@+id/progress"
+                    style="@android:style/Widget.Material.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    android:layout_marginTop="8dp"/>
+
+                <Button
+                    android:id="@+id/btn_measure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Measure"
+                    android:layout_marginTop="24dp"/>
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/white"
+                    android:alpha="0.3"
+                    android:layout_marginVertical="@dimen/card_spacing"/>
+                <include
+                    android:id="@+id/metricsPanel"
+                    layout="@layout/layout_metrics_panel" />
+                <!-- Add this before the closing tag of your main layout -->
+                <include layout="@layout/include_quick_actions" />
+
+        </LinearLayout>
+        </ScrollView>
+
+    </androidx.wear.widget.SwipeDismissFrameLayout>
+
+    <ImageView
+        android:id="@+id/ivConnectionStatus"
+        android:layout_width="31dp"
+        android:layout_height="31dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Connection status"
+        app:tint="@android:color/white"
+        android:visibility="invisible" />
+</androidx.wear.widget.BoxInsetLayout>
