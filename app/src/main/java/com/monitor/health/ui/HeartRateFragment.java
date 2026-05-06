@@ -396,6 +396,7 @@ public class HeartRateFragment extends BaseFragment {
         } else if (quality == NetworkUtils.ConnectionQuality.WEAK) {
             iv.setImageResource(R.drawable.ic_signal_weak);
             iv.setVisibility(android.view.View.VISIBLE);
+            NetworkUtils.showSlowConnectionToast(requireContext());
         } else {
             iv.setVisibility(android.view.View.INVISIBLE);
         }

@@ -147,10 +147,15 @@ import java.util.Collections;
 
 
 public class MainActivity extends AppCompatActivity  implements StepsService.SensorDataListener {
+
+    /** True only while MainActivity is in the resumed (visible) state.
+     *  Read by KeyMonitorAccessibilityService to avoid launching the SOS dialog
+     *  when the app is no longer in the foreground. */
+    public static volatile boolean isInForeground = false;
+
     private PowerManager.WakeLock wakeLock;
     private static final String TAG = "MainActivity";
     private static final int REQUEST_PERMISSIONS = 1001;
-    private boolean pendingShowSosDialog = false;
     private boolean isNavigationReceiverRegistered = false;
 
     UserDrWatch userDrWatch;
@@ -179,8 +184,6 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
 
     private BleScanService bleScanService;
     private boolean isBound = false;
-
-    private boolean isDialogShowing = false;
 
     public final static String ACTION_IOTSERVICES = "android.hsc.iotservices";
     public final static String ACTION = "action";
@@ -782,9 +785,9 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
 //        HourlyKickReceiver.setIntervalFromServer(this, interval, unit);
 
 
-        ApkDownloadManager manager = new ApkDownloadManager(this);
-        manager.setupCallbacks(); // Set up progress and installation callbacks
-        manager.checkVersionDownload(); // Start the process
+//        ApkDownloadManager manager = new ApkDownloadManager(this);
+//        manager.setupCallbacks(); // Set up progress and installation callbacks
+//        manager.checkVersionDownload(); // Start the process
 
 //        setUpFcm();
         handleNavigation(getIntent());
@@ -916,11 +919,11 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
         });
 
         //Please don't forget this to upload -- Warning
-       if (!isAccessibilityServiceEnabled(this, KeyMonitorAccessibilityService.class)) {
-            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-        } else {
-            Log.d("Key-change", "Accessibility already enabled. No popup.");
-        }
+//       if (!isAccessibilityServiceEnabled(this, KeyMonitorAccessibilityService.class)) {
+//            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+//        } else {
+//            Log.d("Key-change", "Accessibility already enabled. No popup.");
+//        }
         //databaseClient.getAppDatabase().bleDeviceDao().deleteAll();
         getAssignDevices();
         //databaseClient.getAppDatabase().bleDeviceDao().resetAllConnections();
@@ -2146,6 +2149,7 @@ private void startHearRateSensorService() {
     @Override
     protected void onResume() {
         super.onResume();
+        isInForeground = true;
         Intent intent = new Intent("RESUME_ACTION");
         sendBroadcast(intent);
 
@@ -2160,11 +2164,6 @@ private void startHearRateSensorService() {
 //                sensorDataReceiver,
 //                new IntentFilter(StepsService.ACTION_SENSOR_DATA)
 //        );
-
-        if (pendingShowSosDialog && !isDialogShowing && !isFinishing() && !isDestroyed()) {
-            pendingShowSosDialog = false;
-            showSaveChangesDialog(); // will pass the RESUMED check now
-        }
 
         // If service is bound, request data update
         if (serviceBound && sensorService != null) {
@@ -2198,6 +2197,10 @@ private void startHearRateSensorService() {
     @Override
     protected void onPause() {
         super.onPause();
+        isInForeground = false;
+        // Key 139 is the back button on this device. Cancel any running SOS timer
+        // immediately so it can't fire if the user reopens the app within 5 seconds.
+        KeyMonitorAccessibilityService.cancelSosTimer();
          //unregisterReceiver(heartRateReceiverOutside);
     }
 
@@ -2233,71 +2236,6 @@ private void startHearRateSensorService() {
     }
 
 
-    private void showSaveChangesDialog() {
-        // 1) wake screen
-        wakeScreen();
-
-        // 2) bring app UI to front
-        bringMainActivityToFront();
-
-        // 3) then show dialog (give UI a tiny moment)
-        runOnUiThread(() -> {
-            if (isFinishing() || isDestroyed()) {
-                pendingShowSosDialog = true;
-                return;
-            }
-            isDialogShowing = true;
-            SmartWatchAlertDialog.showSaveDialog(
-                    MainActivity.this,
-                    "We detected you may have fell or requested Emergency Call?",
-                    new SmartWatchAlertDialog.DialogListener() {
-                        @Override
-                        public void onOkClicked() {
-                            isDialogShowing = false;
-                            releaseWakeLock();
-                            sendAlarm();
-                        }
-
-                        @Override
-                        public void onCancelClicked() {
-                            isDialogShowing = false;
-                            releaseWakeLock();
-                        }
-                    }
-            );
-        });
-    }
-
-
-
-    private void wakeScreen() {
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        if (pm == null) return;
-
-        if (wakeLock == null || !wakeLock.isHeld()) {
-            wakeLock = pm.newWakeLock(
-                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK
-                            | PowerManager.ACQUIRE_CAUSES_WAKEUP
-                            | PowerManager.ON_AFTER_RELEASE,
-                    "DrWatch:EmergencyWakeLock"
-            );
-            wakeLock.acquire(10 * 1000L); // 10 seconds
-        }
-    }
-
-    private void releaseWakeLock() {
-        if (wakeLock != null && wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-    }
-
-    private void bringMainActivityToFront() {
-        Intent i = new Intent(getApplicationContext(), MainActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_SINGLE_TOP
-                | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
-    }
 
 
 

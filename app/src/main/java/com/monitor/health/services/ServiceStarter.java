@@ -1,11 +1,13 @@
 package com.monitor.health.services;
 
 import android.Manifest;
+import android.app.ForegroundServiceStartNotAllowedException;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 import androidx.work.OneTimeWorkRequest;
@@ -67,8 +69,21 @@ public final class ServiceStarter {
 
     private static void startFgOrBg(Context ctx, Intent serviceIntent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Foreground services must call startForeground(...) quickly.
-            ContextCompat.startForegroundService(ctx, serviceIntent);
+            try {
+                ContextCompat.startForegroundService(ctx, serviceIntent);
+            } catch (Exception e) {
+                // Android 12+ blocks foreground-service starts from background contexts
+                // (boot receivers with OEM battery restrictions, WorkManager workers, etc.).
+                // Schedule a short retry so the app isn't killed and the service starts once
+                // the system allows it (typically after the user opens the app).
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                        && e instanceof ForegroundServiceStartNotAllowedException) {
+                    Log.w("ServiceStarter", "FG start blocked; scheduling retry: " + e.getMessage());
+                    scheduleInitRetry(ctx, 5);
+                } else {
+                    throw new RuntimeException(e);
+                }
+            }
         } else {
             ctx.startService(serviceIntent);
         }

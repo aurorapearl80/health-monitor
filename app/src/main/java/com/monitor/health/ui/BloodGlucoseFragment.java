@@ -13,6 +13,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -118,6 +119,7 @@ public class BloodGlucoseFragment extends Fragment  implements QuickActionsHandl
 
     ReadingValue list;
 
+    private ConnectivityManager.NetworkCallback networkCallback;
     private QuickActionsHelper quickActionsHelper;
     String _model;                     // e.g., SM-G925I
     String _maker;              // e.g., Samsung
@@ -656,32 +658,43 @@ public class BloodGlucoseFragment extends Fragment  implements QuickActionsHandl
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (networkCallback != null) {
+            ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
+            if (cm != null) cm.unregisterNetworkCallback(networkCallback);
+            networkCallback = null;
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         updateConnectionIcon();
-        if (NetworkUtils.isInternetConnected(requireContext())) {
-            Log.d(TAG, "this is hello world");
-            vm.fetchLatest(
-                    Constant.BASE_URL_BGM,
-                    "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%",
-                    DeviceUtils.getIMEI(requireContext())
-            );
-
-            vm.getTypesAvailabilityMutableLiveData()
-                    .observe(this, typesAvailability -> {
-                        if (typesAvailability == null) return;
-                        updateMetricsVisibility(typesAvailability);
-                        updateNavigationPages(typesAvailability);  // ðŸ‘ˆ add this
-                    });
-
-            syncGlucose();
-            syncBloodPressureData();
-            syncSpo2();
-            syncHeartRate();
-            syncTemperature();
-            ((MainActivity) requireActivity()).startFetchingSteps();
-        }
-        else {
+        NetworkUtils.ConnectionQuality quality = NetworkUtils.getConnectionQuality(requireContext());
+        if (quality != NetworkUtils.ConnectionQuality.NONE) {
+            networkCallback = NetworkUtils.scheduleOnStrongConnection(requireContext(), () -> {
+                if (!isAdded()) return;
+                Log.d(TAG, "this is hello world");
+                vm.fetchLatest(
+                        Constant.BASE_URL_BGM,
+                        "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%",
+                        DeviceUtils.getIMEI(requireContext())
+                );
+                vm.getTypesAvailabilityMutableLiveData()
+                        .observe(this, typesAvailability -> {
+                            if (typesAvailability == null) return;
+                            updateMetricsVisibility(typesAvailability);
+                            updateNavigationPages(typesAvailability);
+                        });
+                syncGlucose();
+                syncBloodPressureData();
+                syncSpo2();
+                syncHeartRate();
+                syncTemperature();
+                ((MainActivity) requireActivity()).startFetchingSteps();
+            });
+        } else {
             // Retrieve data from SharedPreferences
             list = databaseClient.getAppDatabase().readingValueDao().getLatestReadingValue();
             if (list != null) {
@@ -836,6 +849,7 @@ public class BloodGlucoseFragment extends Fragment  implements QuickActionsHandl
         } else if (quality == NetworkUtils.ConnectionQuality.WEAK) {
             iv.setImageResource(R.drawable.ic_signal_weak);
             iv.setVisibility(android.view.View.VISIBLE);
+            NetworkUtils.showSlowConnectionToast(requireContext());
         } else {
             iv.setVisibility(android.view.View.INVISIBLE);
         }
@@ -1164,7 +1178,6 @@ public class BloodGlucoseFragment extends Fragment  implements QuickActionsHandl
 
     @Override
     public void onSettingsClicked() {
-        showSaveChangesDialog();
     }
 
     @Override
@@ -1192,21 +1205,6 @@ public class BloodGlucoseFragment extends Fragment  implements QuickActionsHandl
         startActivity(intent);
     }
 
-    private void showSaveChangesDialog() {
-        SmartWatchAlertDialog.showSaveDialog(getActivity(),
-                "We detected you may have fell or requested Emergency Call?",
-                new SmartWatchAlertDialog.DialogListener() {
-                    @Override
-                    public void onOkClicked() {
-                        //saveChanges();
-                        sendAlarm();                    }
-
-                    @Override
-                    public void onCancelClicked() {
-                        //discardChanges();
-                    }
-                });
-    }
 
     public void sendAlarm() {
 

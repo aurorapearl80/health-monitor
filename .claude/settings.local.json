@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(git filter-branch *)",
+      "Bash(git stash *)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter \"git rm --cached --ignore-unmatch app/release/app-release.apk app/release/app-release.aab\" --prune-empty --tag-name-filter cat -- --all)",
+      "Bash(git reflog *)",
+      "Bash(git gc *)",
+      "Bash(xargs grep *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\DeeDee\\\\AndroidStudioProjects\\\\monitor-your-health\" -Recurse -File -Filter \"*.java\")",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }

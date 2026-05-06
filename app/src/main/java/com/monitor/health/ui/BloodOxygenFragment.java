@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -99,6 +100,7 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
     private boolean measuring = false;
 
     private ReadingsViewModel vm;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     private QuickActionsHelper quickActionsHelper;
     String _model;                     // e.g., SM-G925I
@@ -745,31 +747,41 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (networkCallback != null) {
+            ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
+            if (cm != null) cm.unregisterNetworkCallback(networkCallback);
+            networkCallback = null;
+        }
+        binding = null;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         updateConnectionIcon();
         Log.d(TAG, "OnResume here. ");
-
-        if (NetworkUtils.isInternetConnected(requireContext())) {
-            //Send all offline data to the server
-            vm.fetchLatest(
-                    Constant.BASE_URL_BGM,
-                    "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%",
-                    DeviceUtils.getIMEI(requireContext())
-            );
-
-            vm.getTypesAvailabilityMutableLiveData()
-                    .observe(this, typesAvailability -> {
-                        if (typesAvailability == null) return;
-                        updateMetricsVisibility(typesAvailability);
-                    });
-
-            syncBloodPressureData();
-            syncSpo2();
-            syncHeartRate();
-            syncStep();
-            ((MainActivity) requireActivity()).startFetchingSteps();
-
+        NetworkUtils.ConnectionQuality quality = NetworkUtils.getConnectionQuality(requireContext());
+        if (quality != NetworkUtils.ConnectionQuality.NONE) {
+            networkCallback = NetworkUtils.scheduleOnStrongConnection(requireContext(), () -> {
+                if (!isAdded() || binding == null) return;
+                vm.fetchLatest(
+                        Constant.BASE_URL_BGM,
+                        "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%",
+                        DeviceUtils.getIMEI(requireContext())
+                );
+                vm.getTypesAvailabilityMutableLiveData()
+                        .observe(this, typesAvailability -> {
+                            if (typesAvailability == null) return;
+                            updateMetricsVisibility(typesAvailability);
+                        });
+                syncBloodPressureData();
+                syncSpo2();
+                syncHeartRate();
+                syncStep();
+                ((MainActivity) requireActivity()).startFetchingSteps();
+            });
         } else {
             Oximeter oximeter = databaseClient.getAppDatabase().oximeterDao().getLatestOximeter();
             if (oximeter != null) {
@@ -811,6 +823,7 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
         } else if (quality == NetworkUtils.ConnectionQuality.WEAK) {
             iv.setImageResource(R.drawable.ic_signal_weak);
             iv.setVisibility(android.view.View.VISIBLE);
+            NetworkUtils.showSlowConnectionToast(requireContext());
         } else {
             iv.setVisibility(android.view.View.INVISIBLE);
         }
@@ -1196,7 +1209,6 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
 
     @Override
     public void onSettingsClicked() {
-        showSaveChangesDialog();
     }
 
     @Override
@@ -1224,21 +1236,6 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
         startActivity(intent);
     }
 
-    private void showSaveChangesDialog() {
-        SmartWatchAlertDialog.showSaveDialog(getActivity(),
-                "We detected you may have fell or requested Emergency Call?",
-                new SmartWatchAlertDialog.DialogListener() {
-                    @Override
-                    public void onOkClicked() {
-                        //saveChanges();
-                        sendAlarm();                    }
-
-                    @Override
-                    public void onCancelClicked() {
-                        //discardChanges();
-                    }
-                });
-    }
 
     public void sendAlarm() {
 

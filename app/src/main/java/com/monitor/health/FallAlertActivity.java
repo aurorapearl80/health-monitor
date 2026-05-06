@@ -46,6 +46,13 @@ public class FallAlertActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // savedInstanceState != null means Android is restoring the activity from a saved state
+        // (e.g., process death/recreation). The original intent still carries sos_triggered=true,
+        // so we must explicitly reject restorations — user did not re-trigger SOS.
+        if (savedInstanceState != null || !getIntent().getBooleanExtra("sos_triggered", false)) {
+            finish();
+            return;
+        }
         isShowing = true;
         prefs = this.getSharedPreferences("LocationPrefs", MODE_PRIVATE);
         androidId =  DeviceUtils.getIMEI(this);
@@ -81,9 +88,10 @@ public class FallAlertActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        // singleTask reuse: dialog is already showing, ignore the re-trigger
-        Log.d(TAG, "onNewIntent ignored â€” dialog already visible");
+        //Log.d(TAG, “onNewIntent — dialog already visible, ignoring re-trigger”);
     }
+
+
 
     public void sendAlarm() {
 

@@ -236,10 +236,7 @@ public class ProfileFragment extends Fragment {
 
     private void setupQuickActions() {
         setupQuickAction(R.id.action_settings, () -> {
-            // Handle settings action
-            // Navigation.findNavController(rootView).navigate(R.id.settingsFragment);
-            // Or use fragment transaction if not using Navigation Component
-            showSaveChangesDialog();
+            // Settings navigation placeholder
         });
 
         // Handle health action
@@ -323,21 +320,6 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
-    private void showSaveChangesDialog() {
-        SmartWatchAlertDialog.showSaveDialog(getActivity(),
-                "We detected you may have fell or requested Emergency Call?",
-                new SmartWatchAlertDialog.DialogListener() {
-                    @Override
-                    public void onOkClicked() {
-                        //saveChanges();
-                        sendAlarm();                    }
-
-                    @Override
-                    public void onCancelClicked() {
-                        //discardChanges();
-                    }
-                });
-    }
 
     private void showCustomDialog() {
         SmartWatchAlertDialog dialog = new SmartWatchAlertDialog.Builder(getActivity())
@@ -448,6 +430,7 @@ public class ProfileFragment extends Fragment {
         } else if (quality == NetworkUtils.ConnectionQuality.WEAK) {
             iv.setImageResource(R.drawable.ic_signal_weak);
             iv.setVisibility(android.view.View.VISIBLE);
+            NetworkUtils.showSlowConnectionToast(requireContext());
         } else {
             iv.setVisibility(android.view.View.INVISIBLE);
         }
