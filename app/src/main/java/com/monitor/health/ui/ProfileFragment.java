@@ -4,18 +4,23 @@ import static android.content.Context.BATTERY_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.fragment.app.Fragment;
 
@@ -26,10 +31,12 @@ import android.view.ViewGroup;
 
 import com.monitor.health.ApiClient;
 import com.monitor.health.Constant;
+import com.monitor.health.LoginActivity;
 import com.monitor.health.MainActivity;
 import com.monitor.health.NetworkUtils;
 import com.monitor.health.R;
 import com.monitor.health.adapter.StatsAdapter;
+import com.monitor.health.utility.PreferenceHelper;
 import com.monitor.health.database.DatabaseClient;
 import com.monitor.health.model.ReadingValue;
 import com.monitor.health.model.healthscore.UserDrWatch;
@@ -235,9 +242,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupQuickActions() {
-        setupQuickAction(R.id.action_settings, () -> {
-            // Settings navigation placeholder
-        });
+        setupQuickAction(R.id.action_settings, this::showLogoutConfirmation);
 
         // Handle health action
         // Navigation.findNavController(rootView).navigate(R.id.healthFragment);
@@ -256,6 +261,39 @@ public class ProfileFragment extends Fragment {
             Intent intent = new Intent(getActivity(), MessagesActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void showLogoutConfirmation() {
+        Dialog dialog = new Dialog(requireContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_logout_confirmation);
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.width = (int) (requireContext().getResources().getDisplayMetrics().widthPixels * 0.9);
+            params.height = (int) (requireContext().getResources().getDisplayMetrics().heightPixels * 0.85);
+            window.setAttributes(params);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            window.setDimAmount(0.7f);
+        }
+
+        dialog.findViewById(R.id.btn_logout_confirm).setOnClickListener(v -> {
+            dialog.dismiss();
+            logout();
+        });
+
+        dialog.findViewById(R.id.btn_logout_cancel).setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void logout() {
+        PreferenceHelper.getInstance(requireContext()).remove(Constant.AUTH_TOKEN);
+        Intent intent = new Intent(requireContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     private void showSettingUpBleDevice() {

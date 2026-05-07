@@ -588,6 +588,14 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String authToken = PreferenceHelper.getInstance(this).getString(Constant.AUTH_TOKEN, "");
+        if (TextUtils.isEmpty(authToken)) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
         EdgeToEdge.enable(this);
 
 

@@ -140,15 +140,19 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.MyApplication">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Services: make them non-exported unless a 3P binds/starts them -->
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:launchMode="singleTop" /> <!-- Services: make them non-exported unless a 3P binds/starts them -->
         <service
             android:name=".services.WifiConfigurationService"
             android:exported="false" /> <!-- Boot receiver: do MINIMAL work pre-unlock; real init on USER_UNLOCKED -->

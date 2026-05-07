@@ -89,6 +89,9 @@ public class Constant {
     public static final String ID_TEMPERATURE = "5bb306382598931ffbd1b628";
     public static final String ID_WEIGHT = "5bb306382598931ffbd1b625";
 
+    //auth
+    public static final String AUTH_TOKEN = "auth_token";
+
     //preferences
     public static final String weightUnit = "weightUnit";
     public static final String weightUnitBoolean = "weightUnitBoolean";
