@@ -664,7 +664,9 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
         userDrWatch = new UserDrWatch();
 
         //androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        //Log.d("Android----------------------", "ID: "+androidId);
         androidId = DeviceUtils.getIMEI(this);
+        //Log.d("Android", "ID test: "+androidId);
         //txtAndroidId.setText(androidId);
 
         _model = Build.MODEL;
@@ -1914,6 +1916,16 @@ public void setUpFcm(String userID) {
             needed.add(Manifest.permission.READ_PHONE_STATE);
         if (!isPermissionGranted(Manifest.permission.BODY_SENSORS))
             needed.add(Manifest.permission.BODY_SENSORS);
+        if (!isPermissionGranted(Manifest.permission.BODY_SENSORS_BACKGROUND))
+            needed.add(Manifest.permission.BODY_SENSORS_BACKGROUND);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (!isPermissionGranted("android.permission.health.READ_HEART_RATE"))
+                needed.add("android.permission.health.READ_HEART_RATE");
+            if (!isPermissionGranted("android.permission.health.READ_OXYGEN_SATURATION"))
+                needed.add("android.permission.health.READ_OXYGEN_SATURATION");
+            if (!isPermissionGranted("android.permission.health.READ_STEPS"))
+                needed.add("android.permission.health.READ_STEPS");
+        }
         if (!isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
             needed.add(Manifest.permission.ACCESS_FINE_LOCATION);
         if (!isPermissionGranted(Manifest.permission.RECORD_AUDIO))

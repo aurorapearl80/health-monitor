@@ -21,7 +21,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- If you read device MAC addresses -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" /> <!-- Sensors & activity -->
     <uses-permission android:name="android.permission.BODY_SENSORS" />
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" /> <!-- Foreground service declarations (Android 12+) -->
+    <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" />
+    <uses-permission android:name="android.permission.health.READ_STEPS" /> <!-- Foreground service declarations (Android 12+) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" /> <!-- Add these ONLY if you actually run FGS for mic/camera at runtime -->
@@ -61,6 +65,7 @@
         android:roundIcon="@mipmap/ic_launcher_round_profile"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="false">
         <activity
             android:name=".ui.MessageDetailActivity"
@@ -144,15 +149,16 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MyApplication">
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"> <!-- Services: make them non-exported unless a 3P binds/starts them -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:launchMode="singleTop" /> <!-- Services: make them non-exported unless a 3P binds/starts them -->
         <service
             android:name=".services.WifiConfigurationService"
             android:exported="false" /> <!-- Boot receiver: do MINIMAL work pre-unlock; real init on USER_UNLOCKED -->
@@ -255,7 +261,7 @@
             android:name=".services.BleScanService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="connectedDevice|location"
+            android:foregroundServiceType="connectedDevice"
             tools:ignore="ForegroundServicePermission" />
         <service
             android:name=".services.HeartRateServiceExternal"

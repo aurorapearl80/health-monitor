@@ -71,6 +71,7 @@ import com.monitor.health.model.Temperature;
 import com.monitor.health.model.WeighingScale;
 import com.monitor.health.receiver.BleWatchdogReceiver;
 import com.monitor.health.receiver.BluetoothStateReceiver;
+import com.monitor.health.request.ReadingRequest;
 import com.monitor.health.utility.DeviceUtils;
 import com.monitor.health.utility.DoubleChangeDetector;
 import com.monitor.health.utility.IntChangeDetector;
@@ -1434,24 +1435,29 @@ public class BleScanService extends Service {
         Log.d(TAG, "sending temperature "+ temperature);
         // Usage example in your activity or service
         token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
-        Reading reading = new Reading(
+        ReadingRequest reading = new ReadingRequest(
                 false,
                 "Asia/Manila",
                 "jtm00025b94050c",
-                Arrays.asList(temperature),
-                "5bc3cb14cba82b066cae7bc1",
+                temperature,
+                Constant.DEVICE_TEMPERATURE,
                 "5bb306382598931ffbd1b628",
                 getDate(),
-                "5bc3cb14cba82b066cae7bc1"
+                androidId
         );
-        List<Reading> readingsList = Arrays.asList(reading);
-        ReadingsRequest readingsRequest = new ReadingsRequest(readingsList);
+        Log.d(TAG, "sendTemperature POST → url=" + Constant.BASE_URL_BGM + "api/temperatures"
+                + " | temperature=" + reading.getTemperature()
+                + " | serial=" + reading.getSerial()
+                + " | device_id=" + reading.getDevice_id()
+                + " | timezone=" + reading.getTimezone()
+                + " | measured_at=" + reading.getMeasured_at());
 
-        Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM,token, androidId).sendReadings(readingsRequest);
+        Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM,token, androidId).sendTemperature(reading);
         call.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-
+                Log.d(TAG, response+"");
+                Log.d(TAG, "Temperature Success 1 : "+response);
                 if (response.isSuccessful()) {
                     // Request successful
                     // Handle response if needed
@@ -1476,6 +1482,7 @@ public class BleScanService extends Service {
             public void onFailure(Call<Object> call, Throwable t) {
                 // Request failed
                 // Handle failure
+                Log.d(TAG, "Temperature Error 1 : "+t.toString());
                 restartBle();
             }
         });

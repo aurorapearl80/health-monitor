@@ -5,6 +5,7 @@ import com.monitor.health.dto.ApiResponseDTO;
 import com.monitor.health.model.MedicationSchedule;
 import com.monitor.health.model.MedicinePayload;
 import com.monitor.health.model.healthscore.DataObjectDto;
+import com.monitor.health.request.ReadingRequest;
 import com.monitor.health.request.SendAlarmRequest;
 import com.monitor.health.request.UserTelemedikRequest;
 import com.monitor.health.request.bledevice.AssignBleRequest;
@@ -37,6 +38,10 @@ public interface UserService {
 
     @POST("api/doctor-watches/readings")
     Call<Object> sendReadings(@Body ReadingsRequest readingsRequest);
+
+
+    @POST("api/temperatures")
+    Call<Object> sendTemperature(@Body ReadingRequest readingsRequest);
 
     @GET("api/doctor-watches/medicine-schedules")
     Call<MedicationSchedule> getMedicineSchedule();
