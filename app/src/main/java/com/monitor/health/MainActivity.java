@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
         public void onReceive(Context context, Intent intent) {
             if (Constant.ACTION_TEMPERATURE.equals(intent.getAction())) {
                 double acc = intent.getDoubleExtra(Constant.VALUE_TEMPERATURE, 0f);
-                Log.d(TAG, "The data of temperature main"+acc);
+                Log.d(TAG, "The data of temperature main "+acc);
                 //model.setHeartRate(acc);
                 model.setTemperatureData(acc);
             }
@@ -588,13 +588,6 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        String authToken = PreferenceHelper.getInstance(this).getString(Constant.AUTH_TOKEN, "");
-        if (TextUtils.isEmpty(authToken)) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
 
         EdgeToEdge.enable(this);
 

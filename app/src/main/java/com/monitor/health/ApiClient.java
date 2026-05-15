@@ -51,7 +51,7 @@ public class ApiClient {
     private static Retrofit getRetrofit(String baseUrl, String authToken, String watchSerial) {
         // Add per-call interceptor without rebuilding the whole client
         OkHttpClient client = getSharedHttpClient().newBuilder()
-                .addInterceptor(new AuthInterceptor(authToken, "35647854073153455"))
+                .addInterceptor(new AuthInterceptor(authToken, "RFAY81MT22A"))
                 .build();
 
         return new Retrofit.Builder()
@@ -62,7 +62,7 @@ public class ApiClient {
     }
 
     public static UserService getUserService(String baseUrl, String authToken, String watchSerial) {
-        return getRetrofit(baseUrl, authToken, "35647854073153455").create(UserService.class);
+        return getRetrofit(baseUrl, authToken, "RFAY81MT22A").create(UserService.class);
     }
 
     private static SSLSocketFactory getSSLSocketFactory() {

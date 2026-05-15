@@ -399,7 +399,7 @@ public class ReadingsViewModel extends ViewModel {
         loading.setValue(true);
         error.setValue(null);
 
-        Call<Root> call = ApiClient.getUserService(baseUrl, token, imei).getReadingsLatest();
+        Call<Root> call = ApiClient.getUserService(baseUrl, token, imei).getReadingsLatest(imei);
         call.enqueue(new Callback<Root>() {
             @Override
             public void onResponse(Call<Root> call, Response<Root> response) {
@@ -459,7 +459,7 @@ public class ReadingsViewModel extends ViewModel {
         loading.setValue(true);
         error.setValue(null);
 
-        Call<Root> call = ApiClient.getUserService(baseUrl, token, imei).getReadingsLatest();
+        Call<Root> call = ApiClient.getUserService(baseUrl, token, imei).getReadingsLatest(imei);
         call.enqueue(new Callback<Root>() {
             @Override
             public void onResponse(Call<Root> call, Response<Root> response) {

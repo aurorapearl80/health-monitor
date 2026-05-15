@@ -91,8 +91,8 @@ public interface UserService {
     //api/doctor-watches/readings/latest
     //Request History
     //@GET("api/doctor-watches/readings/latest?isTest=1")
-    @GET("api/doctor-watches/readings/latest")
-    Call<Root> getReadingsLatest();
+    @GET("api/ble-devices/summary")
+    Call<Root> getReadingsLatest(@Query("serial") String serial);
 
 
     @GET("api/doctor-watches/readings")

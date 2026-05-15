@@ -28,7 +28,8 @@
     <uses-permission android:name="android.permission.health.READ_STEPS" /> <!-- Foreground service declarations (Android 12+) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" /> <!-- Add these ONLY if you actually run FGS for mic/camera at runtime -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" /> <!-- Add these ONLY if you actually run FGS for mic/camera at runtime -->
     <!-- Android 14+ (API 34) more specific FGS type -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" /> <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" /> -->
     <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" /> -->
@@ -185,7 +186,7 @@
             android:name=".services.MyForegroundService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="health" />
+            android:foregroundServiceType="dataSync" />
         <service
             android:name=".services.VideoCallService"
             android:exported="false"

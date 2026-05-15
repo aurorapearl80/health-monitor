@@ -9,8 +9,8 @@ public class Constant {
     public static final String PASSWORD = "password";
 
     //public static final String BASE_URL = "https://api.smarthealth1on1.com/";
-    public static final String BASE_URL = "http://43.205.55.171/";
-    public static final String BASE_URL_BGM = "http://43.205.55.171/";
+    public static final String BASE_URL = "https://familywatchtoday.com/";
+    public static final String BASE_URL_BGM = "https://familywatchtoday.com/";
     //public static final String BASE_URL_FALL_DETECTION = "https://preprod.drsecurityapp.com:8079/appservices/webservices/";
     public static final String BASE_URL_FALL_DETECTION = "https://lbaws.drsecurity.es/appservices/webservices/";
 

@@ -127,6 +127,21 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
         // Set the text
         model = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
 
+        model.getTemperature().observe(getViewLifecycleOwner(), temp -> {
+            if (temp == null) return;
+            Temperature list = databaseClient.getAppDatabase().temperatureDao().getLatestTemperature();
+            if (list == null) return;
+            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.CELSIUS_TEXT, false);
+            if (isConvert) {
+                binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", list.getTemperature()));
+                binding.tvUnit.setText(Constant.CELSIUS_VALUE);
+            } else {
+                binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", UnitConverter.celsiusToFahrenheit(list.getTemperature())));
+                binding.tvUnit.setText(Constant.FAHRENHEIT_VALUE);
+            }
+            binding.tvTimeAgo.setText(list.getCreatedAtFormatted());
+        });
+
         prefs = requireActivity().getSharedPreferences(Constant.PREFERENCE_BLOOD_GLUCOSE, MODE_PRIVATE);
         editor = prefs.edit();
 
@@ -456,26 +471,6 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
                             }
                         });
 
-                model.getTemperature().observe(getViewLifecycleOwner(), temp -> {
-                    Log.d(TAG, "The data of temperature Temperature fragment --------------------  "+temp);
-                    //binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", temp));
-                    Temperature list = databaseClient.getAppDatabase().temperatureDao().getLatestTemperature();
-                    if (list != null) {
-
-                        boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.CELSIUS_TEXT, false);
-                        Log.d(TAG, "weight get the data inside db "+isConvert);
-                        if(isConvert) {
-                            binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", list.getTemperature()));
-                            binding.tvUnit.setText(Constant.CELSIUS_VALUE);
-                        } else {
-                            binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", UnitConverter.celsiusToFahrenheit(list.getTemperature())));
-                            binding.tvUnit.setText(Constant.FAHRENHEIT_VALUE);
-                        }
-                        binding.tvTimeAgo.setText(list.getCreatedAtFormatted());
-                    }
-
-                });
-
                 return;
             }
 
@@ -494,32 +489,12 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
                                 }
                             });
 
-                    model.getTemperature().observe(getViewLifecycleOwner(), temp -> {
-                        Log.d(TAG, "The data of temperature Temperature fragment "+temp);
-                        //binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", temp));
-                        Temperature list = databaseClient.getAppDatabase().temperatureDao().getLatestTemperature();
-                        if (list != null) {
-
-                            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.CELSIUS_TEXT, false);
-                            Log.d(TAG, "weight get the data inside db "+isConvert);
-                            if(isConvert) {
-                                binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", list.getTemperature()));
-                                binding.tvUnit.setText(Constant.CELSIUS_VALUE);
-                            } else {
-                                binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", UnitConverter.celsiusToFahrenheit(list.getTemperature())));
-                                binding.tvUnit.setText(Constant.FAHRENHEIT_VALUE);
-                            }
-                            binding.tvTimeAgo.setText(list.getCreatedAtFormatted());
-                        }
-
-                    });
-
                     return;
                 }
 
                 vm.getTemperatureEventDescription().observe(getViewLifecycleOwner(), bpm -> {
                     if (bpm == null) return;
-
+                    Log.d(TAG, "weight get the data inside db Line 522");
                     // Default values
                     String displayTime = timeAgo;
                     String displayValue = "-- ";
@@ -560,25 +535,6 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
                                 }
                             });
 
-                    model.getTemperature().observe(getViewLifecycleOwner(), temp -> {
-                        Log.d(TAG, "The data of temperature Temperature fragment "+temp);
-                        //binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", temp));
-                        Temperature list = databaseClient.getAppDatabase().temperatureDao().getLatestTemperature();
-                        if (list != null) {
-
-                            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.CELSIUS_TEXT, false);
-                            Log.d(TAG, "weight get the data inside db "+isConvert);
-                            if(isConvert) {
-                                binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", list.getTemperature()));
-                                binding.tvUnit.setText(Constant.CELSIUS_VALUE);
-                            } else {
-                                binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", UnitConverter.celsiusToFahrenheit(list.getTemperature())));
-                                binding.tvUnit.setText(Constant.FAHRENHEIT_VALUE);
-                            }
-                            binding.tvTimeAgo.setText(list.getCreatedAtFormatted());
-                        }
-
-                    });
                 });
             });
         });
@@ -651,6 +607,7 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
             // Retrieve data from SharedPreferences
             Temperature list = databaseClient.getAppDatabase().temperatureDao().getLatestTemperature();
             if (list != null) {
+                Log.d(TAG, "weight get the data inside db line 654");
                 String valueBg = String.format(Locale.getDefault(), "%.1f", list.getTemperature());
                 binding.tvValueBg.setText(valueBg);
                 binding.tvTimeAgo.setText(list.getCreatedAtFormatted());

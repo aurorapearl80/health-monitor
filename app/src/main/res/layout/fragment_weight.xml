@@ -30,7 +30,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="20dp">
+                android:padding="4dp">
 
                 <!-- Main Weight Display -->
                 <LinearLayout
@@ -46,14 +46,14 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center"
-                        android:layout_marginBottom="12dp">
+                        android:layout_marginBottom="4dp">
 
                         <TextView
                             android:id="@+id/tvTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Weight Monitor"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
                             android:textColor="@android:color/white"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -71,7 +71,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="--"
-                            android:textSize="48sp"
+                            android:textSize="32sp"
                             android:textColor="@android:color/white"
                             android:textStyle="bold" />
 
@@ -80,10 +80,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text=""
-                            android:textSize="18sp"
+                            android:textSize="12sp"
                             android:textColor="@android:color/white"
                             android:layout_marginStart="6dp"
-                            android:layout_marginBottom="8dp" />
+                            android:layout_marginBottom="4dp" />
 
                     </LinearLayout>
                     <!-- Estimated Body Composition -->
@@ -92,7 +92,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Estimated Body Composition"
-                        android:textSize="13sp"
+                        android:textSize="10sp"
                         android:textColor="@android:color/white"
                         android:layout_marginTop="4dp"
                         android:textStyle="bold"
@@ -124,7 +124,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="13sp"
+                                android:textSize="11sp"
                                 android:textColor="@android:color/white"
                                 android:textStyle="bold" />
 
@@ -151,7 +151,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="13sp"
+                                android:textSize="11sp"
                                 android:textColor="@android:color/white"
                                 android:textStyle="bold" />
 
@@ -178,7 +178,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="13sp"
+                                android:textSize="11sp"
                                 android:textColor="@android:color/white"
                                 android:textStyle="bold" />
 
@@ -205,7 +205,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="13sp"
+                                android:textSize="11sp"
                                 android:textColor="@android:color/white"
                                 android:textStyle="bold" />
 
@@ -227,9 +227,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="14sp"
+                        android:textSize="10sp"
                         android:textColor="@android:color/white"
-                        android:layout_marginTop="8dp" />
+                        android:layout_marginTop="2dp" />
 
                     <!-- BMI Status (Optional) -->
                     <TextView
@@ -237,7 +237,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@android:color/white"
                         android:layout_marginTop="4dp"
                         android:alpha="0.8" />
@@ -250,23 +250,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:layout_marginBottom="20dp">
+                    android:layout_marginBottom="6dp">
 
                     <TextView
                         android:id="@+id/tvBPM"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BMI: "
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@android:color/white"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
                         android:gravity="center" />
 
                     <ImageView
                         android:id="@+id/heartIcon"
-                        android:layout_width="25dp"
+                        android:layout_width="18dp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
                         android:src="@drawable/ic_weight_foreground"
                         tools:ignore="UseAppTint" />
 
@@ -275,18 +275,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@android:color/white"
                         android:gravity="center" />
 
                     <ImageView
                         android:id="@+id/chartIcon"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:src="@drawable/ic_chart"
                         android:clickable="true"
                         android:focusable="true"
-                        android:layout_marginLeft="50dp"
+                        android:layout_marginLeft="16dp"
                         app:tint="@android:color/white" />
                 </LinearLayout>
                 <!-- Divider -->
@@ -309,8 +309,8 @@
 
     <ImageView
         android:id="@+id/ivConnectionStatus"
-        android:layout_width="31dp"
-        android:layout_height="31dp"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="8dp"
         android:contentDescription="Connection status"

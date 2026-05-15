@@ -506,6 +506,7 @@ public class BleScanService extends Service {
 
         //androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         androidId = DeviceUtils.getIMEI(getApplicationContext());
+        Log.d(TAG, "sending temperature serial ID: "+ androidId);
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
@@ -590,6 +591,7 @@ public class BleScanService extends Service {
                     sendWeightScale(stableInt);
                 } else {
                     Intent fallIntent = new Intent(Constant.ACTION_WEIGHT);
+                    fallIntent.setPackage(getPackageName());
                     fallIntent.putExtra(Constant.VALUE_WEIGHT, (double) stableInt);
                     saveWeighingScale(stableInt, 1, serial);
                     sendBroadcast(fallIntent);
@@ -1447,7 +1449,7 @@ public class BleScanService extends Service {
         );
         Log.d(TAG, "sendTemperature POST → url=" + Constant.BASE_URL_BGM + "api/temperatures"
                 + " | temperature=" + reading.getTemperature()
-                + " | serial=" + reading.getSerial()
+                + " | serial=" + androidId
                 + " | device_id=" + reading.getDevice_id()
                 + " | timezone=" + reading.getTimezone()
                 + " | measured_at=" + reading.getMeasured_at());
@@ -1465,9 +1467,13 @@ public class BleScanService extends Service {
 
 
                     playNotificationSound();
+
+                    Log.d(TAG, "Sending data "+temperature);
+
                     saveTemperatureData((double)temperature, 1, serial);
                     Intent fallIntent = new Intent(Constant.ACTION_TEMPERATURE);
-                    fallIntent.putExtra(Constant.VALUE_WEIGHT, (double) temperature);
+                    fallIntent.setPackage(getPackageName());
+                    fallIntent.putExtra(Constant.VALUE_TEMPERATURE, (double) temperature);
                     sendBroadcast(fallIntent);
                     restartBle();
 
@@ -1518,6 +1524,7 @@ public class BleScanService extends Service {
                 playNotificationSound();
                 ArrayList<Double> bloodpressureList = new ArrayList<>(Arrays.asList(systolic,diastolic, bpm));
                 Intent fallIntent = new Intent(Constant.ACTION_BLOOD_PRESSURE);
+                fallIntent.setPackage(getPackageName());
                 fallIntent.putExtra(Constant.VALUE_BLOOD_PRESSURE, bloodpressureList);
                 sendBroadcast(fallIntent);
                 Log.d("BP--- saving DB", "Systolic: " + (int)systolic + " Diastolic: " + (int)diastolic +"Blood pressure "+(int)bpm);
@@ -1624,6 +1631,7 @@ public class BleScanService extends Service {
                     saveOximeter((int) pulseRate, (int) oxygen, 1, serial);
 
                     Intent fallIntent = new Intent(Constant.ACTION_PULSE_OXIMETER);
+                    fallIntent.setPackage(getPackageName());
                     fallIntent.putExtra(Constant.VALUE_PULSE_OXIMETER_PULSE_RATE, (int)oxygen);
                     fallIntent.putExtra(Constant.VALUE_OXIMETER_PULSE_OXYGEN, (int)pulseRate);
                     sendBroadcast(fallIntent);
@@ -1992,6 +2000,7 @@ public class BleScanService extends Service {
 
             ///playNotificationSound();
             Intent fallIntent = new Intent(Constant.ACTION_WEIGHT);
+            fallIntent.setPackage(getPackageName());
             fallIntent.putExtra(Constant.VALUE_WEIGHT, weight);
             sendBroadcast(fallIntent);
             saveWeighingScale(weight, 1, serial);
@@ -2011,6 +2020,7 @@ public class BleScanService extends Service {
                         //saveTemperatureData(temperature);D
                         playNotificationSound();
                         Intent fallIntent = new Intent(Constant.ACTION_WEIGHT);
+                        fallIntent.setPackage(getPackageName());
                         fallIntent.putExtra(Constant.VALUE_WEIGHT, weight);
                         sendBroadcast(fallIntent);
                         saveWeighingScale(weight, 1, serial);
@@ -2107,6 +2117,7 @@ public class BleScanService extends Service {
             Log.d(TAG, "No internet connection from BLE Services");
             saveData(glucose, 1, serial, mailValue,  unitValue);
             Intent fallIntent = new Intent(Constant.ACTION_BLOOD_GLUCOSE);
+            fallIntent.setPackage(getPackageName());
             fallIntent.putExtra(Constant.ACTION_BLOOD_GLUCOSE, (double)glucose);
             fallIntent.putExtra(Constant.VALUE_BLOOD_GLUCOSE_MAIL_VALUE, mailValue);
             fallIntent.putExtra(Constant.VALUE_BLOOD_GLUCOSE_UNIT_VALUE, unitValue);
@@ -2163,6 +2174,7 @@ public class BleScanService extends Service {
                     saveData(glucose, 1, serial, mailValue, unitValue);
                     playNotificationSound();
                     Intent fallIntent = new Intent(Constant.ACTION_BLOOD_GLUCOSE);
+                    fallIntent.setPackage(getPackageName());
                     fallIntent.putExtra(Constant.VALUE_BLOOD_GLUCOSE, glucose);
                     fallIntent.putExtra(Constant.VALUE_BLOOD_GLUCOSE_MAIL_VALUE, mailValue);
                     fallIntent.putExtra(Constant.VALUE_BLOOD_GLUCOSE_UNIT_VALUE, unitValue);

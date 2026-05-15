@@ -46,14 +46,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:layout_marginBottom="12dp">
-                    
+                    android:layout_marginBottom="4dp">
+
                     <TextView
                         android:id="@+id/tvTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Temperature"
-                        android:textSize="14sp"
+                        android:textSize="11sp"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -64,23 +64,24 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="4dp">
 
                     <TextView
                         android:id="@+id/tv_value_bg"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
-                        android:textSize="48sp"
+                        android:textSize="32sp"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:layout_width="18dp"
-                        android:layout_height="23dp"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginBottom="14dp"
+                        android:layout_width="14dp"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginBottom="8dp"
                         android:id="@+id/tvUnit"
+                        android:textSize="12sp"
                         android:textColor="@color/white"
                         app:tint="@android:color/white" />
 
@@ -92,9 +93,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="--"
-                    android:textSize="14sp"
+                    android:textSize="10sp"
                     android:textColor="@android:color/white"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="2dp" />
 
                 <!-- BMI Status (Optional) -->
 
@@ -107,24 +108,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="6dp">
 
                 <TextView
                     android:id="@+id/tvBPM"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:textColor="@android:color/white"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:gravity="center" />
 
                 <ImageView
                     android:id="@+id/heartIcon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:src="@drawable/ic_temperature1_foreground"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:textColor="@android:color/white"
                     tools:ignore="UseAppTint" />
 
@@ -133,17 +134,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:textColor="@android:color/white"
                     android:gravity="center" />
                 <ImageView
                     android:id="@+id/chartIcon"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:src="@drawable/ic_chart"
                     android:clickable="true"
                     android:focusable="true"
-                    android:layout_marginLeft="50dp"
+                    android:layout_marginLeft="16dp"
                     app:tint="@android:color/white" />
 
             </LinearLayout>
