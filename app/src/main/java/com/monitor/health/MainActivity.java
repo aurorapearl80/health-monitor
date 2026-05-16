@@ -734,14 +734,6 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
         model.setImeData(DeviceUtils.getIMEI(this));
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-                !getPackageManager().canRequestPackageInstalls()) {
-            Intent intentInstall = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
-            intentInstall.setData(Uri.parse("package:" + getPackageName()));
-            intentInstall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intentInstall);
-            return;
-        }
         //String downloadUrl = "https://drive.google.com/uc?export=download&id=1yFOr03N70nLHSumoy23xAdNq6N52VbMs";
         //String downloadUrl = "https://sample-file.bazadanni.com/download/applications/android/sample.apk";
         //downloadAndInstallApk(downloadUrl);
@@ -928,7 +920,7 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
 //            Log.d("Key-change", "Accessibility already enabled. No popup.");
 //        }
         //databaseClient.getAppDatabase().bleDeviceDao().deleteAll();
-        getAssignDevices();
+        //getAssignDevices();
         //databaseClient.getAppDatabase().bleDeviceDao().resetAllConnections();
 
         checkAccessibilityServices();
@@ -1010,19 +1002,31 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
             boolean isIgnoring = pm.isIgnoringBatteryOptimizations(packageName);
             Log.d("MainActivity", "Battery optimization disabled: " + isIgnoring);
 
-            if (!isIgnoring) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Enable Continuous Monitoring")
-                        .setMessage("This medical device app needs to run continuously. Please disable battery optimization.")
-                        .setPositiveButton("OK", (dialog, which) -> {
-                            Intent intent = new Intent();
-                            intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                            intent.setData(Uri.parse("package:" + packageName));
+            if (isIgnoring) return;
+
+            android.content.SharedPreferences prefs =
+                    getSharedPreferences("app_prefs", MODE_PRIVATE);
+            boolean alreadyPrompted = prefs.getBoolean("battery_opt_prompted", false);
+            if (alreadyPrompted) return;
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Enable Continuous Monitoring")
+                    .setMessage("This medical device app needs to run continuously. Please disable battery optimization.")
+                    .setPositiveButton("Go to Settings", (dialog, which) -> {
+                        prefs.edit().putBoolean("battery_opt_prompted", true).apply();
+                        try {
+                            Intent intent = new Intent(
+                                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                                    Uri.parse("package:" + packageName));
                             startActivity(intent);
-                        })
-                        .setCancelable(false)
-                        .show();
-            }
+                        } catch (Exception e) {
+                            startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+                        }
+                    })
+                    .setNegativeButton("Not now", (dialog, which) ->
+                            prefs.edit().putBoolean("battery_opt_prompted", true).apply())
+                    .setCancelable(false)
+                    .show();
         }
     }
 
@@ -2533,6 +2537,7 @@ private void startHearRateSensorService() {
     }
 
     private void getAssignDevices() {
+        Log.d(TAG, "Running assign data -- ");
         try {
             String token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
 
@@ -2561,6 +2566,7 @@ private void startHearRateSensorService() {
 
         } catch (Exception e) {
             Log.e(TAG, "âŒ Exception during server sync", e);
+            Log.d(TAG, "Error assign data -- ");
         }
     }
 

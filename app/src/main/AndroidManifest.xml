@@ -31,14 +31,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" /> <!-- Add these ONLY if you actually run FGS for mic/camera at runtime -->
     <!-- Android 14+ (API 34) more specific FGS type -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" /> <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" /> -->
-    <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" /> -->
-    <!-- Only keep what you truly need from below; these often cause issues if misused -->
+
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- <uses-permission -->
-    <uses-permission android:name="android.permission.CAMERA" />
+
 
 
     <uses-feature
@@ -46,8 +42,7 @@
         android:required="false" /> <!-- android:name="android.permission.CAMERA" -->
     <!-- tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" /> -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission
         android:name="android.permission.BATTERY_STATS"
@@ -211,11 +206,6 @@
             android:exported="false"
             tools:ignore="Instantiatable" /> <!-- <service -->
 <!-- FCM -->
-        <!-- Foreground service that posts the full-screen notification -->
-        <service
-            android:name=".services.CallFgService"
-            android:exported="false"
-            android:foregroundServiceType="phoneCall" /> <!-- Your service declaration -->
         <service
             android:name=".services.MyFirebaseMessagingService"
             android:exported="false">

@@ -11,6 +11,8 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -23,6 +25,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.monitor.health.ApiClient;
 import com.monitor.health.Constant;
@@ -172,20 +175,40 @@ public class TestService extends Service {
     }
 
     private void startInForeground() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            NotificationChannel ch = new NotificationChannel(
-                    NOTIF_CH_ID, "Health Uploads", NotificationManager.IMPORTANCE_LOW
-            );
-            nm.createNotificationChannel(ch);
+        // Android 14+ enforces that foregroundServiceType=health requires at least one
+        // prerequisite runtime permission (ACTIVITY_RECOGNITION, health.READ_HEART_RATE, etc.).
+        // After clearing app data, these are revoked — stop gracefully instead of crashing.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "ACTIVITY_RECOGNITION not granted — skipping TestService startup");
+            stopSelf();
+            return;
         }
+
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationChannel ch = new NotificationChannel(
+                NOTIF_CH_ID, "Health Uploads", NotificationManager.IMPORTANCE_LOW);
+        nm.createNotificationChannel(ch);
+
         Notification notif = new NotificationCompat.Builder(this, NOTIF_CH_ID)
                 .setContentTitle("Health sync running")
                 .setContentText("Collecting & uploading data")
                 .setSmallIcon(android.R.drawable.stat_sys_upload)
                 .setOngoing(true)
                 .build();
-        startForeground(NOTIF_ID, notif);
+
+        try {
+            // Android 14+ (API 34) requires the service type in the startForeground() call
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                startForeground(NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH);
+            } else {
+                startForeground(NOTIF_ID, notif);
+            }
+        } catch (SecurityException e) {
+            Log.e(TAG, "startForeground failed — prerequisite permission not granted", e);
+            stopSelf();
+        }
     }
 
     private void uploadAndStop() {

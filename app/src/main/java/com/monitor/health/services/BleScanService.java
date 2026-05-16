@@ -129,7 +129,8 @@ public class BleScanService extends Service {
 
     private final Handler bleHandler = new Handler(Looper.getMainLooper());
     private boolean isConnecting = false;
-    private String connectingAddress = null;
+    private String connectingAddress = null;   // device name (for spam guard)
+    private String connectingMac = null;       // MAC address (for GATT retries)
     private int connectRetry = 0;
     private static final int MAX_CONNECT_RETRY = 3;
 
@@ -154,6 +155,11 @@ public class BleScanService extends Service {
     private volatile Set<String> dbDeviceNameCache = Collections.emptySet();
     private volatile long lastDbDeviceNameCacheAt = 0L;
     private static final long DB_DEVICE_NAME_CACHE_TTL_MS = 15_000; // refresh every 15s
+
+    // TypeAvailability cache — controls which device types are active
+    private volatile com.monitor.health.entity.TypeAvailabilityEntity cachedTypeAvailability = null;
+    private volatile long lastTypeAvailabilityCacheAt = 0L;
+    private static final long TYPE_CACHE_TTL_MS = 15_000;
 
 
 
@@ -257,44 +263,23 @@ public class BleScanService extends Service {
     private List<android.bluetooth.le.ScanFilter> getScreenOffScanFilters() {
         List<android.bluetooth.le.ScanFilter> filters = new ArrayList<>();
 
-        // Get device names from database and create filters
-        dbExecutor.execute(() -> {
-            try {
-                List<BleDeviceModel> dbDevices = databaseClient.getAppDatabase().bleDeviceDao().getConnectedDevices();
-                for (BleDeviceModel device : dbDevices) {
-                    if (device.getDeviceName() != null && !device.getDeviceName().isEmpty()) {
-                        filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                                .setDeviceName(device.getDeviceName())
-                                .build());
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error creating device name filters", e);
+        // Use the already-cached device names (populated in onCreate and refreshed periodically)
+        for (String cachedName : dbDeviceNameCache) {
+            if (cachedName != null && !cachedName.isEmpty()) {
+                filters.add(new android.bluetooth.le.ScanFilter.Builder()
+                        .setDeviceName(cachedName)
+                        .build());
             }
-        });
+        }
 
-        // Add default device name filters
-        filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                .setDeviceName("JPD Scale")
-                .build());
+        // Fallback hardcoded names in case DB is empty
+        if (filters.isEmpty()) {
+            for (String name : new String[]{"JPD Scale", "JPD BPM", "My Thermometer", "My Oximeter", "EMPECS-BBXK010027"}) {
+                filters.add(new android.bluetooth.le.ScanFilter.Builder().setDeviceName(name).build());
+            }
+        }
 
-        filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                .setDeviceName("JPD BPM")
-                .build());
-
-        filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                .setDeviceName("My Thermometer")
-                .build());
-
-        filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                .setDeviceName("My Oximeter")
-                .build());
-
-        filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                .setDeviceName("EMPECS-BBXK010027")
-                .build());
-
-        // If no filters, keep at least one filter (required for screen-off "filtered scan")
+        // Screen-off scan requires at least one filter
         if (filters.isEmpty()) {
             filters.add(new android.bluetooth.le.ScanFilter.Builder().build());
         }
@@ -524,6 +509,17 @@ public class BleScanService extends Service {
 
         startDeviceSync();
 
+        // Pre-warm the TypeAvailability cache so isKnownDevice works on the very first scan
+        dbExecutor.execute(() -> {
+            try {
+                cachedTypeAvailability = databaseClient.getAppDatabase()
+                        .typeAvailabilityDao().getSingleTypeAvailability();
+                lastTypeAvailabilityCacheAt = System.currentTimeMillis();
+                Log.d(TAG, "Pre-warmed TypeAvailability cache: " + cachedTypeAvailability);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to pre-warm TypeAvailability cache", e);
+            }
+        });
 
         startBleScan();
 
@@ -737,14 +733,18 @@ public class BleScanService extends Service {
         }
 
         if (!wakeLock.isHeld()) {
-            wakeLock.acquire(30 * 1000L); // Hold for 30 seconds
-            Log.d(TAG, "WakeLock acquired with screen wake");
+            wakeLock.acquire(10 * 60 * 1000L); // Hold for 10 minutes; refreshRunnable keeps it alive
+            Log.d(TAG, "WakeLock acquired");
+            // Start the periodic refresh so the lock never expires while service is running
+            wakeLockHandler.removeCallbacks(wakeLockRefreshRunnable);
+            wakeLockHandler.postDelayed(wakeLockRefreshRunnable, 9 * 60 * 1000L);
         }
     }
 
 
 
     private void releaseWakeLock() {
+        wakeLockHandler.removeCallbacks(wakeLockRefreshRunnable);
         try {
             if (wakeLock != null && wakeLock.isHeld()) {
                 wakeLock.release();
@@ -809,8 +809,7 @@ public class BleScanService extends Service {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             lastResultAt = System.currentTimeMillis();
-            // Refresh device name cache if needed
-            refreshDbDeviceNameCacheIfNeeded();
+            refreshTypeAvailabilityCacheIfNeeded();
 
             BluetoothDevice device = result.getDevice();
             if (device == null) return;
@@ -819,17 +818,14 @@ public class BleScanService extends Service {
             String deviceAddress = device.getAddress();
 
             if (deviceName == null || deviceName.isEmpty()) {
-                return; // Skip devices without names
+                return;
             }
 
-            //Log.d(TAG, "Device found: " + deviceName + " - " + deviceAddress);
-
-            // âœ… ONLY connect if device name exists in database
-            if (!isDeviceNameInDb(deviceName)) {
-                return; // not in DB => ignore completely
+            if (!isKnownDevice(deviceName)) {
+                return;
             }
 
-            //Log.d(TAG, "Device name found in database: " + deviceName);
+            Log.d(TAG, "Known device found: " + deviceName + " - " + deviceAddress);
 
             // Grab scan data IF available (don't require it)
             ScanRecord scanRecord = result.getScanRecord();
@@ -849,7 +845,8 @@ public class BleScanService extends Service {
 
             if (isConnecting) return;
             isConnecting = true;
-            connectingAddress = deviceName; // Store device name instead of MAC
+            connectingAddress = deviceName;
+            connectingMac = deviceAddress;
 
             // Stop scan so you don't connect multiple times
             stopScanSafe();
@@ -890,6 +887,42 @@ public class BleScanService extends Service {
         return dbDeviceNameCache.contains(norm);
     }
 
+    private void refreshTypeAvailabilityCacheIfNeeded() {
+        long now = System.currentTimeMillis();
+        if (now - lastTypeAvailabilityCacheAt < TYPE_CACHE_TTL_MS) return;
+        lastTypeAvailabilityCacheAt = now;
+        dbExecutor.execute(() -> {
+            try {
+                cachedTypeAvailability = databaseClient.getAppDatabase()
+                        .typeAvailabilityDao().getSingleTypeAvailability();
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to refresh TypeAvailability cache", e);
+            }
+        });
+    }
+
+    private boolean isKnownDevice(String deviceName) {
+        if (deviceName == null || deviceName.isEmpty()) return false;
+
+        com.monitor.health.entity.TypeAvailabilityEntity t = cachedTypeAvailability;
+        if (t == null) {
+            // Cache not ready yet — fall back to allowing all known device names
+            return deviceName.contains("EMPECS")
+                    || deviceName.contains("Thermometer")
+                    || deviceName.contains("JPD")
+                    || deviceName.contains("My Oximeter")
+                    || deviceName.contains("JPD Scale");
+        }
+
+        if (t.isBloodGlucose()   && deviceName.contains("EMPECS"))      return true;
+        if (t.isBloodPressure()  && deviceName.contains("JPD"))         return true;
+        if (t.isWeight()         && deviceName.contains("JPD Scale"))   return true;
+        if (t.isBloodOxygen()    && deviceName.contains("My Oximeter")) return true;
+        if (t.isTemperature()    && deviceName.contains("Thermometer")) return true;
+        // electrocardiogram — no device paired yet
+
+        return false;
+    }
 
     private void refreshDbMacCacheIfNeeded() {
         long now = System.currentTimeMillis();
@@ -1051,15 +1084,16 @@ public class BleScanService extends Service {
                 isConnecting = false;
 
                 // Retry a few times (133 often recovers on retry without toggling BT)
-                if (status == 133 && connectRetry < MAX_CONNECT_RETRY && connectingAddress != null) {
+                if (status == 133 && connectRetry < MAX_CONNECT_RETRY && connectingMac != null) {
                     int delay = 700 * (connectRetry + 1); // 700ms, 1400ms, 2100ms
                     connectRetry++;
 
                     Log.d(TAG, "GATT 133 -> retry " + connectRetry + " in " + delay + "ms");
 
+                    final String retryMac = connectingMac;
                     bleHandler.postDelayed(() -> {
                         if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
-                            BluetoothDevice d = bluetoothAdapter.getRemoteDevice(connectingAddress);
+                            BluetoothDevice d = bluetoothAdapter.getRemoteDevice(retryMac);
                             connectToDevice(d);
                         } else {
                             startScanSafe();
@@ -1069,6 +1103,7 @@ public class BleScanService extends Service {
                     // Give up and go back to scanning
                     connectRetry = 0;
                     connectingAddress = null;
+                    connectingMac = null;
                     startScanSafe();
                 }
                 return;
@@ -1085,6 +1120,8 @@ public class BleScanService extends Service {
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 isConnecting = false;
+                connectingAddress = null;
+                connectingMac = null;
 
                 try { gatt.close(); } catch (Exception ignore) {}
                 bluetoothGatt = null;
