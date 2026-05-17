@@ -11,15 +11,10 @@ import com.monitor.health.ApiClient;
 import com.monitor.health.model.ReadingValueEcg;
 import com.monitor.health.response.readinghistory.ReadingHistoryItem;
 import com.monitor.health.response.readinghistory.ReadingHistoryResponse;
+import com.monitor.health.response.alldata.ConvertedValue;
 import com.monitor.health.response.alldata.DataItem;
 import com.monitor.health.response.alldata.ReadingMetricValue;
 import com.monitor.health.response.alldata.ReadingValueActivity;
-import com.monitor.health.response.alldata.ReadingValueBloodPressure;
-import com.monitor.health.response.alldata.ReadingValueECG;
-import com.monitor.health.response.alldata.ReadingValueGlucose;
-import com.monitor.health.response.alldata.ReadingValueOxygen;
-import com.monitor.health.response.alldata.ReadingValueTemperature;
-import com.monitor.health.response.alldata.ReadingValueWeight;
 import com.monitor.health.response.alldata.Root;
 import com.monitor.health.response.alldata.TypesAvailability;
 import com.monitor.health.utility.TimeAgo;
@@ -495,159 +490,129 @@ public class ReadingsViewModel extends ViewModel {
     // --- Helpers ---
 
     private void dispatchItem(DataItem item) {
-        if (item == null || item.getReadingType() == null || item.getReadingType().isEmpty()) return;
+        if (item == null) return;
 
-        String desc = safe(item.getReadingType().get(0).getDescription()); // e.g., "Blood Glucose"
+        String type = item.getType();
+        if (type == null || type.isEmpty()) return;
 
+        // Items with no data: leave LiveData at its current value (fragments show "--" on null)
+        if ("no_data".equals(item.getStatus()) || item.getValue() == null || item.getValue().isEmpty()) {
+            Log.d("ViewModel", "no_data for type=" + type);
+            return;
+        }
 
+        List<Object> rawValues = item.getValue();
+        String timeAgo = TimeAgo.relativeFromIsoUtc(item.getDeviceReadingDate());
 
-        switch (desc) {
-            case "Blood Glucose": {
-                ReadingMetricValue v = convert(item.getReadingMetricValues().get(0), ReadingMetricValue.class);
-                glucoseUpdatedAt.setValue(TimeAgo.relativeFromIsoUtc(item.getDeviceReadingDate()));
-                if (v != null) {
-                    glucose.setValue(v);
-                    glucoseEventDescription.setValue(String.valueOf(item.getReadingValue()));
-                    String type = item.getReadingType() != null && !item.getReadingType().isEmpty()
-                            ? item.getReadingType().get(0).getDescription() : "";
-                    if ("Blood Glucose".equals(type)) {
-                        Gson gson = new Gson();
-                        ReadingValueGlucose g = gson.fromJson(gson.toJsonTree(item.getReadingValue()),
-                                ReadingValueGlucose.class);
-                        if (g != null) glucoseEventDescription.setValue(String.valueOf(g.getEventDescription()));
-                    }
-                }
-
-
+        switch (type) {
+            case "blood_glucose": {
+                double glucoseVal = toDouble(rawValues.get(0));
+                ReadingMetricValue m = new ReadingMetricValue();
+                m.setValue(glucoseVal);
+                m.setUnit("mg/dL");
+                glucoseUpdatedAt.setValue(timeAgo);
+                glucose.setValue(m);
+                glucoseEventDescription.setValue("");
                 break;
             }
-            case "Blood Pressure": {
-                List<ReadingMetricValue> v = Arrays.asList(convert(item.getReadingMetricValues(), ReadingMetricValue[].class));
-                //if (v != null) bloodPressure.setValue(v);
-                bpUpdatedAt.setValue(TimeAgo.relativeFromIsoUtc(item.getUpdatedAt()));
-                if (v != null) {
-                    bloodPressure.setValue(v);
-                    bpEventDescription.setValue(String.valueOf(item.getReadingValue()));
-                    String type = item.getReadingType() != null && !item.getReadingType().isEmpty()
-                            ? item.getReadingType().get(0).getDescription() : "";
-                    if ("Blood Pressure".equals(type)) {
-                        Gson gson = new Gson();
-                        ReadingValueGlucose g = gson.fromJson(gson.toJsonTree(item.getReadingValue()),
-                                ReadingValueGlucose.class);
-                        if (g != null) bpEventDescription.setValue(String.valueOf(g.getEventDescription()));
-                    }
-                }
+            case "blood_pressure": {
+                if (rawValues.size() < 3) return;
+                double systolic  = toDouble(rawValues.get(0));
+                double diastolic = toDouble(rawValues.get(1));
+                double bpm       = toDouble(rawValues.get(2));
+
+                ReadingMetricValue sys = new ReadingMetricValue();
+                sys.setValue(systolic);
+                sys.setUnit("mmHg");
+
+                ReadingMetricValue dia = new ReadingMetricValue();
+                dia.setValue(diastolic);
+                dia.setUnit("mmHg");
+
+                ReadingMetricValue pulse = new ReadingMetricValue();
+                pulse.setValue(bpm);
+                pulse.setUnit("bpm");
+
+                bpUpdatedAt.setValue(timeAgo);
+                bloodPressure.setValue(Arrays.asList(sys, dia, pulse));
+                bpEventDescription.setValue("");
                 break;
             }
-            case "Blood Oxygen": {
-                List<ReadingMetricValue> v = Arrays.asList(convert(item.getReadingMetricValues(), ReadingMetricValue[].class));
-                oxygenUpdatedAt.setValue(TimeAgo.relativeFromIsoUtc(item.getUpdatedAt()));
-                oxygen.setValue(v);
-                oxygenEventDescription.setValue(String.valueOf(item.getReadingValue()));
-                String type = item.getReadingType() != null && !item.getReadingType().isEmpty()
-                        ? item.getReadingType().get(0).getDescription() : "";
-                if ("Blood Oxygen".equals(type)) {
-                    Gson gson = new Gson();
-                    ReadingValueGlucose g = gson.fromJson(gson.toJsonTree(item.getReadingValue()),
-                            ReadingValueGlucose.class);
-                    if (g != null) oxygenEventDescription.setValue(String.valueOf(g.getEventDescription()));
-                }
+            case "weight": {
+                double kgs = toDouble(rawValues.get(0));
+                double lbs = kgs * 2.20462;
+
+                ConvertedValue lbsCV = new ConvertedValue();
+                lbsCV.setValue(Math.round(lbs * 10.0) / 10.0);
+                lbsCV.setUnit("lbs");
+
+                ConvertedValue kgsCV = new ConvertedValue();
+                kgsCV.setValue(kgs);
+                kgsCV.setUnit("kgs");
+
+                ReadingMetricValue wm = new ReadingMetricValue();
+                wm.setValue(kgs);
+                wm.setUnit("kgs");
+                wm.setShould_convert(true);
+                wm.setConvertedValues(Arrays.asList(lbsCV, kgsCV));
+
+                weightUpdatedAt.setValue(timeAgo);
+                weight.setValue(Arrays.asList(wm));
+                weightEventDescription.setValue("");
                 break;
             }
-            case "Temperature": {
-                List<ReadingMetricValue> v = Arrays.asList(convert(item.getReadingMetricValues(), ReadingMetricValue[].class));
-                //temperature.setValue(v);
-                temperatureUpdatedAt.setValue(TimeAgo.relativeFromIsoUtc(item.getUpdatedAt()));
-                temperature.setValue(v);
-                temperatureEventDescription.setValue(String.valueOf(item.getReadingValue()));
-                String type = item.getReadingType() != null && !item.getReadingType().isEmpty()
-                        ? item.getReadingType().get(0).getDescription() : "";
-                if ("Temperature".equals(type)) {
-                    Gson gson = new Gson();
-                    ReadingValueGlucose g = gson.fromJson(gson.toJsonTree(item.getReadingValue()),
-                            ReadingValueGlucose.class);
-                    if (g != null) temperatureEventDescription.setValue(String.valueOf(g.getEventDescription()));
-                }
+            case "blood_oxygen": {
+                if (rawValues.size() < 2) return;
+                double spo2  = toDouble(rawValues.get(0));
+                double pulse = toDouble(rawValues.get(1));
+
+                ConvertedValue pulseCV = new ConvertedValue();
+                pulseCV.setValue(pulse);
+                pulseCV.setUnit("bpm");
+
+                ReadingMetricValue pulseMetric = new ReadingMetricValue();
+                pulseMetric.setValue(pulse);
+                pulseMetric.setUnit("bpm");
+                pulseMetric.setConvertedValues(Arrays.asList(pulseCV));
+
+                ConvertedValue spo2CV = new ConvertedValue();
+                spo2CV.setValue(spo2);
+                spo2CV.setUnit("%");
+
+                ReadingMetricValue spo2Metric = new ReadingMetricValue();
+                spo2Metric.setValue(spo2);
+                spo2Metric.setUnit("%");
+                spo2Metric.setConvertedValues(Arrays.asList(spo2CV));
+
+                oxygenUpdatedAt.setValue(timeAgo);
+                oxygen.setValue(Arrays.asList(pulseMetric, spo2Metric));
+                oxygenEventDescription.setValue("");
                 break;
             }
-            case "Weight": {
-                List<ReadingMetricValue> v = Arrays.asList(convert(item.getReadingMetricValues(), ReadingMetricValue[].class));
-                weightUpdatedAt.setValue(TimeAgo.relativeFromIsoUtc(item.getUpdatedAt()));
-                if (v != null) {
-                    weight.setValue(v);
-                    weightEventDescription.setValue(String.valueOf(item.getReadingValue()));
-                    String type = item.getReadingType() != null && !item.getReadingType().isEmpty()
-                            ? item.getReadingType().get(0).getDescription() : "";
-                    if ("Weight".equals(type)) {
-                        Gson gson = new Gson();
-                        ReadingValueGlucose g = gson.fromJson(gson.toJsonTree(item.getReadingValue()),
-                                ReadingValueGlucose.class);
-                        if (g != null) weightEventDescription.setValue(String.valueOf(g.getEventDescription()));
-                    }
-                }
-                break;
-            }
-            case "ECG": {
+            case "temperature": {
+                double celsius    = toDouble(rawValues.get(0));
+                double fahrenheit = Math.round(((celsius * 9.0 / 5.0) + 32.0) * 10.0) / 10.0;
 
-                Log.d("ECG: ", "result "+ desc + " this is the");
+                ConvertedValue fahrenheitCV = new ConvertedValue();
+                fahrenheitCV.setValue(fahrenheit);
+                fahrenheitCV.setUnit("°F");
 
-                //ReadingValueECG v = convert(item.getReadingValue(), ReadingValueECG.class);
-//                List<ReadingMetricValue> v = Arrays.asList(convert(item.getReadingMetricValues(), ReadingMetricValue[].class));
-//                if (v != null) ecg.setValue(v);
-                List<ReadingMetricValue> v = Arrays.asList(convert(item.getReadingMetricValues(), ReadingMetricValue[].class));
+                ConvertedValue celsiusCV = new ConvertedValue();
+                celsiusCV.setValue(celsius);
+                celsiusCV.setUnit("°C");
 
-                //temperature.setValue(v);
-                Log.d("ECG: ", "result value - mao"+ item.toString()+ " this is the");
-                if(item != null) {
-                    if(item.getReadingMetricValues() != null) {
-                        Log.d("ECG: ", "result value - mao" + item.getReadingMetricValues());
-                        Log.d("ECG: ", "result value - mao" + item.getReadingMetricValues());
-                    }
-                }
-                ecgUpdatedAt.setValue(TimeAgo.relativeFromIsoUtc(item.getUpdatedAt()));
+                ReadingMetricValue tm = new ReadingMetricValue();
+                tm.setValue(celsius);
+                tm.setUnit("°C");
+                tm.setConvertedValues(Arrays.asList(fahrenheitCV, celsiusCV));
 
-//                Object value = item.getReadingValue();
-//
-//                if (value instanceof java.util.Map) {
-//                    java.util.Map<?, ?> map = (java.util.Map<?, ?>) value;
-//
-//                    double heartRate = toDouble(map.get("heartRate"));
-//                    double length = toDouble(map.get("ecgMeasurementLength"));
-//                    double mood = toDouble(map.get("mood"));
-//
-//                    Log.d("ECG: break", "HR=" + heartRate + ", len=" + length + ", mood=" + mood);
-//
-//                    ReadingValueEcg ecgL = new ReadingValueEcg();
-//                    ecgL.setHeartRate(heartRate);
-//                    ecgL.setEcgMeasurementLength(length);
-//                    ecgL.setMood(mood);
-//
-//                    ecgServer.setValue(ecgL);
-//                } else {
-//                    Log.d("ECG: break", "Not a Map. class=" + (value == null ? "null" : value.getClass().getName()));
-//                }
-
-
-
-                ecg.setValue(v);
-                ecgEventDescription.setValue(String.valueOf(item.getReadingValue()));
-                String type = item.getReadingType() != null && !item.getReadingType().isEmpty()
-                        ? item.getReadingType().get(0).getDescription() : "";
-                if ("ECG".equals(type)) {
-                    Gson gson = new Gson();
-                    ReadingValueGlucose g = gson.fromJson(gson.toJsonTree(item.getReadingValue()),
-                            ReadingValueGlucose.class);
-                    if (g != null) ecgEventDescription.setValue(String.valueOf(g.getEventDescription()));
-                }
-                break;
-            }
-            case "Activity": {
-                ReadingValueActivity v = convert(item.getReadingValue(), ReadingValueActivity.class);
-                if (v != null) activity.setValue(v);
+                temperatureUpdatedAt.setValue(timeAgo);
+                temperature.setValue(Arrays.asList(tm));
+                temperatureEventDescription.setValue("");
                 break;
             }
             default:
-                // Unknown type; ignore or log
+                Log.d("ViewModel", "unhandled type=" + type);
                 break;
         }
     }

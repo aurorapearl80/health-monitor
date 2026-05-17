@@ -16,7 +16,9 @@
       "PowerShell(Test-Path \"C:\\\\Users\\\\DeeDee\\\\AndroidStudioProjects\\\\monitor-your-health\\\\app\\\\src\\\\main\\\\res\\\\raw\"; Get-ChildItem -Path \"C:\\\\Users\\\\DeeDee\\\\AndroidStudioProjects\\\\monitor-your-health\\\\app\\\\src\\\\main\\\\res\\\\raw\" -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq \".json\" } | Select-Object Name)",
       "Bash(jar tf *)",
       "Bash(Get-ChildItem -Directory)",
-      "Bash(Select-Object -ExpandProperty Name)"
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(python3 *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\DeeDee\\\\AndroidStudioProjects\\\\monitor-your-health\" -Recurse -Filter \"ProfileFragment.java\")"
     ]
   }
 }

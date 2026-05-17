@@ -113,6 +113,7 @@ import com.monitor.health.utility.PreferenceHelper;
 import com.monitor.health.utility.SmartWatchAlertDialog;
 import com.monitor.health.utility.TimeAgo;
 import com.monitor.health.utility.TimeConverter;
+import com.monitor.health.viewmodel.ProfileViewModel;
 import com.monitor.health.viewmodel.ReadingsViewModel;
 import com.monitor.health.viewmodel.SharedDataViewModel;
 import com.monitor.health.worker.ServiceKeepaliveWorker;
@@ -818,6 +819,11 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
                 "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%",
                 DeviceUtils.getIMEI(this)
         );
+
+        // Load user profile early so measurement_units are cached in PreferenceHelper
+        // before WeightFragment (and others) need them for unit conversion.
+        ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel.fetchBleDeviceUserProfile(null, androidId);
 
         loadingOverlay.setVisibility(View.VISIBLE);
 

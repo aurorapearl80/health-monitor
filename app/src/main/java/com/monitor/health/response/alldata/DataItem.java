@@ -3,6 +3,7 @@ package com.monitor.health.response.alldata;
 import java.util.List;
 
 public class DataItem {
+    private String type;
     private List<Object> value; // holds raw numbers
     private Object readingValue; // one of the ReadingValue* classes
     private String timezone;
@@ -22,6 +23,9 @@ public class DataItem {
     private List<ReadingMetricValue> readingMetricValues;
 
     // getters & setters...
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
     public List<Object> getValue() {
         return value;

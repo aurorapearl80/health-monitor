@@ -317,9 +317,9 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
                     if (list != null) {
 
                         Log.d(TAG, "weight get the data inside db "+UnitConverter.kiloToPounds(weight));
-                        String weightUnit = PreferenceHelper.getInstance(getContext()).getString(Constant.weightUnit, "");
+                        String weightUnit = getWeightUnitLabel();
                         binding.tvUnit.setText(weightUnit);
-                        boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.weightUnitBoolean, false);
+                        boolean isConvert = isWeightInKilograms();
                         Log.d(TAG, "weight get the data inside db "+isConvert);
                         if(isConvert) {
                             binding.tvValueBg.setText(String.valueOf(weight));
@@ -390,9 +390,9 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
                         if (list != null) {
 
                             Log.d(TAG, "weight get the data inside db "+UnitConverter.kiloToPounds(weight));
-                            String weightUnit = PreferenceHelper.getInstance(getContext()).getString(Constant.weightUnit, "");
+                            String weightUnit = getWeightUnitLabel();
                             binding.tvUnit.setText(weightUnit);
-                            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.weightUnitBoolean, false);
+                            boolean isConvert = isWeightInKilograms();
                             Log.d(TAG, "weight get the data inside db "+isConvert);
                             if(isConvert) {
                                 binding.tvValueBg.setText(String.valueOf(weight));
@@ -447,7 +447,7 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
                     String displayTime = timeAgo;
                     String displayValue = "-- kgs";
                     // Safely read from first item (index 0), second converted value (index 1)
-                    boolean convert = g.get(0).isShould_convert();
+                    boolean convert = isWeightInKilograms();
                     double weightVal = 0;
                     String unitValue = convert ? "kgs" : "lbs";
                     if (g.get(0) != null
@@ -511,9 +511,9 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
                         if (list != null) {
 
                             Log.d(TAG, "weight get the data inside db "+UnitConverter.kiloToPounds(weight));
-                            String weightUnit = PreferenceHelper.getInstance(getContext()).getString(Constant.weightUnit, "");
+                            String weightUnit = getWeightUnitLabel();
                             binding.tvUnit.setText(weightUnit);
-                            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.weightUnitBoolean, false);
+                            boolean isConvert = isWeightInKilograms();
                             Log.d(TAG, "weight get the data inside db "+isConvert);
                             if(isConvert) {
                                 binding.tvValueBg.setText(String.valueOf(weight));
@@ -713,9 +713,9 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
             if (weight == null || weight == 0) return;
             if (binding == null) return;
 
-            String weightUnit = PreferenceHelper.getInstance(getContext()).getString(Constant.weightUnit, "");
+            String weightUnit = getWeightUnitLabel();
             binding.tvUnit.setText(weightUnit);
-            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.weightUnitBoolean, false);
+            boolean isConvert = isWeightInKilograms();
             if (isConvert) {
                 binding.tvValueBg.setText(String.valueOf(weight));
             } else {
@@ -757,6 +757,16 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
     }
 
 
+
+    private boolean isWeightInKilograms() {
+        String pref = PreferenceHelper.getInstance(requireContext())
+                .getString(Constant.PREF_UNIT_WEIGHT_VALUE, "pounds");
+        return "kilograms".equals(pref);
+    }
+
+    private String getWeightUnitLabel() {
+        return isWeightInKilograms() ? "kgs" : "lbs";
+    }
 
     private void bindMetric(@Nullable View row,
                             @DrawableRes int iconRes,
@@ -824,13 +834,13 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
         } else {
             list = databaseClient.getAppDatabase().weighingScaleDao().getLatestWeighingScale();
             if (list != null) {
-                String weightUnit = PreferenceHelper.getInstance(getContext()).getString(Constant.weightUnit, "");
+                String weightUnit = getWeightUnitLabel();
                 binding.tvUnit.setText(weightUnit);
-                boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.weightUnitBoolean, false);
+                boolean isConvert = isWeightInKilograms();
                 if(isConvert) {
-                    binding.tvValueBg.setText(String.valueOf(UnitConverter.kiloToPounds(list.getWeight())));
-                } else {
                     binding.tvValueBg.setText(String.valueOf(list.getWeight()));
+                } else {
+                    binding.tvValueBg.setText(String.valueOf(UnitConverter.kiloToPounds(list.getWeight())));
                 }
                 BodyComposition bodyComposition = new BodyComposition();
                 //String heightStr = response.body().getData().getHeight();

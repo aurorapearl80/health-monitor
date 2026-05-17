@@ -25,7 +25,6 @@ import com.monitor.health.database.DatabaseClient;
 import com.monitor.health.databinding.FragmentSleepBinding;
 import com.monitor.health.entity.HeartRateJarEntity;
 import com.monitor.health.model.Reading;
-import com.monitor.health.sleep.SleepMonitor;
 import com.monitor.health.utility.DeviceUtils;
 import com.monitor.health.viewmodel.SharedDataViewModel;
 
@@ -136,10 +135,8 @@ public class SleepFragment extends BaseFragment {
                             binding.progress.setVisibility(View.GONE);
 
                             if (bpm != 0) {
-                                SleepMonitor sleepMonitor = new SleepMonitor();
-                                sleepMonitor.setBaselineHeartRate(bpm);
-                                String quality = String.valueOf(sleepMonitor.calculateSleepQuality());
-                                binding.tvValue.setText(quality + " ");
+                                if (currentBpmText != null) currentBpmText.setText(String.valueOf(bpm));
+                                binding.tvValue.setText(assessSleepFromBPM(bpm));
                                 binding.tvStatus.setText("Done");
                                // binding.heartRateLine.cancelAnimation();
                                // binding.heartRateLine.setProgress(1f);
@@ -228,6 +225,13 @@ public class SleepFragment extends BaseFragment {
         } catch (Exception e) {
             Log.e(TAG, "âŒ Exception during server sync", e);
         }
+    }
+
+    private String assessSleepFromBPM(int bpm) {
+        if (bpm < 60) return "Excellent";
+        if (bpm < 70) return "Good";
+        if (bpm < 80) return "Fair";
+        return "Poor";
     }
 
     private void playNotificationSound() {

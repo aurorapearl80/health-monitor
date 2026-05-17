@@ -19,9 +19,11 @@ import com.monitor.health.response.glocuse.GlucoseServerResponse;
 import com.monitor.health.response.readinghistory.ReadingHistoryResponse;
 import com.monitor.health.request.BloodPressureRequest;
 import com.monitor.health.request.OximeterRequest;
+import com.monitor.health.request.HeartRateRequest;
 import com.monitor.health.request.WeightRequest;
 import com.monitor.health.response.ble.BleUserProfileResponse;
 import com.monitor.health.response.bloodpressure.BloodPressureResponse;
+import com.monitor.health.response.heartrate.HeartRateResponse;
 import com.monitor.health.response.oximeter.OximeterResponse;
 import com.monitor.health.response.weight.WeightResponse;
 import com.monitor.health.response.user.UserProfileResponse;
@@ -58,6 +60,9 @@ public interface UserService {
 
     @POST("api/weights")
     Call<WeightResponse> sendWeight(@Body WeightRequest request);
+
+    @POST("api/heart-rates")
+    Call<HeartRateResponse> sendHeartRate(@Body HeartRateRequest request);
 
     @GET("api/doctor-watches/medicine-schedules")
     Call<MedicationSchedule> getMedicineSchedule();

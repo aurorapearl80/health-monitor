@@ -47,6 +47,8 @@ import com.monitor.health.database.DatabaseClient;
 import com.monitor.health.databinding.FragmentBloodPressureBinding;
 import com.monitor.health.databinding.FragmentElectrocardiogramBinding;
 import com.monitor.health.entity.HeartRateJarEntity;
+import com.monitor.health.request.HeartRateRequest;
+import com.monitor.health.response.heartrate.HeartRateResponse;
 import com.monitor.health.model.BPJumper;
 import com.monitor.health.model.HeartRateEntity;
 import com.monitor.health.model.Oximeter;
@@ -644,7 +646,7 @@ public class ElectrocardiogramFragment extends Fragment implements QuickActionsH
                             //binding.heartRateLine.setProgress(1f); // optional final frame
 
                             if (NetworkUtils.isInternetConnected(requireContext())) {
-                                if (bpm != 0) sendHeartRateSync(bpm);
+                                if (bpm != 0) sendHeartRate(bpm);
                             } else {
                                 databaseClient.getAppDatabase().heartRateDao().insertHeartRate(new HeartRateEntity(bpm));
                             }
@@ -673,50 +675,31 @@ public class ElectrocardiogramFragment extends Fragment implements QuickActionsH
     }
 
 
-    private void sendHeartRateSync(Integer heartRateValue) {
-        Log.d(TAG, "Sending heart rate data synchronously " + heartRateValue);
-        try {
-            List<Double> heartRateList = new ArrayList<>();
-            heartRateList.add(0.0);
-            heartRateList.add((double) heartRateValue);
+    private void sendHeartRate(int bpm) {
+        String serial = DeviceUtils.getIMEI(requireContext());
 
-            String token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
-            Reading reading = new Reading(
-                    false,
-                    "Asia/Manila",
-                    "jtm00025b94050c",
-                    heartRateList,
-                    "66437be266c8833a1c42d7aa",
-                    "5bb306382598931ffbd1b626",
-                    getTodayDate(),
-                    DeviceUtils.getIMEI(requireContext())
-            );
-            List<Reading> readingsList = Arrays.asList(reading);
-            ReadingsRequest readingsRequest = new ReadingsRequest(readingsList);
+        // 1. Save locally
+        databaseClient.getAppDatabase().heartRateDao().insertHeartRate(new HeartRateEntity(bpm));
 
-            Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM, token,
-                    DeviceUtils.getIMEI(requireContext())).sendReadings(readingsRequest);
-            call.enqueue(new Callback<Object>() {
-                @Override
-                public void onResponse(Call<Object> call, Response<Object> response) {
-                    if (response.isSuccessful()) {
-                        Log.d(TAG, "âœ… Heart rate data sent successfully");
-                        playNotificationSound();
-                    } else {
-                        Log.e(TAG, "âŒ Server returned error: " + response.code() + " - " + response.message());
-                    }
-                }
+        // 2. Send to server
+        HeartRateRequest request = new HeartRateRequest(
+                getTodayDate(), serial, bpm, "5bc3cb14cba82b066cae7bc2", "Asia/Manila");
+        Call<HeartRateResponse> call = ApiClient
+                .getUserService(Constant.BASE_URL_BGM, Constant.TOKEN_DR_WATCH_API, serial)
+                .sendHeartRate(request);
+        call.enqueue(new Callback<HeartRateResponse>() {
+            @Override
+            public void onResponse(Call<HeartRateResponse> call, Response<HeartRateResponse> response) {
+                Log.d(TAG, "sendHeartRate response success=" + response.isSuccessful() + " code=" + response.code());
+                if (response.isSuccessful()) playNotificationSound();
+            }
 
-                @Override
-                public void onFailure(Call<Object> call, Throwable t) {
-                    Log.e(TAG, "âŒ Sync failed", t);
-                }
-            });
-        } catch (Exception e) {
-            Log.e(TAG, "âŒ Exception during server sync", e);
-        }
+            @Override
+            public void onFailure(Call<HeartRateResponse> call, Throwable t) {
+                Log.e(TAG, "sendHeartRate error: " + t.getMessage());
+            }
+        });
     }
-
     private void bindMetric(@Nullable View row,
                             @DrawableRes int iconRes,
                             @NonNull String title,

@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Add inset padding so content stays readable on round screens -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -34,15 +33,14 @@
 
                 <!-- Main Weight Display -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_weight="1">
+                    android:gravity="center">
 
-                    <!-- Page Title for Focused Version -->
+                    <!-- Page Title -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center"
@@ -86,10 +84,11 @@
                             android:layout_marginBottom="4dp" />
 
                     </LinearLayout>
+
                     <!-- Estimated Body Composition -->
                     <TextView
                         android:id="@+id/tv_body_composition_title"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Estimated Body Composition"
                         android:textSize="10sp"
@@ -98,128 +97,131 @@
                         android:textStyle="bold"
                         android:gravity="center" />
 
-                    <!-- FIXED: Body Composition Row -->
+                    <!-- Body Composition Row — equal-weight columns filling full width -->
                     <LinearLayout
                         android:id="@+id/bodyCompositionRow"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_marginTop="6dp"
-                        android:paddingLeft="8dp"
-                        android:paddingRight="8dp">
+                        android:layout_marginTop="6dp">
 
-                        <!-- Each column is narrower now -->
                         <!-- Body Water -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center"
-                            android:paddingLeft="4dp"
-                            android:paddingRight="4dp">
+                            android:gravity="center">
 
                             <TextView
                                 android:id="@+id/tvBodyWater"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="11sp"
+                                android:textSize="10sp"
                                 android:textColor="@android:color/white"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="BODY WATER"
-                                android:textSize="9sp"
+                                android:textSize="7sp"
                                 android:textColor="@android:color/white"
-                                android:alpha="0.8" />
+                                android:alpha="0.8"
+                                android:gravity="center" />
                         </LinearLayout>
 
                         <!-- Lean Mass -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center"
-                            android:paddingLeft="4dp"
-                            android:paddingRight="4dp">
+                            android:gravity="center">
 
                             <TextView
                                 android:id="@+id/tvLeanMass"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="11sp"
+                                android:textSize="10sp"
                                 android:textColor="@android:color/white"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="LEAN MASS"
-                                android:textSize="9sp"
+                                android:textSize="7sp"
                                 android:textColor="@android:color/white"
-                                android:alpha="0.8" />
+                                android:alpha="0.8"
+                                android:gravity="center" />
                         </LinearLayout>
 
                         <!-- Fat Mass -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center"
-                            android:paddingLeft="4dp"
-                            android:paddingRight="4dp">
+                            android:gravity="center">
 
                             <TextView
                                 android:id="@+id/tvFatMass"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="11sp"
+                                android:textSize="10sp"
                                 android:textColor="@android:color/white"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="FAT MASS"
-                                android:textSize="9sp"
+                                android:textSize="7sp"
                                 android:textColor="@android:color/white"
-                                android:alpha="0.8" />
+                                android:alpha="0.8"
+                                android:gravity="center" />
                         </LinearLayout>
 
                         <!-- Body Fat % -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center"
-                            android:paddingLeft="4dp"
-                            android:paddingRight="4dp">
+                            android:gravity="center">
 
                             <TextView
                                 android:id="@+id/tvBodyFatPercent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="11sp"
+                                android:textSize="10sp"
                                 android:textColor="@android:color/white"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="BODY FAT %"
-                                android:textSize="9sp"
+                                android:textSize="7sp"
                                 android:textColor="@android:color/white"
-                                android:alpha="0.8" />
+                                android:alpha="0.8"
+                                android:gravity="center" />
                         </LinearLayout>
 
                     </LinearLayout>
-
 
                     <!-- Time Ago -->
                     <TextView
@@ -231,7 +233,7 @@
                         android:textColor="@android:color/white"
                         android:layout_marginTop="2dp" />
 
-                    <!-- BMI Status (Optional) -->
+                    <!-- BMI Status -->
                     <TextView
                         android:id="@+id/tvBMIStatus"
                         android:layout_width="wrap_content"
@@ -246,7 +248,7 @@
 
                 <!-- Status Info -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
@@ -289,6 +291,7 @@
                         android:layout_marginLeft="16dp"
                         app:tint="@android:color/white" />
                 </LinearLayout>
+
                 <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
@@ -296,11 +299,13 @@
                     android:background="@android:color/white"
                     android:alpha="0.3"
                     android:layout_marginVertical="@dimen/card_spacing"/>
+
                 <include
                     android:id="@+id/metricsPanel"
                     layout="@layout/layout_metrics_panel" />
-                <!-- Add this before the closing tag of your main layout -->
+
                 <include layout="@layout/include_quick_actions" />
+
             </LinearLayout>
 
         </ScrollView>
@@ -316,4 +321,5 @@
         android:contentDescription="Connection status"
         app:tint="@android:color/white"
         android:visibility="invisible" />
+
 </androidx.wear.widget.BoxInsetLayout>

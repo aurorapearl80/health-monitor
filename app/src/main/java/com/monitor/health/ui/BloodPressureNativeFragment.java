@@ -2,6 +2,7 @@ package com.monitor.health.ui;
 
 import static com.monitor.health.utility.AppUtils.getTodayDate;
 
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -14,22 +15,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.airbnb.lottie.LottieDrawable;
 import com.monitor.health.ApiClient;
 import com.monitor.health.Constant;
 import com.monitor.health.R;
-import com.monitor.health.ReadingsRequest;
 import com.monitor.health.adapter.HealthManager;
 import com.monitor.health.chart.HeartRateChartView;
 import com.monitor.health.database.DatabaseClient;
 import com.monitor.health.databinding.FragmentBloodPressureNativeBinding;
 import com.monitor.health.entity.HeartRateJarEntity;
-import com.monitor.health.model.Reading;
+import com.monitor.health.model.BPJumper;
+import com.monitor.health.request.BloodPressureRequest;
+import com.monitor.health.response.bloodpressure.BloodPressureResponse;
 import com.monitor.health.utility.BPReading;
 import com.monitor.health.utility.BloodPressureEstimator;
 import com.monitor.health.utility.DeviceUtils;
 import com.monitor.health.viewmodel.SharedDataViewModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -43,24 +45,22 @@ public class BloodPressureNativeFragment extends BaseFragment {
 
     private static final String TAG = "BloodPressureFragment";
 
-    // ----- UI / VM / DB -----
     private FragmentBloodPressureNativeBinding binding;
     private HeartRateChartView heartRateChart;
     private TextView currentBpmText;
     private SharedDataViewModel model;
     private DatabaseClient databaseClient;
 
-    // ----- Chart update placeholders (kept from your code) -----
     private Handler handler;
     private Runnable heartRateUpdater;
 
-    // ----- UX timing for loader/Lottie -----
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
-    private static final long MIN_LOADER_MS = 1500L;  // show loader at least 1.5s
+    private static final long MIN_LOADER_MS = 1500L;
     private long measureStartMs = 0L;
     private boolean measuring = false;
 
     // ===== BaseFragment hooks =====
+
     @Override
     protected int getContentLayoutResId() {
         return R.layout.fragment_blood_pressure_native;
@@ -70,21 +70,12 @@ public class BloodPressureNativeFragment extends BaseFragment {
     protected void onBaseViewCreated(@NonNull View root) {
         databaseClient = DatabaseClient.getInstance(getActivity());
 
-        // Bind to child content inflated by BaseFragment
         View content = getContentContainer().getChildAt(0);
         binding = FragmentBloodPressureNativeBinding.bind(content);
 
-        // Chart refs (if used by your layout)
         heartRateChart = binding.heartRateChart;
         currentBpmText = binding.currentBpm;
 
-        // Lottie initial state (no autoplay)
-       // binding.heartRateLine.cancelAnimation();
-        //binding.heartRateLine.setProgress(0f);
-        //binding.heartRateLine.setRepeatCount(LottieDrawable.INFINITE);
-        //binding.heartRateLine.setSpeed(1.0f);
-
-        // Data wire-ups
         initializeHeartRateData();
         startHeartRateUpdates();
         getLatestHeartRate();
@@ -96,50 +87,45 @@ public class BloodPressureNativeFragment extends BaseFragment {
             if (currentBpmText != null) currentBpmText.setText(String.valueOf(heartRate));
         });
 
-        // Measure button
         binding.btnMeasure.setOnClickListener(v -> startMeasuring());
     }
 
-    // ===== Measuring logic (HR -> estimate BP -> send) =====
+    // ===== Measuring logic =====
+
     private void startMeasuring() {
         if (measuring || binding == null) return;
         measuring = true;
         binding.btnMeasure.setEnabled(false);
-
         measureStartMs = android.os.SystemClock.uptimeMillis();
 
-        binding.tvStatus.setText("Measuringâ€¦");
+        binding.tvStatus.setText("Measuring…");
         binding.progress.setVisibility(View.VISIBLE);
-        //binding.heartRateLine.setProgress(0f);
-        //binding.heartRateLine.playAnimation();
 
         HealthManager.getInstance(requireContext())
                 .startHeartRateMeasurement(new HealthManager.ValueCallback<Integer>() {
                     @Override
                     public void onValue(Integer bpm) {
                         long elapsed = android.os.SystemClock.uptimeMillis() - measureStartMs;
-                        long delay = Math.max(0L, MIN_LOADER_MS - elapsed);
+                        long delay   = Math.max(0L, MIN_LOADER_MS - elapsed);
 
                         uiHandler.postDelayed(() -> {
                             if (binding == null) return;
 
-                            if (bpm != 0) {
-                                // Estimate BP from HR (your existing logic)
+                            if (bpm != null && bpm > 0) {
                                 BloodPressureEstimator estimator = new BloodPressureEstimator();
                                 BPReading bp = estimator.estimateBloodPressure(bpm);
 
-                                binding.tvValue.setText("Systolic: " + bp.systolic + "\nDiastolic: " + bp.diastolic);
-                                sendBloodPressureRateSync(bp.systolic, bp.diastolic);
+                                binding.tvValue.setText(
+                                        "Systolic: " + bp.systolic + "\nDiastolic: " + bp.diastolic);
+
+                                // Save locally, broadcast to UI, then send to server
+                                sendBloodPressure(bp.systolic, bp.diastolic, bpm);
                             } else {
                                 binding.tvValue.setText("--");
                             }
 
                             binding.progress.setVisibility(View.GONE);
                             binding.tvStatus.setText("Done");
-
-                           // binding.heartRateLine.cancelAnimation();
-                            //binding.heartRateLine.setProgress(1f);
-
                             measuring = false;
                             binding.btnMeasure.setEnabled(true);
                         }, delay);
@@ -148,17 +134,12 @@ public class BloodPressureNativeFragment extends BaseFragment {
                     @Override
                     public void onError(String error) {
                         long elapsed = android.os.SystemClock.uptimeMillis() - measureStartMs;
-                        long delay = Math.max(0L, MIN_LOADER_MS - elapsed);
+                        long delay   = Math.max(0L, MIN_LOADER_MS - elapsed);
 
                         uiHandler.postDelayed(() -> {
                             if (binding == null) return;
-
                             binding.progress.setVisibility(View.GONE);
                             binding.tvStatus.setText(error);
-
-                           // binding.heartRateLine.cancelAnimation();
-                            //binding.heartRateLine.setProgress(0f);
-
                             measuring = false;
                             binding.btnMeasure.setEnabled(true);
                         }, delay);
@@ -166,44 +147,63 @@ public class BloodPressureNativeFragment extends BaseFragment {
                 });
     }
 
-    // ===== Network sync =====
-    private void sendBloodPressureRateSync(Integer systolic, Integer diastolic) {
-        Log.d(TAG, "Sending BP synchronously: " + systolic + "/" + diastolic);
+    // ===== Send blood pressure (same pattern as BleScanService.sendBPJumper) =====
+
+    private void sendBloodPressure(double systolic, double diastolic, int bpm) {
+        String serial    = DeviceUtils.getIMEI(requireContext());
+        String androidId = DeviceUtils.getIMEI(requireContext());
+
+        // 1. Save locally so UI and offline sync always have the data
+        saveDataBPJumper((int) systolic, (int) diastolic, bpm, 1, serial);
+
+        // 2. Broadcast immediately so MainActivity / fragments update without waiting for the server
+        ArrayList<Double> bloodpressureList =
+                new ArrayList<>(Arrays.asList(systolic, diastolic, (double) bpm));
+        Intent fallIntent = new Intent(Constant.ACTION_BLOOD_PRESSURE);
+        fallIntent.setPackage(requireContext().getPackageName());
+        fallIntent.putExtra(Constant.VALUE_BLOOD_PRESSURE, bloodpressureList);
+        requireContext().sendBroadcast(fallIntent);
+
+        // 3. Send to server
+        BloodPressureRequest request = new BloodPressureRequest(
+                getTodayDate(),
+                serial,
+                systolic,
+                diastolic,
+                "66437be266c8833a1c42d7aa",
+                bpm,
+                "Asia/Manila"
+        );
+
+        Call<BloodPressureResponse> call = ApiClient
+                .getUserService(Constant.BASE_URL_BGM, Constant.TOKEN_DR_WATCH_API, androidId)
+                .sendBloodPressure(request);
+
+        call.enqueue(new Callback<BloodPressureResponse>() {
+            @Override
+            public void onResponse(Call<BloodPressureResponse> call,
+                                   Response<BloodPressureResponse> response) {
+                Log.d(TAG, "sendBloodPressure response success="
+                        + response.isSuccessful() + " code=" + response.code());
+                if (response.isSuccessful()) {
+                    playNotificationSound();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BloodPressureResponse> call, Throwable t) {
+                Log.e(TAG, "sendBloodPressure server error: " + t.getMessage());
+            }
+        });
+    }
+
+    private void saveDataBPJumper(int systolic, int diastolic, int pulseRate,
+                                   int status, String serial) {
         try {
-            String token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
-            Reading reading = new Reading(
-                    false,
-                    "Asia/Manila",
-                    "jtm00025b94050c",
-                    Arrays.asList((double) systolic, (double) diastolic, 0.0),
-                    "66437be266c8833a1c42d7aa",
-                    "5bb306382598931ffbd1b624",
-                    getTodayDate(),
-                    DeviceUtils.getIMEI(requireContext())
-            );
-            ReadingsRequest payload = new ReadingsRequest(Arrays.asList(reading));
-
-            ApiClient.getUserService(Constant.BASE_URL_BGM, token, DeviceUtils.getIMEI(requireContext()))
-                    .sendReadings(payload)
-                    .enqueue(new Callback<Object>() {
-                        @Override
-                        public void onResponse(Call<Object> call, Response<Object> response) {
-                            if (response.isSuccessful()) {
-                                Log.d(TAG, "âœ… BP data sent successfully");
-                                playNotificationSound();
-                            } else {
-                                Log.e(TAG, "âŒ Server error: " + response.code() + " - " + response.message());
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Object> call, Throwable t) {
-                            Log.e(TAG, "âŒ Sync failed", t);
-                        }
-                    });
-
+            BPJumper bpJumper = new BPJumper(systolic, diastolic, pulseRate, status, serial);
+            databaseClient.getAppDatabase().bpJumperDao().insertBPJumper(bpJumper);
         } catch (Exception e) {
-            Log.e(TAG, "âŒ Exception during server sync", e);
+            Log.e(TAG, "saveDataBPJumper error: " + e.getMessage());
         }
     }
 
@@ -215,9 +215,10 @@ public class BloodPressureNativeFragment extends BaseFragment {
         } catch (Exception ignored) {}
     }
 
-    // ===== Chart/sample data helpers (kept from your code) =====
+    // ===== Chart / DB helpers =====
+
     private void initializeHeartRateData() { loadHeartRateDataAsync(); }
-    private void startHeartRateUpdates() { /* no-op placeholder for your chart timing */ }
+    private void startHeartRateUpdates()   { /* placeholder */ }
 
     private void stopHeartRateUpdates() {
         if (handler != null && heartRateUpdater != null) {
@@ -231,7 +232,6 @@ public class BloodPressureNativeFragment extends BaseFragment {
     public void onPause() {
         super.onPause();
         stopHeartRateUpdates();
-        //if (binding != null) binding.heartRateLine.cancelAnimation();
     }
 
     @Override
@@ -251,7 +251,9 @@ public class BloodPressureNativeFragment extends BaseFragment {
         }
     }
 
-    public static BloodPressureNativeFragment newInstance() { return new BloodPressureNativeFragment(); }
+    public static BloodPressureNativeFragment newInstance() {
+        return new BloodPressureNativeFragment();
+    }
 
     private float[] convertToFloatArray(List<HeartRateJarEntity> list) {
         if (list == null || list.isEmpty()) return new float[0];
@@ -275,7 +277,6 @@ public class BloodPressureNativeFragment extends BaseFragment {
                     if (binding == null) return;
                     if (sampleData.length > 0) {
                         heartRateChart.updateHeartRateData(sampleData);
-                        Log.d(TAG, "Updated chart with " + sampleData.length + " DB values");
                     } else {
                         loadSampleData();
                     }
@@ -289,9 +290,7 @@ public class BloodPressureNativeFragment extends BaseFragment {
 
     private void loadSampleData() {
         if (binding == null) return;
-        float[] sampleData = {55, 58};
-        heartRateChart.updateHeartRateData(sampleData);
-        Log.d(TAG, "Using sample data");
+        heartRateChart.updateHeartRateData(new float[]{55, 58});
     }
 
     private void getLatestHeartRate() {

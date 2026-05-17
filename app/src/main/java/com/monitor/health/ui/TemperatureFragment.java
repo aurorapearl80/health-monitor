@@ -131,7 +131,7 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
             if (temp == null) return;
             Temperature list = databaseClient.getAppDatabase().temperatureDao().getLatestTemperature();
             if (list == null) return;
-            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.CELSIUS_TEXT, false);
+            boolean isConvert = isTemperatureInCelsius();
             if (isConvert) {
                 binding.tvValueBg.setText(String.format(Locale.getDefault(), "%.1f", list.getTemperature()));
                 binding.tvUnit.setText(Constant.CELSIUS_VALUE);
@@ -498,7 +498,7 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
                     // Default values
                     String displayTime = timeAgo;
                     String displayValue = "-- ";
-                    boolean convert = g.get(0).isShould_convert();
+                    boolean convert = isTemperatureInCelsius();
                     if (g.get(0).getConvertedValues() != null
                             && !g.get(0).getConvertedValues().isEmpty()) {
                         if(!convert) {
@@ -543,6 +543,12 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
 
     }
 
+
+    private boolean isTemperatureInCelsius() {
+        String pref = PreferenceHelper.getInstance(requireContext())
+                .getString(Constant.PREF_UNIT_TEMPERATURE_VALUE, "celsius");
+        return "celsius".equals(pref);
+    }
 
     private void bindMetric(@Nullable View row,
                             @DrawableRes int iconRes,
@@ -608,7 +614,15 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
             Temperature list = databaseClient.getAppDatabase().temperatureDao().getLatestTemperature();
             if (list != null) {
                 Log.d(TAG, "weight get the data inside db line 654");
-                String valueBg = String.format(Locale.getDefault(), "%.1f", list.getTemperature());
+                boolean isConvert = isTemperatureInCelsius();
+                String valueBg;
+                if (isConvert) {
+                    valueBg = String.format(Locale.getDefault(), "%.1f", list.getTemperature());
+                    binding.tvUnit.setText(Constant.CELSIUS_VALUE);
+                } else {
+                    valueBg = String.format(Locale.getDefault(), "%.1f", UnitConverter.celsiusToFahrenheit(list.getTemperature()));
+                    binding.tvUnit.setText(Constant.FAHRENHEIT_VALUE);
+                }
                 binding.tvValueBg.setText(valueBg);
                 binding.tvTimeAgo.setText(list.getCreatedAtFormatted());
 

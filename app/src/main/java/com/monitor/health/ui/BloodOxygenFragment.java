@@ -37,6 +37,8 @@ import com.monitor.health.MainActivity;
 import com.monitor.health.NetworkUtils;
 import com.monitor.health.R;
 import com.monitor.health.ReadingsRequest;
+import com.monitor.health.request.OximeterRequest;
+import com.monitor.health.response.oximeter.OximeterResponse;
 import com.monitor.health.adapter.HealthManager;
 import com.monitor.health.adapter.PageType;
 import com.monitor.health.dao.BPJumperDao;
@@ -589,12 +591,7 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
                                 //binding.heartRateLine.setProgress(1f);
                                 //if (spo2 != 0)
                                 binding.tvTimeAgo.setText("just now");
-                                if (NetworkUtils.isInternetConnected(requireContext())) {
-                                    sendOxygenSync(spo2);
-                                } else {
-                                    Oximeter oximeter = new Oximeter(spo2, 0, 1, DeviceUtils.getIMEI(requireContext()));
-                                    databaseClient.getAppDatabase().oximeterDao().insertOximeter(oximeter);
-                                }
+                                sendOximeter(spo2, 0);
 
                             } else {
                                 binding.tvStatus.setVisibility(View.VISIBLE);
@@ -629,50 +626,41 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
     }
 
     // ===== Network sync =====
-    private void sendOxygenSync(Integer oxygenValue) {
-        Log.d(TAG, "Sending oxygen data synchronously " + oxygenValue);
-        try {
-            List<Double> values = new ArrayList<>();
-            values.add((double) oxygenValue);
-            values.add(0.0);
+    private void sendOximeter(int spo2, int pulseRate) {
+        String serial = DeviceUtils.getIMEI(requireContext());
 
-            String token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
-            Reading reading = new Reading(
-                    false,
-                    "Asia/Manila",
-                    "jtm00025b94050c",
-                    values,
-                    "66437be266c8833a1c42d7aa",
-                    "5bb306382598931ffbd1b626",
-                    getTodayDate(),
-                    DeviceUtils.getIMEI(requireContext())
-            );
-            List<Reading> readingsList = Arrays.asList(reading);
-            ReadingsRequest readingsRequest = new ReadingsRequest(readingsList);
+        // 1. Save locally
+        Oximeter oximeter = new Oximeter(spo2, pulseRate, 1, serial);
+        databaseClient.getAppDatabase().oximeterDao().insertOximeter(oximeter);
 
-            Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM, token,
-                    DeviceUtils.getIMEI(requireContext())).sendReadings(readingsRequest);
-            call.enqueue(new Callback<Object>() {
-                @Override
-                public void onResponse(Call<Object> call, Response<Object> response) {
-                    if (response.isSuccessful()) {
-                        Log.d(TAG, "âœ… Oxygen data sent successfully");
-                        playNotificationSound();
-                    } else {
-                        Log.e(TAG, "âŒ Server error: " + response.code() + " - " + response.message());
-                    }
+        // 2. Broadcast so MainActivity and other fragments update immediately
+        Intent fallIntent = new Intent(Constant.ACTION_PULSE_OXIMETER);
+        fallIntent.setPackage(requireContext().getPackageName());
+        fallIntent.putExtra(Constant.VALUE_PULSE_OXIMETER_PULSE_RATE, pulseRate);
+        fallIntent.putExtra(Constant.VALUE_OXIMETER_PULSE_OXYGEN, spo2);
+        requireContext().sendBroadcast(fallIntent);
+
+        // 3. Send to server
+        OximeterRequest request = new OximeterRequest(
+                getTodayDate(), serial, spo2, "5bc3cb14cba82b066cae7bc2", "Asia/Manila", pulseRate);
+        Call<OximeterResponse> call = ApiClient
+                .getUserService(Constant.BASE_URL_BGM, Constant.TOKEN_DR_WATCH_API, serial)
+                .sendOximeterReading(request);
+        call.enqueue(new Callback<OximeterResponse>() {
+            @Override
+            public void onResponse(Call<OximeterResponse> call, Response<OximeterResponse> response) {
+                Log.d(TAG, "sendOximeter response success=" + response.isSuccessful() + " code=" + response.code());
+                if (response.isSuccessful()) {
+                    playNotificationSound();
                 }
-                @Override
-                public void onFailure(Call<Object> call, Throwable t) {
-                    Log.e(TAG, "âŒ Sync failed", t);
-                }
-            });
+            }
 
-        } catch (Exception e) {
-            Log.e(TAG, "âŒ Exception during server sync", e);
-        }
+            @Override
+            public void onFailure(Call<OximeterResponse> call, Throwable t) {
+                Log.e(TAG, "sendOximeter server error: " + t.getMessage());
+            }
+        });
     }
-
     private void playNotificationSound() {
         try {
             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
