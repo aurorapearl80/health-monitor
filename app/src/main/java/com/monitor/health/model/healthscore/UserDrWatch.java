@@ -32,6 +32,22 @@ public class UserDrWatch {
     public int allReadingsFound;
     public double overallHealthScore;
 
+    // Fields from ble-devices/user-profile endpoint
+    public String firstName;
+    public String lastName;
+    public String state;
+    public String country;
+    public String zipCode;
+    public String completeAddress;
+    public String height;
+    public String weight;
+    public String profileImageUrl;
+    public String status;
+    public String generalPractitioner;
+    public String primaryInsuranceName;
+    public String homeNumber;
+    public String angelSupport;
+
     public UserDrWatch() {}
 
     public UserDrWatch(String _id, String prescribeTestRate, boolean isActive, String phone, String memberId, String email, String bday, String gender, String organization, String createdAt, String username, String subOrganization, String fullname, String client, boolean withDevice, String patient_conditions, String practitioners, List<HealthRating> health_ratings, int allReadingsFound, double overallHealthScore) {
@@ -224,6 +240,48 @@ public class UserDrWatch {
     public void setOverallHealthScore(double overallHealthScore) {
         this.overallHealthScore = overallHealthScore;
     }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getState() { return state; }
+    public void setState(String state) { this.state = state; }
+
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+
+    public String getZipCode() { return zipCode; }
+    public void setZipCode(String zipCode) { this.zipCode = zipCode; }
+
+    public String getCompleteAddress() { return completeAddress; }
+    public void setCompleteAddress(String completeAddress) { this.completeAddress = completeAddress; }
+
+    public String getHeight() { return height; }
+    public void setHeight(String height) { this.height = height; }
+
+    public String getWeight() { return weight; }
+    public void setWeight(String weight) { this.weight = weight; }
+
+    public String getProfileImageUrl() { return profileImageUrl; }
+    public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getGeneralPractitioner() { return generalPractitioner; }
+    public void setGeneralPractitioner(String generalPractitioner) { this.generalPractitioner = generalPractitioner; }
+
+    public String getPrimaryInsuranceName() { return primaryInsuranceName; }
+    public void setPrimaryInsuranceName(String primaryInsuranceName) { this.primaryInsuranceName = primaryInsuranceName; }
+
+    public String getHomeNumber() { return homeNumber; }
+    public void setHomeNumber(String homeNumber) { this.homeNumber = homeNumber; }
+
+    public String getAngelSupport() { return angelSupport; }
+    public void setAngelSupport(String angelSupport) { this.angelSupport = angelSupport; }
 
     @Override
     public String toString() {

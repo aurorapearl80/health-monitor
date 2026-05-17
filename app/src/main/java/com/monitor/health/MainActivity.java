@@ -690,8 +690,8 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
 
 
 
-        loginDrWatch();
-        userProfile();
+        //loginDrWatch();
+        ///userProfile();
 
         ContextCompat.registerReceiver(this, locationReceiver, new IntentFilter("LOCATION_UPDATE"), ContextCompat.RECEIVER_NOT_EXPORTED);
 

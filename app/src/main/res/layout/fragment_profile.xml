@@ -7,7 +7,7 @@
     android:background="@color/dark_background"
     app:boxedEdges="all">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -69,10 +69,11 @@
             </LinearLayout>
 
             <!-- Quick Stats -->
-            <androidx.wear.widget.WearableRecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/stats_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
                 android:layout_marginBottom="20dp" />
 
             <!-- Quick Actions -->
@@ -140,6 +141,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.wear.widget.BoxInsetLayout>

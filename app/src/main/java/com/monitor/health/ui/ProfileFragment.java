@@ -29,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.monitor.health.ApiClient;
 import com.monitor.health.Constant;
 import com.monitor.health.LoginActivity;
@@ -43,6 +45,8 @@ import com.monitor.health.model.healthscore.UserDrWatch;
 import com.monitor.health.request.SendAlarmRequest;
 import com.monitor.health.utility.DeviceUtils;
 import com.monitor.health.utility.SmartWatchAlertDialog;
+import com.monitor.health.model.BleDeviceModel;
+import com.monitor.health.viewmodel.ProfileViewModel;
 import com.monitor.health.viewmodel.SharedDataViewModel;
 
 import android.os.Bundle;
@@ -56,8 +60,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.wear.widget.WearableLinearLayoutManager;
-import androidx.wear.widget.WearableRecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -70,13 +74,14 @@ public class ProfileFragment extends Fragment {
     private ImageView profileImage;
     private TextView userName;
     private TextView userStatus;
-    private WearableRecyclerView statsRecyclerView;
+    private RecyclerView statsRecyclerView;
     private LinearLayout quickActionsLayout;
     private View rootView;
     private List<String> userInfo;
     List<StatItem> stats;
     StatsAdapter adapter;
     SharedDataViewModel model;
+    ProfileViewModel profileViewModel;
     DatabaseClient databaseClient;
 
     int versionCode;
@@ -129,11 +134,13 @@ public class ProfileFragment extends Fragment {
         prefs = getActivity().getSharedPreferences("LocationPrefs", MODE_PRIVATE);
 
         model = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
+        profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+
         getUserInfo();
         initViews();
         setupRecyclerView();
-        loadUserData();
         setupQuickActions();
+        observeProfileViewModel();
 
 
 
@@ -159,11 +166,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        WearableLinearLayoutManager layoutManager = new WearableLinearLayoutManager(getContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         statsRecyclerView.setLayoutManager(layoutManager);
-        statsRecyclerView.setEdgeItemsCenteringEnabled(true);
+        statsRecyclerView.setNestedScrollingEnabled(false);
 
-        //List<StatItem> stats = createStatItems();
         stats = new ArrayList<>();
         adapter = new StatsAdapter(stats);
         statsRecyclerView.setAdapter(adapter);
@@ -186,6 +192,93 @@ public class ProfileFragment extends Fragment {
             stats.addAll(newStats);
             adapter.notifyDataSetChanged();
         }
+    }
+
+    private void observeProfileViewModel() {
+        // Show skeleton data while waiting for API
+        String IME = DeviceUtils.getIMEI(getActivity());
+        List<StatItem> skeleton = new ArrayList<>();
+        skeleton.add(new StatItem("VERSION", Constant.APP_VERSION, R.drawable.ic_health_score));
+        skeleton.add(new StatItem("IME", IME, R.drawable.ic_health_score));
+        updateStatsData(skeleton);
+        profileImage.setImageResource(R.drawable.ic_profile);
+        userStatus.setText("Active");
+
+        profileViewModel.getProfileData().observe(getViewLifecycleOwner(), user -> {
+            if (user == null) return;
+
+            // Profile image: load from URL, fallback to placeholder
+            if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
+                Glide.with(this)
+                        .load(user.getProfileImageUrl())
+                        .placeholder(R.drawable.ic_profile)
+                        .error(R.drawable.ic_profile)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .circleCrop()
+                        .into(profileImage);
+            } else {
+                profileImage.setImageResource(R.drawable.ic_profile);
+            }
+
+            // Display name
+            String displayName = user.getFullname() != null && !user.getFullname().isEmpty()
+                    ? user.getFullname()
+                    : notEmpty(user.getUsername());
+            userName.setText(displayName);
+            userStatus.setText(notEmpty(user.getStatus(), "Active"));
+
+            // Stats list
+            List<StatItem> newStats = new ArrayList<>();
+            newStats.add(new StatItem("Email",     notEmpty(user.getEmail()),                R.drawable.ic_email));
+            newStats.add(new StatItem("Phone",     notEmpty(user.getPhone()),                R.drawable.ic_phone));
+            newStats.add(new StatItem("Gender",    notEmpty(user.getGender()),               R.drawable.ic_health_score));
+            newStats.add(new StatItem("Height",    notEmpty(user.getHeight()),               R.drawable.ic_health_score));
+            newStats.add(new StatItem("Weight",    notEmpty(user.getWeight()) + " lbs",      R.drawable.ic_health_score));
+            newStats.add(new StatItem("DOB",       notEmpty(user.getBday()),                 R.drawable.ic_health_score));
+            newStats.add(new StatItem("Conditions",notEmpty(user.getPatient_conditions()),   R.drawable.ic_health_score));
+            newStats.add(new StatItem("Address",   notEmpty(user.getCompleteAddress()),      R.drawable.ic_health_score));
+            newStats.add(new StatItem("State",     notEmpty(user.getState()),                R.drawable.ic_health_score));
+            newStats.add(new StatItem("Country",   notEmpty(user.getCountry()),              R.drawable.ic_health_score));
+            newStats.add(new StatItem("Insurance", notEmpty(user.getPrimaryInsuranceName()), R.drawable.ic_health_score));
+            newStats.add(new StatItem("Doctor",    notEmpty(user.getGeneralPractitioner()),  R.drawable.ic_health_score));
+            newStats.add(new StatItem("Member ID", notEmpty(user.getMemberId()),             R.drawable.ic_health_score));
+            newStats.add(new StatItem("VERSION",   Constant.APP_VERSION,                    R.drawable.ic_health_score));
+            newStats.add(new StatItem("IME",       IME,                                     R.drawable.ic_health_score));
+            updateStatsData(newStats);
+        });
+
+        // Show API errors on screen so they are visible without Logcat
+        profileViewModel.getError().observe(getViewLifecycleOwner(), errorMsg -> {
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                Log.e(TAG, "ProfileViewModel error: " + errorMsg);
+                android.widget.Toast.makeText(requireContext(),
+                        "Profile error: " + errorMsg, android.widget.Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Load cached data immediately so screen isn't blank, then refresh from API
+        profileViewModel.loadCachedProfile();
+        String serial = getBleSerial(); // returns androidId if no BLE device registered
+        Log.d(TAG, "Fetching profile — serial='" + serial + "'");
+        profileViewModel.fetchBleDeviceUserProfile(serial, androidId);
+    }
+
+    private String getBleSerial() {
+        List<com.monitor.health.model.BleDeviceModel> devices =
+                databaseClient.getAppDatabase().bleDeviceDao().getAllBleDevices();
+        if (!devices.isEmpty() && devices.get(0).getSerial() != null) {
+            return devices.get(0).getSerial();
+        }
+        // No BLE device registered — use Android device ID as the serial
+        return androidId;
+    }
+
+    private String notEmpty(String value) {
+        return (value != null && !value.isEmpty()) ? value : "—";
+    }
+
+    private String notEmpty(String value, String fallback) {
+        return (value != null && !value.isEmpty()) ? value : fallback;
     }
 
     private void loadUserData() {

@@ -28,10 +28,31 @@ public class DatabaseClient {
         }
     };
 
+    // Adds BLE user profile columns to user_drwatch table introduced in version 12.
+    static final Migration MIGRATION_11_12 = new Migration(11, 12) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN firstName TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN lastName TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN state TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN country TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN zipCode TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN completeAddress TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN height TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN weight TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN profileImageUrl TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN status TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN generalPractitioner TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN primaryInsuranceName TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN homeNumber TEXT");
+            database.execSQL("ALTER TABLE user_drwatch ADD COLUMN angelSupport TEXT");
+        }
+    };
+
     private DatabaseClient(Context context) {
         appDatabase = Room.databaseBuilder(context.getApplicationContext(),
                 AppDatabase.class, "vital_watch_database")
-                .addMigrations(MIGRATION_10_11)
+                .addMigrations(MIGRATION_10_11, MIGRATION_11_12)
                 .fallbackToDestructiveMigration() // fallback for any other version gap
                 .allowMainThreadQueries()
                 .build();

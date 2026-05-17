@@ -32,7 +32,7 @@ import com.monitor.health.model.healthscore.UserDrWatch;
         BleDeviceModel.class,
         MessageEntity.class,
         StepEntity.class,
-}, version = 11, exportSchema = false)
+}, version = 12, exportSchema = false)
 @TypeConverters({Converters.class}) // Add TypeConverters annotation
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ReadingValueDao readingValueDao();

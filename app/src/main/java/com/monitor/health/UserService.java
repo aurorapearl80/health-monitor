@@ -17,6 +17,7 @@ import com.monitor.health.response.bledevice.DeviceResponse;
 import com.monitor.health.response.bledevice.DeviceResponseList;
 import com.monitor.health.response.glocuse.GlucoseServerResponse;
 import com.monitor.health.response.readinghistory.ReadingHistoryResponse;
+import com.monitor.health.response.ble.BleUserProfileResponse;
 import com.monitor.health.response.user.UserProfileResponse;
 
 import okhttp3.RequestBody;
@@ -106,6 +107,9 @@ public interface UserService {
 
     @GET("api/doctor-watches/user-profile")
     Call<UserProfileResponse> getUserProfile();
+
+    @GET("api/ble-devices/user-profile")
+    Call<BleUserProfileResponse> getBleDeviceUserProfile(@Query("serial") String serial);
 
 
 

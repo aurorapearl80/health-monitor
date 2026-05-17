@@ -93,6 +93,18 @@ public class Constant {
     //auth
     public static final String AUTH_TOKEN = "auth_token";
 
+    // Measurement unit preference keys
+    public static final String PREF_UNIT_HEIGHT_VALUE       = "unit_height_value";
+    public static final String PREF_UNIT_HEIGHT_LABEL       = "unit_height_label";
+    public static final String PREF_UNIT_WEIGHT_VALUE       = "unit_weight_value";
+    public static final String PREF_UNIT_WEIGHT_LABEL       = "unit_weight_label";
+    public static final String PREF_UNIT_TEMPERATURE_VALUE  = "unit_temperature_value";
+    public static final String PREF_UNIT_TEMPERATURE_LABEL  = "unit_temperature_label";
+    public static final String PREF_UNIT_GLUCOSE_VALUE      = "unit_glucose_value";
+    public static final String PREF_UNIT_GLUCOSE_LABEL      = "unit_glucose_label";
+    public static final String PREF_UNIT_BP_VALUE           = "unit_blood_pressure_value";
+    public static final String PREF_UNIT_BP_LABEL           = "unit_blood_pressure_label";
+
     //preferences
     public static final String weightUnit = "weightUnit";
     public static final String weightUnitBoolean = "weightUnitBoolean";

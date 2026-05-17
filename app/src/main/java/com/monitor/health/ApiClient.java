@@ -30,7 +30,7 @@ public class ApiClient {
     private static synchronized OkHttpClient getSharedHttpClient() {
         if (sharedHttpClient == null) {
             HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             ConnectionSpec tlsSpec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                     .tlsVersions(TlsVersion.TLS_1_2, TlsVersion.TLS_1_3)
