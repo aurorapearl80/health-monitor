@@ -71,7 +71,13 @@ import com.monitor.health.model.Temperature;
 import com.monitor.health.model.WeighingScale;
 import com.monitor.health.receiver.BleWatchdogReceiver;
 import com.monitor.health.receiver.BluetoothStateReceiver;
+import com.monitor.health.request.BloodPressureRequest;
+import com.monitor.health.request.OximeterRequest;
 import com.monitor.health.request.ReadingRequest;
+import com.monitor.health.request.WeightRequest;
+import com.monitor.health.response.bloodpressure.BloodPressureResponse;
+import com.monitor.health.response.oximeter.OximeterResponse;
+import com.monitor.health.response.weight.WeightResponse;
 import com.monitor.health.utility.DeviceUtils;
 import com.monitor.health.utility.DoubleChangeDetector;
 import com.monitor.health.utility.IntChangeDetector;
@@ -1532,52 +1538,42 @@ public class BleScanService extends Service {
     }
 
     public void sendBPJumper(double systolic, double diastolic, double bpm, String serial) {
-        Log.d(TAG, "Success : sending the BP");
+        Log.d(TAG, "sendBPJumper: systolic=" + systolic + " diastolic=" + diastolic + " bpm=" + bpm);
 
         token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
 
-        Reading reading = new Reading(
-                false,
-                "Asia/Manila",
-                "jtm00025b94050c",
-                Arrays.asList(systolic, diastolic, bpm),
-                "66437be266c8833a1c42d7aa",
-                "5bb306382598931ffbd1b624",
+        // Save locally and broadcast immediately so the UI updates regardless of server response
+        saveDataBPJumper((int) systolic, (int) diastolic, (int) bpm, 1, serial);
+        ArrayList<Double> bloodpressureList = new ArrayList<>(Arrays.asList(systolic, diastolic, bpm));
+        Intent fallIntent = new Intent(Constant.ACTION_BLOOD_PRESSURE);
+        fallIntent.setPackage(getPackageName());
+        fallIntent.putExtra(Constant.VALUE_BLOOD_PRESSURE, bloodpressureList);
+        sendBroadcast(fallIntent);
+
+        BloodPressureRequest request = new BloodPressureRequest(
                 getDate(),
-                serial
+                serial,
+                systolic,
+                diastolic,
+                "66437be266c8833a1c42d7aa",
+                bpm,
+                "Asia/Manila"
         );
-        List<Reading> readingsList = Arrays.asList(reading);
-        ReadingsRequest readingsRequest = new ReadingsRequest(readingsList);
 
-        Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM,token, androidId).sendReadings(readingsRequest);
-        call.enqueue(new Callback<Object>() {
+        Call<BloodPressureResponse> call = ApiClient.getUserService(Constant.BASE_URL_BGM, token, androidId).sendBloodPressure(request);
+        call.enqueue(new Callback<BloodPressureResponse>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
-                Log.d(TAG, "Success : "+response);
-                Log.d(TAG, "Success : "+response.code());
-                Log.d(TAG, "Success : "+response.message());
-                Log.d(TAG, "Success : "+response.toString());
-
-                playNotificationSound();
-                ArrayList<Double> bloodpressureList = new ArrayList<>(Arrays.asList(systolic,diastolic, bpm));
-                Intent fallIntent = new Intent(Constant.ACTION_BLOOD_PRESSURE);
-                fallIntent.setPackage(getPackageName());
-                fallIntent.putExtra(Constant.VALUE_BLOOD_PRESSURE, bloodpressureList);
-                sendBroadcast(fallIntent);
-                Log.d("BP--- saving DB", "Systolic: " + (int)systolic + " Diastolic: " + (int)diastolic +"Blood pressure "+(int)bpm);
-                saveDataBPJumper((int)systolic, (int)diastolic, (int)bpm, 1, serial);
-
+            public void onResponse(Call<BloodPressureResponse> call, Response<BloodPressureResponse> response) {
+                Log.d(TAG, "sendBPJumper server response success=" + response.isSuccessful() + " code=" + response.code());
                 if (response.isSuccessful()) {
-                    restartBle();
-                } else {
-                    restartBle();
+                    playNotificationSound();
                 }
+                restartBle();
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
-                // Request failed
-                // Handle failure
+            public void onFailure(Call<BloodPressureResponse> call, Throwable t) {
+                Log.e(TAG, "sendBPJumper server error: " + t.getMessage());
                 restartBle();
             }
         });
@@ -1639,53 +1635,40 @@ public class BleScanService extends Service {
     }
 
     public void sendOximeter(double pulseRate, double oxygen, String serial2) {
-        // Usage example in your activity or service
-        Log.d(TAG, "Eximeter serial: "+serial);
+        Log.d(TAG, "Eximeter serial: " + serial);
         token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
-        Reading reading = new Reading(
-                false,
-                "Asia/Manila",
-                serial,
-                Arrays.asList(oxygen, pulseRate),
-                "5bc3cb14cba82b066cae7bc2",
-                "5bb306382598931ffbd1b626",
+
+        // Save locally and broadcast immediately — UI updates regardless of server response
+        saveOximeter((int) pulseRate, (int) oxygen, 1, serial);
+        Intent fallIntent = new Intent(Constant.ACTION_PULSE_OXIMETER);
+        fallIntent.setPackage(getPackageName());
+        fallIntent.putExtra(Constant.VALUE_PULSE_OXIMETER_PULSE_RATE, (int) pulseRate);
+        fallIntent.putExtra(Constant.VALUE_OXIMETER_PULSE_OXYGEN, (int) oxygen);
+        sendBroadcast(fallIntent);
+
+        OximeterRequest oximeterRequest = new OximeterRequest(
                 getDate(),
-                serial
+                serial,
+                oxygen,
+                "5bc3cb14cba82b066cae7bc2",
+                "Asia/Manila",
+                (int) pulseRate
         );
-        List<Reading> readingsList = Arrays.asList(reading);
-        ReadingsRequest readingsRequest = new ReadingsRequest(readingsList);
 
-        Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM,token, androidId).sendReadings(readingsRequest);
-        call.enqueue(new Callback<Object>() {
+        Call<OximeterResponse> call = ApiClient.getUserService(Constant.BASE_URL_BGM, token, androidId).sendOximeterReading(oximeterRequest);
+        call.enqueue(new Callback<OximeterResponse>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
-                Log.d(TAG, "sendOximeter main from "+ oxygen +" "+pulseRate);
-
+            public void onResponse(Call<OximeterResponse> call, Response<OximeterResponse> response) {
+                Log.d(TAG, "sendOximeter server response success=" + response.isSuccessful() + " oxygen=" + oxygen + " pulseRate=" + pulseRate);
                 if (response.isSuccessful()) {
-                    // Request successful
-                    // Handle response if needed
-                    //saveTemperatureData(temperature);
-                    saveOximeter((int) pulseRate, (int) oxygen, 1, serial);
-
-                    Intent fallIntent = new Intent(Constant.ACTION_PULSE_OXIMETER);
-                    fallIntent.setPackage(getPackageName());
-                    fallIntent.putExtra(Constant.VALUE_PULSE_OXIMETER_PULSE_RATE, (int)oxygen);
-                    fallIntent.putExtra(Constant.VALUE_OXIMETER_PULSE_OXYGEN, (int)pulseRate);
-                    sendBroadcast(fallIntent);
-                    restartBle();
                     playNotificationSound();
-
-                } else {
-                    // Request failed
-                    // Handle error
-                    restartBle();
                 }
+                restartBle();
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
-                // Request failed
-                // Handle failure
+            public void onFailure(Call<OximeterResponse> call, Throwable t) {
+                Log.e(TAG, "sendOximeter server error: " + t.getMessage());
                 restartBle();
             }
         });
@@ -2018,43 +2001,22 @@ public class BleScanService extends Service {
         databaseClient.getAppDatabase().weighingScaleDao().insertWeighingScale(weighingScale);
     }
     public void sendWeightScale(double weight) {
-        // Usage example in your activity or service
-        if(weight != 0 ) {
-            Log.d(TAG, "Eximeter serial: "+serial);
-            token = "bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%";
-            Reading reading = new Reading(
-                    false,
-                    "Asia/Manila",
-                    serial,
-                    Arrays.asList(weight),
-                    "5d2cac72ed5d7122d4044f0f",
-                    "5bb306382598931ffbd1b625",
+        if (weight != 0) {
+            Log.d(TAG, "Weight serial: " + serial);
+            WeightRequest request = new WeightRequest(
                     getDate(),
-                    serial
+                    androidId,
+                    weight,
+                    "5d2cac72ed5d7122d4044f0f",
+                    "Asia/Manila"
             );
-            List<Reading> readingsList = Arrays.asList(reading);
-            ReadingsRequest readingsRequest = new ReadingsRequest(readingsList);
 
-            ///playNotificationSound();
-            Intent fallIntent = new Intent(Constant.ACTION_WEIGHT);
-            fallIntent.setPackage(getPackageName());
-            fallIntent.putExtra(Constant.VALUE_WEIGHT, weight);
-            sendBroadcast(fallIntent);
-            saveWeighingScale(weight, 1, serial);
-            restartBle();
-
-            Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM,token, androidId).sendReadings(readingsRequest);
-            call.enqueue(new Callback<Object>() {
+            Call<WeightResponse> call = ApiClient.getUserService(Constant.BASE_URL_BGM, token, androidId).sendWeight(request);
+            call.enqueue(new Callback<WeightResponse>() {
                 @Override
-                public void onResponse(Call<Object> call, Response<Object> response) {
-                    Log.d(TAG, "this is the result "+ response.code());
-                    Log.d(TAG, "this is the result "+ response.body());
-                    Log.d(TAG, "this is the result "+ response.toString());
-                    Log.d(TAG, "this is the result "+ response.message());
+                public void onResponse(Call<WeightResponse> call, Response<WeightResponse> response) {
+                    Log.d(TAG, "sendWeightScale server response success=" + response.isSuccessful() + " code=" + response.code());
                     if (response.isSuccessful()) {
-                        // Request successful
-                        // Handle response if needed
-                        //saveTemperatureData(temperature);D
                         playNotificationSound();
                         Intent fallIntent = new Intent(Constant.ACTION_WEIGHT);
                         fallIntent.setPackage(getPackageName());
@@ -2062,18 +2024,13 @@ public class BleScanService extends Service {
                         sendBroadcast(fallIntent);
                         saveWeighingScale(weight, 1, serial);
                         restartBle();
-
                     } else {
-                        // Request failed
-                        // Handle error
                         restartBle();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<Object> call, Throwable t) {
-                    // Request failed
-                    // Handle failure
+                public void onFailure(Call<WeightResponse> call, Throwable t) {
                     restartBle();
                 }
             });

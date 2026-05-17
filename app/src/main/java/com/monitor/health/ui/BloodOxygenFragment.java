@@ -397,28 +397,12 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
                             }
                         });
 
-                model.getOximeterData().observe(getViewLifecycleOwner(), oximeters -> {
-
-                    Oximeter oximeter = databaseClient.getAppDatabase().oximeterDao().getLatestOximeter();
-                    Log.d("ERR size", oximeters.size()+" ths size");
-                    if (oximeter != null) {
-                        binding.tvValueBg.setText(String.valueOf(oximeters.get(0)));
-
-                        binding.tvBPM.setText("BMI: "+oximeters.get(1));
-                        String formattedTime = oximeter.getCreatedAtFormatted();
-                        if (formattedTime != null && !formattedTime.isEmpty()) {
-                            binding.tvTimeAgo.setText(formattedTime);
-                        }
-
-                    }
-                });
-
                 return;
             }
 
             vm.getOxygenUpdatedAt().observe(getViewLifecycleOwner(), timeAgo -> {
                 if (timeAgo == null) {
-                    // Missing timestamp â†’ show defaults
+                    // Missing timestamp → show defaults
                     bindMetric(rowBloodOxygen,
                             R.drawable.ic_oxygen_foreground,
                             Constant.BLOOD_OXYGEN,
@@ -430,22 +414,6 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
                                     ((MainActivity) getActivity()).navigateTo(PageType.BLOOD_OXYGEN);
                                 }
                             });
-
-                    model.getOximeterData().observe(getViewLifecycleOwner(), oximeters -> {
-
-                        Oximeter oximeter = databaseClient.getAppDatabase().oximeterDao().getLatestOximeter();
-                        Log.d("ERR size", oximeters.size()+" ths size");
-                        if (oximeter != null) {
-                            binding.tvValueBg.setText(String.valueOf(oximeters.get(0)));
-
-                            binding.tvBPM.setText("BMI: "+oximeters.get(1));
-                            String formattedTime = oximeter.getCreatedAtFormatted();
-                            if (formattedTime != null && !formattedTime.isEmpty()) {
-                                binding.tvTimeAgo.setText(formattedTime);
-                            }
-
-                        }
-                    });
                     return;
                 }
 
@@ -483,22 +451,6 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
                                     ((MainActivity) getActivity()).navigateTo(PageType.BLOOD_OXYGEN);
                                 }
                             });
-
-                    model.getOximeterData().observe(getViewLifecycleOwner(), oximeters -> {
-
-                        Oximeter oximeter = databaseClient.getAppDatabase().oximeterDao().getLatestOximeter();
-                        Log.d("ERR size", oximeters.size()+" ths size");
-                        if (oximeter != null) {
-                            binding.tvValueBg.setText(String.valueOf(oximeters.get(0)));
-
-                            binding.tvBPM.setText("BMI: "+oximeters.get(1));
-                            String formattedTime = oximeter.getCreatedAtFormatted();
-                            if (formattedTime != null && !formattedTime.isEmpty()) {
-                                binding.tvTimeAgo.setText(formattedTime);
-                            }
-
-                        }
-                    });
 
                 });
             });
@@ -582,6 +534,20 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
                             });
                 });
             });
+        });
+
+        model.getOximeterData().observe(getViewLifecycleOwner(), oximeters -> {
+            if (oximeters == null || oximeters.size() < 2) return;
+            Log.d(TAG, "sendOximeter data: pulseRate=" + oximeters.get(0) + " oxygen=" + oximeters.get(1));
+            binding.tvValueBg.setText(String.valueOf(oximeters.get(0)));
+            binding.tvBPM.setText("BPM: " + oximeters.get(1));
+            Oximeter oximeter = databaseClient.getAppDatabase().oximeterDao().getLatestOximeter();
+            if (oximeter != null) {
+                String formattedTime = oximeter.getCreatedAtFormatted();
+                if (formattedTime != null && !formattedTime.isEmpty()) {
+                    binding.tvTimeAgo.setText(formattedTime);
+                }
+            }
         });
 
         binding.btnMeasure.setOnClickListener(v -> startMeasuring());

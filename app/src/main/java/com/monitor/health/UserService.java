@@ -17,7 +17,13 @@ import com.monitor.health.response.bledevice.DeviceResponse;
 import com.monitor.health.response.bledevice.DeviceResponseList;
 import com.monitor.health.response.glocuse.GlucoseServerResponse;
 import com.monitor.health.response.readinghistory.ReadingHistoryResponse;
+import com.monitor.health.request.BloodPressureRequest;
+import com.monitor.health.request.OximeterRequest;
+import com.monitor.health.request.WeightRequest;
 import com.monitor.health.response.ble.BleUserProfileResponse;
+import com.monitor.health.response.bloodpressure.BloodPressureResponse;
+import com.monitor.health.response.oximeter.OximeterResponse;
+import com.monitor.health.response.weight.WeightResponse;
 import com.monitor.health.response.user.UserProfileResponse;
 
 import okhttp3.RequestBody;
@@ -43,6 +49,15 @@ public interface UserService {
 
     @POST("api/temperatures")
     Call<Object> sendTemperature(@Body ReadingRequest readingsRequest);
+
+    @POST("api/oximeter-readings")
+    Call<OximeterResponse> sendOximeterReading(@Body OximeterRequest request);
+
+    @POST("api/blood-pressures")
+    Call<BloodPressureResponse> sendBloodPressure(@Body BloodPressureRequest request);
+
+    @POST("api/weights")
+    Call<WeightResponse> sendWeight(@Body WeightRequest request);
 
     @GET("api/doctor-watches/medicine-schedules")
     Call<MedicationSchedule> getMedicineSchedule();

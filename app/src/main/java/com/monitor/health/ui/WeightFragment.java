@@ -709,6 +709,50 @@ public class WeightFragment extends Fragment implements QuickActionsHandler {
             });
         });
 
+        model.getWeightData().observe(getViewLifecycleOwner(), weight -> {
+            if (weight == null || weight == 0) return;
+            if (binding == null) return;
+
+            String weightUnit = PreferenceHelper.getInstance(getContext()).getString(Constant.weightUnit, "");
+            binding.tvUnit.setText(weightUnit);
+            boolean isConvert = PreferenceHelper.getInstance(getContext()).getBoolean(Constant.weightUnitBoolean, false);
+            if (isConvert) {
+                binding.tvValueBg.setText(String.valueOf(weight));
+            } else {
+                binding.tvValueBg.setText(String.valueOf(UnitConverter.kiloToPounds(weight)));
+            }
+
+            String heightStr = PreferenceHelper.getInstance(getContext()).getString(Constant.userHeight, "");
+            double height = (heightStr != null && !heightStr.trim().isEmpty()) ? Double.parseDouble(heightStr) : 0.0;
+            String gender = PreferenceHelper.getInstance(getContext()).getString(Constant.userGender, "");
+            int age = PreferenceHelper.getInstance(getContext()).getInt(Constant.userAge, 0);
+            BodyComposition bodyComposition = new BodyComposition();
+            bodyComposition.computeBodyWaterMuscleFat_1a(weight, 600, height, gender, age);
+            binding.tvBodyWater.setText(String.format("%.1f L", bodyComposition.getTotalBodyWater()));
+            binding.tvLeanMass.setText(String.format("%.1f kgs", bodyComposition.getLeanMass()));
+            binding.tvFatMass.setText(String.format("%.1f kgs", bodyComposition.getFatMass()));
+            binding.tvBodyFatPercent.setText(String.format("%.1f %%", bodyComposition.getBodyFatPercent()));
+
+            double bmi = AppUtils.calculateBMI(getContext(), weight);
+            binding.tvBPM.setText("BMI: " + bmi);
+            binding.tvOutcome.setText(AppUtils.getBmiDescription(bmi));
+
+            list = databaseClient.getAppDatabase().weighingScaleDao().getLatestWeighingScale();
+            if (list != null) {
+                binding.tvTimeAgo.setText(list.getCreatedAtFormatted());
+                bindMetric(rowWeight,
+                        R.drawable.ic_weight_foreground,
+                        "Weight",
+                        list.getCreatedAtFormatted(),
+                        String.valueOf(list.getWeight()),
+                        v -> {
+                            if (getActivity() instanceof MainActivity) {
+                                ((MainActivity) getActivity()).navigateTo(PageType.WEIGHT);
+                            }
+                        });
+            }
+        });
+
         setupQuickActions();
     }
 

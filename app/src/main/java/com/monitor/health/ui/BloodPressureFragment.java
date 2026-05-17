@@ -254,22 +254,6 @@ public class BloodPressureFragment extends Fragment implements QuickActionsHandl
                             }
                         });
 
-                    model.getBloodPressureData().observe(getViewLifecycleOwner(), list -> {
-                        Log.d("BP-- from fragment 4", "Systolic: " + list.get(0) + " Diastolic: " + list.get(1) + "Blood pressure " + list.get(2));
-                        int systolic = (int) Math.floor(list.get(0));
-                        int diastolic = (int) Math.floor(list.get(1));
-                        int pbm = (int) Math.floor(list.get(2));
-                        binding.tvSystolic.setText(systolic + "");
-                        binding.tvDiastolic.setText(diastolic + "");
-                        binding.tvBPM.setText("BPM: " + pbm + "");
-                        if (list != null) {
-                            BPJumper listDb = databaseClient.getAppDatabase().bpJumperDao().getLatestBPJumper();
-                            if (listDb != null) {
-                                binding.tvTimeAgo.setText(listDb.getCreatedAtFormatted());
-                            }
-
-                        }
-                    });
                 return;
             }
 
@@ -288,22 +272,6 @@ public class BloodPressureFragment extends Fragment implements QuickActionsHandl
                                 }
                             });
 
-                        model.getBloodPressureData().observe(getViewLifecycleOwner(), list -> {
-                            Log.d("BP-- from fragment 4", "Systolic: " + list.get(0) + " Diastolic: " + list.get(1) + "Blood pressure " + list.get(2));
-                            int systolic = (int) Math.floor(list.get(0));
-                            int diastolic = (int) Math.floor(list.get(1));
-                            int pbm = (int) Math.floor(list.get(2));
-                            binding.tvSystolic.setText(systolic + "");
-                            binding.tvDiastolic.setText(diastolic + "");
-                            binding.tvBPM.setText("BPM: " + pbm + "");
-                            if (list != null) {
-                                BPJumper listDb = databaseClient.getAppDatabase().bpJumperDao().getLatestBPJumper();
-                                if (listDb != null) {
-                                    binding.tvTimeAgo.setText(listDb.getCreatedAtFormatted());
-                                }
-
-                            }
-                        });
                     return;
                 }
 
@@ -372,36 +340,6 @@ public class BloodPressureFragment extends Fragment implements QuickActionsHandl
                             });
 
 
-                    model.getBloodPressureData().observe(getViewLifecycleOwner(), list -> {
-                        Log.d("BP-- from fragment 4", "Systolic: " + list.get(0) + " Diastolic: " + list.get(1) +"Blood pressure "+list.get(2));
-                        int systolic = (int) Math.floor(list.get(0));
-                        int diastolic = (int) Math.floor(list.get(1));
-                        int pbm = (int) Math.floor(list.get(2));
-                        binding.tvSystolic.setText(systolic+"");
-                        binding.tvDiastolic.setText(diastolic+"");
-                        binding.tvBPM.setText("BPM: "+pbm+"");
-                        if (list != null) {
-                            BPJumper listDb = databaseClient.getAppDatabase().bpJumperDao().getLatestBPJumper();
-                            if (listDb != null) {
-                                binding.tvTimeAgo.setText(listDb.getCreatedAtFormatted());
-                            }
-
-                        }
-
-                        bindMetric(rowBloodPressure,
-                                R.drawable.ic_heart_rate,
-                                Constant.BLOOD_PRESSURE,
-                                displayTime,
-                                Math.round(list.get(0))+"/"+Math.round(list.get(1)),
-                                v -> {
-                                    if (getActivity() instanceof MainActivity) {
-                                        // BP
-                                        ((MainActivity) getActivity()).navigateTo(PageType.BLOOD_PRESSURE);
-                                    }
-                                });
-
-
-                    });
 
                 });
             });
@@ -629,6 +567,31 @@ public class BloodPressureFragment extends Fragment implements QuickActionsHandl
             });
         });
 
+        model.getBloodPressureData().observe(getViewLifecycleOwner(), list -> {
+            if (list == null || list.size() < 3) return;
+            int systolic = (int) Math.floor(list.get(0));
+            int diastolic = (int) Math.floor(list.get(1));
+            int pbm = (int) Math.floor(list.get(2));
+            Log.d(TAG, "BP data received: systolic=" + systolic + " diastolic=" + diastolic + " bpm=" + pbm);
+            binding.tvSystolic.setText(String.valueOf(systolic));
+            binding.tvDiastolic.setText(String.valueOf(diastolic));
+            binding.tvBPM.setText("BPM: " + pbm);
+            BPJumper listDb = databaseClient.getAppDatabase().bpJumperDao().getLatestBPJumper();
+            if (listDb != null) {
+                binding.tvTimeAgo.setText(listDb.getCreatedAtFormatted());
+            }
+            bindMetric(rowBloodPressure,
+                    R.drawable.ic_heart_rate,
+                    Constant.BLOOD_PRESSURE,
+                    binding.tvTimeAgo.getText().toString(),
+                    systolic + "/" + diastolic + " mmHg",
+                    v -> {
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).navigateTo(PageType.BLOOD_PRESSURE);
+                        }
+                    });
+        });
+
         // Measure button
         binding.btnMeasure.setOnClickListener(v -> startMeasuring());
 
@@ -845,11 +808,11 @@ public class BloodPressureFragment extends Fragment implements QuickActionsHandl
                             if (typesAvailability == null) return;
                             updateMetricsVisibility(typesAvailability);
                         });
-                syncBloodPressureData();
-                syncSpo2();
-                syncHeartRate();
-                syncStep();
-                ((MainActivity) requireActivity()).startFetchingSteps();
+                //syncBloodPressureData();
+                //syncSpo2();
+                //syncHeartRate();
+                //syncStep();
+                //((MainActivity) requireActivity()).startFetchingSteps();
             });
         } else {
             BPJumper list = databaseClient.getAppDatabase().bpJumperDao().getLatestBPJumper();

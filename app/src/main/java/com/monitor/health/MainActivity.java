@@ -411,7 +411,7 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
             if (Constant.ACTION_PULSE_OXIMETER.equals(intent.getAction())) {
                 int pulseRate = intent.getIntExtra(Constant.VALUE_PULSE_OXIMETER_PULSE_RATE, 0);
                 int oxygen = intent.getIntExtra(Constant.VALUE_OXIMETER_PULSE_OXYGEN, 0);
-                Log.d(TAG, "sendOximeter main The data of pulseRate main "+pulseRate);
+                Log.d(TAG, "sendOximeter data:  "+pulseRate);
                 //model.setHeartRate(acc);
                 List<Integer> oximeters = new ArrayList<>();
                 oximeters.add(pulseRate);
