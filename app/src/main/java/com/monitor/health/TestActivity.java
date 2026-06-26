@@ -1,7 +1,6 @@
 package com.monitor.health;
 
 import android.annotation.SuppressLint;
-import android.app.HSystemAssistManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,15 +24,15 @@ import com.monitor.health.utility.BloodPressureEstimator;
 public class TestActivity extends AppCompatActivity {
 
     private static final String TAG = "TestActivity";
-    private HSystemAssistManager systemAssistManager;
     private SensorManager mSensorManager;
-    private static final int TYPE_HEART_RATE = 21;
 
     // Measurement variables
     private int heartRateValue = 0;
     private int bloodRateValue = 0;
-    private int steps;
+    private int currentStepCount = 0;
+    private int steps = 0;
     private Sensor mSensor;
+    private Sensor mStepCounterSensor;
     private float semaphore;
     private float light;
 
@@ -147,25 +146,32 @@ public class TestActivity extends AppCompatActivity {
         tv_sleep = findViewById(R.id.tvSleep);
     }
 
-    @SuppressLint("WrongConstant")
     private void initializeSystemServices() {
-        systemAssistManager = (HSystemAssistManager) getSystemService("hsystemassist");
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        systemAssistManager.isEnableAccelerate(this);
-
-        //Retrieve blood pressure data via below API
-//
     }
 
     private void setupSensorListener() {
-        mSensor = mSensorManager.getDefaultSensor(TYPE_HEART_RATE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         if (mSensor != null) {
             mSensorManager.registerListener(mHeartRateListener, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
             Log.d(TAG, "Heart rate sensor registered successfully");
         } else {
             Log.e(TAG, "Heart rate sensor not available");
         }
+        mStepCounterSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if (mStepCounterSensor != null) {
+            mSensorManager.registerListener(mStepCounterListener, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
+
+    private final SensorEventListener mStepCounterListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            currentStepCount = (int) event.values[0];
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    };
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private void registerBroadcastReceiver() {
@@ -175,29 +181,9 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void enableBothMeasurements() {
-        try {
-            // Try to enable both modes - this might work on some hardware
-            systemAssistManager.setHeartrateMode(1); // Heart rate
-            // Small delay to ensure first mode is set
-            new Handler().postDelayed(() -> {
-                try {
-                    systemAssistManager.setHeartrateMode(2); // Blood rate
-                    Log.d(TAG, "Both measurement modes enabled");
-                } catch (Exception e) {
-                    Log.e(TAG, "Error enabling blood rate mode: " + e.getMessage());
-                }
-            }, 100);
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error enabling heart rate mode: " + e.getMessage());
-        }
-
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                updateUI();
-            }
-        };
+        // On standard Android (Pixel Watch, Samsung Watch), just registering TYPE_HEART_RATE
+        // is sufficient — no proprietary mode-switching needed.
+        runnable = this::updateUI;
     }
 
     private void updateUI() {
@@ -214,20 +200,12 @@ public class TestActivity extends AppCompatActivity {
 
             // Update steps display
             if (txt_steps != null) {
-                try {
-                    int stepCount = systemAssistManager.getSetpCount();
-                    txt_steps.setText("Steps: " + stepCount);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error getting step count: " + e.getMessage());
-                    txt_steps.setText("Steps: --");
-                }
+                txt_steps.setText("Steps: " + currentStepCount);
             }
 
-            String bloodpressure=systemAssistManager.getBloodPressure();
-            tv_blood_pressure.setText(String.format("Value: %s", bloodpressure));
-            //Retrieve sleep data via below API
-            String sleep=systemAssistManager.getSleep();
-            tv_sleep.setText("Sleep : "+sleep);
+            // Blood pressure and sleep are not available via standard Android sensor APIs
+            if (tv_blood_pressure != null) tv_blood_pressure.setText("Value: N/A");
+            if (tv_sleep != null) tv_sleep.setText("Sleep: N/A");
         });
     }
 
@@ -271,9 +249,11 @@ public class TestActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Re-register sensor listener when activity resumes
         if (mSensor != null) {
             mSensorManager.registerListener(mHeartRateListener, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        if (mStepCounterSensor != null) {
+            mSensorManager.registerListener(mStepCounterListener, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
         updateUI();
     }
@@ -281,16 +261,16 @@ public class TestActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // Unregister sensor listener to save battery
         mSensorManager.unregisterListener(mHeartRateListener);
+        mSensorManager.unregisterListener(mStepCounterListener);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Clean up resources
         if (mSensorManager != null) {
             mSensorManager.unregisterListener(mHeartRateListener);
+            mSensorManager.unregisterListener(mStepCounterListener);
         }
         if (dataReceiver != null) {
             try {

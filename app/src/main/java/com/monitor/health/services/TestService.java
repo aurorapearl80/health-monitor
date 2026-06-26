@@ -3,8 +3,6 @@ package com.monitor.health.services;
 import static com.monitor.health.Constant.ACTION_HEALTH_UPDATE;
 import static com.monitor.health.utility.AppUtils.getTodayDate;
 
-import android.annotation.SuppressLint;
-import android.app.HSystemAssistManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -58,11 +56,11 @@ public class TestService extends Service {
     private static final String TAG = "TestService";
     private static final int NOTIF_ID = 44;
     private static final String NOTIF_CH_ID = "health_upload";
-    private static final int TYPE_HEART_RATE = 21;
 
-    private HSystemAssistManager systemAssistManager;
     private SensorManager mSensorManager;
     private Sensor mSensor;
+    private Sensor mStepCounterSensor;
+    private int currentStepCount = -1;
 
     private int heartRateValue = 0;
     private int bloodRateValue = 0;
@@ -103,8 +101,7 @@ public class TestService extends Service {
                 bloodRateValue = spo2;
             }
 
-            int stepsNow = -1;
-            try { stepsNow = systemAssistManager.getSetpCount(); } catch (Throwable ignored) {}
+            int stepsNow = currentStepCount;
             broadcastToUI(heartRateValue, bloodRateValue, stepsNow, /*uploaded=*/false, "live");
         }
         @Override public void onAccuracyChanged(Sensor s, int a) {}
@@ -114,7 +111,6 @@ public class TestService extends Service {
         super.onCreate();
         startInForeground();
         initSystem();
-        enableBothMeasurements();
         registerSensor();
 
         // give sensors time, then upload
@@ -127,52 +123,29 @@ public class TestService extends Service {
         return START_STICKY;
     }
 
-    @SuppressLint("WrongConstant")
     private void initSystem() {
-        systemAssistManager = (HSystemAssistManager) getSystemService("hsystemassist");
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        try { systemAssistManager.isEnableAccelerate(this); } catch (Throwable ignored) {}
-    }
-
-    private void enableBothMeasurements() {
-        try {
-            systemAssistManager.setHeartrateMode(1); // HR â€” needs several seconds to produce a reading
-            // Switch to SpO2 mode only once we have a valid HR reading, or after 50 s max.
-            // This prevents the 2pm/Doze scenario where mode-1 never fires an event within 30 s,
-            // leaving heartRateValue = 0 for the rest of the run.
-            scheduleSwitchToMode2(0);
-        } catch (Exception e) {
-            Log.e(TAG, "Error enabling heart rate mode: " + e.getMessage());
-        }
-    }
-
-    // Polls every 10 s (up to 50 s total) for a valid HR reading, then switches to SpO2 mode.
-    private void scheduleSwitchToMode2(int attemptCount) {
-        final int MAX_ATTEMPTS = 5; // 5 Ã— 10 s = 50 s max wait
-        handler.postDelayed(() -> {
-            if (heartRateValue > 0 || attemptCount >= MAX_ATTEMPTS) {
-                try {
-                    systemAssistManager.setHeartrateMode(2); // Blood/SpO2
-                    Log.d(TAG, "Switched to SpO2 mode (attempt=" + (attemptCount + 1)
-                            + ", heartRate=" + heartRateValue + ")");
-                } catch (Exception e) {
-                    Log.e(TAG, "Error enabling SpO2 mode: " + e.getMessage());
-                }
-            } else {
-                Log.d(TAG, "HR not yet captured (attempt=" + (attemptCount + 1) + "), waitingâ€¦");
-                scheduleSwitchToMode2(attemptCount + 1);
-            }
-        }, 10_000);
     }
 
     private void registerSensor() {
-        mSensor = mSensorManager.getDefaultSensor(TYPE_HEART_RATE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         if (mSensor != null) {
             mSensorManager.registerListener(mHeartRateListener, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
-            Log.w(TAG, "No HR sensor; will still upload placeholder values.");
+            Log.w(TAG,"No HR sensor will still upload placeholder values.");
+        }
+        mStepCounterSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if (mStepCounterSensor != null) {
+            mSensorManager.registerListener(mStepCounterListener, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
+
+    private final SensorEventListener mStepCounterListener = new SensorEventListener() {
+        @Override public void onSensorChanged(SensorEvent e) {
+            currentStepCount = (int) e.values[0];
+        }
+        @Override public void onAccuracyChanged(Sensor s, int a) {}
+    };
 
     private void startInForeground() {
         // Android 14+ enforces that foregroundServiceType=health requires at least one
@@ -215,8 +188,7 @@ public class TestService extends Service {
         measurementComplete = true;
         try { mSensorManager.unregisterListener(mHeartRateListener); } catch (Throwable ignored) {}
 
-        int steps = -1;
-        try { steps = systemAssistManager.getSetpCount(); } catch (Throwable ignored) {}
+        int steps = currentStepCount;
 
         // 4 live measurements (HR, SpO2, Steps, BP) + 1 DB flush (Steps only).
         // sendSleepSync removed: it sent [0.0, heartRateValue] with the same readingType as
@@ -756,6 +728,7 @@ public class TestService extends Service {
     @Override public void onDestroy() {
         super.onDestroy();
         try { mSensorManager.unregisterListener(mHeartRateListener); } catch (Throwable ignored) {}
+        try { mSensorManager.unregisterListener(mStepCounterListener); } catch (Throwable ignored) {}
         if (stopAndUploadRunnable != null) handler.removeCallbacks(stopAndUploadRunnable);
         Log.d(TAG, "Service destroyed");
     }

@@ -47,16 +47,7 @@ public class WatchStateOverlayView extends FrameLayout {
     }
 
     public void setState(State state) {
-        if (state == State.HIDDEN) {
-            setVisibility(GONE);
-        } else {
-            setVisibility(VISIBLE);
-            // Make it super obvious
-            setForeground(null);
-            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) root.getLayoutParams();
-            if (lp != null) lp.gravity = Gravity.CENTER;
-            if (title != null) title.setText("Please wear the device");
-            if (message != null) message.setText("During measurement please stay still");
-        }
+        // Overlay disabled — always hidden
+        setVisibility(GONE);
     }
 }

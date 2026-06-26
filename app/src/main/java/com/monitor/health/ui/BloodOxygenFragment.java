@@ -594,8 +594,7 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
                                 sendOximeter(spo2, 0);
 
                             } else {
-                                binding.tvStatus.setVisibility(View.VISIBLE);
-                                binding.tvStatus.setText("Please wear the device");
+                                binding.tvStatus.setVisibility(View.GONE);
                             }
                             binding.progress.setVisibility(View.GONE);
                             measuring = false;
@@ -613,7 +612,7 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
                             if (binding == null) return;
 
                             binding.progress.setVisibility(View.GONE);
-                            binding.tvStatus.setText("Please wear the device");
+                            binding.tvStatus.setVisibility(View.GONE);
 
                             //binding.heartRateLine.cancelAnimation();
                             //binding.heartRateLine.setProgress(0f);

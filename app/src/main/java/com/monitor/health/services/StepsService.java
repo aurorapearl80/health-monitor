@@ -1,6 +1,4 @@
 package com.monitor.health.services;
-import android.annotation.SuppressLint;
-import android.app.HSystemAssistManager;
 import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -19,7 +17,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 public class StepsService extends Service {
 
     private static final String TAG = "SensorDataService";
-    private static final int TYPE_HEART_RATE = 21;
 
     // Broadcast action constants
     public static final String ACTION_SENSOR_DATA = "com.yourpackage.SENSOR_DATA";
@@ -29,9 +26,9 @@ public class StepsService extends Service {
     public static final String EXTRA_HEART_RATE = "heart_rate";
     public static final String EXTRA_STEP_COUNT = "step_count";
 
-    private HSystemAssistManager mHSystemAssistManager;
     private SensorManager mSensorManager;
-    private Sensor mSensor;
+    private Sensor mHeartRateSensor;
+    private Sensor mStepCounterSensor;
 
     private int steps;
     private float semaphore;
@@ -54,7 +51,6 @@ public class StepsService extends Service {
         }
     }
 
-    @SuppressLint("WrongConstant")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -62,13 +58,11 @@ public class StepsService extends Service {
 
         handler = new Handler(Looper.getMainLooper());
 
-        // Initialize sensor manager and custom system manager
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mHSystemAssistManager = (HSystemAssistManager) getSystemService("hsystemassist");
 
-        // Get heart rate sensor
         if (mSensorManager != null) {
-            mSensor = mSensorManager.getDefaultSensor(TYPE_HEART_RATE);
+            mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+            mStepCounterSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         }
 
         startSensorMonitoring();
@@ -86,19 +80,16 @@ public class StepsService extends Service {
     }
 
     private void startSensorMonitoring() {
-        // Register heart rate sensor listener
-        if (mSensor != null && mSensorManager != null) {
-            mSensorManager.registerListener(mHeartRateListener, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            Log.d(TAG, "Heart rate sensor registered");
+        if (mSensorManager != null) {
+            if (mHeartRateSensor != null) {
+                mSensorManager.registerListener(mHeartRateListener, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+                Log.d(TAG, "Heart rate sensor registered");
+            }
+            if (mStepCounterSensor != null) {
+                mSensorManager.registerListener(mStepCounterListener, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
+                Log.d(TAG, "Step counter sensor registered");
+            }
         }
-
-        // Enable accelerometer through custom system manager
-        if (mHSystemAssistManager != null) {
-            mHSystemAssistManager.isEnableAccelerate(this);
-            Log.d(TAG, "Accelerometer enabled");
-        }
-
-        // Start periodic data collection
         startDataCollection();
     }
 
@@ -109,13 +100,7 @@ public class StepsService extends Service {
     private final Runnable dataCollectionRunnable = new Runnable() {
         @Override
         public void run() {
-            // Get step count from system manager
-            if (mHSystemAssistManager != null) {
-                stepCount = mHSystemAssistManager.getSetpCount();
-            }
-
-//            Log.d(TAG, String.format("Data collected - Steps: %d, Semaphore: %.2f, Light: %.2f, StepCount: %d",
-//                    steps, semaphore, light, stepCount));
+            // stepCount is updated by mStepCounterListener
 
             // Notify activity through callback
             if (sensorDataListener != null) {
@@ -133,19 +118,27 @@ public class StepsService extends Service {
     private final SensorEventListener mHeartRateListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
-            //if (event.values.length > 6) {
+            if (event.values.length > 0) {
                 steps = (int) (event.values[0] + 0.5f);
-                semaphore = event.values[5];
-                light = event.values[6];
-
-                //Log.d(TAG, "Sensor changed - Steps: " + steps + ", Semaphore: " + semaphore + ", Light: " + light);
-            //}
+            }
+            // values[5] and [6] are Huawei-specific channels; not available on standard Android
+            semaphore = (event.values.length > 5) ? event.values[5] : 0f;
+            light     = (event.values.length > 6) ? event.values[6] : 0f;
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
             Log.d(TAG, "Sensor accuracy changed: " + accuracy);
         }
+    };
+
+    private final SensorEventListener mStepCounterListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            stepCount = (int) event.values[0];
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
     };
 
     private void sendSensorDataBroadcast() {
@@ -175,8 +168,9 @@ public class StepsService extends Service {
         Log.d(TAG, "Service destroyed");
 
         // Unregister sensor listeners
-        if (mSensorManager != null && mHeartRateListener != null) {
+        if (mSensorManager != null) {
             mSensorManager.unregisterListener(mHeartRateListener);
+            mSensorManager.unregisterListener(mStepCounterListener);
         }
 
         // Remove handler callbacks

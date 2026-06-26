@@ -9,6 +9,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.monitor.health.utility.BPReading;
+import com.monitor.health.utility.BloodPressureEstimator;
+
 /**
  * Native-sensor façade for heart rate, SpO2, and step count.
  * Uses only android.hardware.SensorManager — no vendor plugins or
@@ -77,6 +80,24 @@ public class HealthManager {
     }
 
     // ── Public API ─────────────────────────────────────────────────────────────
+
+    /**
+     * Measure heart rate, then derive blood pressure using BloodPressureEstimator.
+     * Note: estimation is not medically accurate — it is a correlation-based approximation.
+     */
+    public void startBloodPressureMeasurement(ValueCallback<BPReading> cb) {
+        startHeartRateMeasurement(new ValueCallback<Integer>() {
+            @Override
+            public void onValue(Integer bpm) {
+                BPReading bp = new BloodPressureEstimator().estimateBloodPressure(bpm);
+                cb.onValue(bp);
+            }
+            @Override
+            public void onError(String error) {
+                cb.onError(error);
+            }
+        });
+    }
 
     public void startHeartRateMeasurement(ValueCallback<Integer> cb) {
         heartCallback = null;

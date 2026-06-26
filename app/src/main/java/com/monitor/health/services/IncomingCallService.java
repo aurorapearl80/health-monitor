@@ -41,7 +41,6 @@ public class IncomingCallService extends Service {
 
         createIncomingChannel();
 
-        // Full-screen intent (OEM may ignore while screen off, but harmless)
         Intent fsIntent = new Intent(this, IncomingCallActivity.class)
                 .putExtra(EXTRA_CALLER, caller)
                 .putExtra(EXTRA_TOKEN, token)
@@ -49,11 +48,6 @@ public class IncomingCallService extends Service {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                         | Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        PendingIntent fsPi = PendingIntent.getActivity(
-                this, 0, fsIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
 
         // Actions -> BroadcastReceiver
         Intent answerI = new Intent(this, CallActionReceiver.class)
@@ -91,7 +85,6 @@ public class IncomingCallService extends Service {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setFullScreenIntent(fsPi, true)                  // ignored if OEM blocks FSI
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(rv)
                 .setCustomBigContentView(rv)

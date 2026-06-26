@@ -89,14 +89,6 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
     private void showIncomingNotification(@NonNull CallInvite invite) {
         createChannelIfNeeded();
 
-        Intent fullScreenIntent = new Intent(this, com.monitor.health.ui.IncomingVoiceActivity.class)
-                .putExtra("VOICE_CALL_SID", invite.getCallSid())
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
-                this, 0, fullScreenIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0)
-        );
-
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_call)
@@ -106,8 +98,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setAutoCancel(true)
                 .setOngoing(true)
-                .setSound(sound)
-                .setFullScreenIntent(fullScreenPendingIntent, true);
+                .setSound(sound);
 
         Notification notification = builder.build();
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -3,7 +3,6 @@ package com.monitor.health.services;
 import static com.monitor.health.Constant.ACTION_HEALTH_UPDATE;
 
 import android.annotation.SuppressLint;
-import android.app.HSystemAssistManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,14 +19,14 @@ import android.util.Log;
 public class HeartRateOxygenStepService extends Service {
 
     private static final String TAG = "TestService";
-    private HSystemAssistManager systemAssistManager;
     private SensorManager mSensorManager;
-    private static final int TYPE_HEART_RATE = 21;
 
     private int heartRateValue = 0;
     private int bloodRateValue = 0;
-    private int steps;
+    private int currentStepCount = 0;
+    private int steps = 0;
     private Sensor mSensor;
+    private Sensor stepCounterSensor;
     private float semaphore;
     private float light;
 
@@ -94,17 +93,18 @@ public class HeartRateOxygenStepService extends Service {
         runnable = this::broadcastResults;
     }
 
-    @SuppressLint("WrongConstant")
     private void initializeSystemServices() {
-        systemAssistManager = (HSystemAssistManager) getSystemService("hsystemassist");
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        systemAssistManager.isEnableAccelerate(this);
     }
 
     private void setupSensorListener() {
-        mSensor = mSensorManager.getDefaultSensor(TYPE_HEART_RATE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         if (mSensor != null) {
             mSensorManager.registerListener(mHeartRateListener, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        stepCounterSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if (stepCounterSensor != null) {
+            mSensorManager.registerListener(mStepCounterListener, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -115,15 +115,20 @@ public class HeartRateOxygenStepService extends Service {
         registerReceiver(dataReceiver, filter);
     }
 
+    private final SensorEventListener mStepCounterListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            currentStepCount = (int) event.values[0];
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    };
+
     private void broadcastResults() {
         Intent intent = new Intent(ACTION_HEALTH_UPDATE);
         intent.putExtra("heartRate", heartRateValue);
         intent.putExtra("bloodRate", bloodRateValue);
-        try {
-            intent.putExtra("steps", systemAssistManager.getSetpCount());
-        } catch (Exception e) {
-            intent.putExtra("steps", -1);
-        }
+        intent.putExtra("steps", currentStepCount);
         sendBroadcast(intent);
     }
 
@@ -137,6 +142,7 @@ public class HeartRateOxygenStepService extends Service {
         super.onDestroy();
         if (mSensorManager != null) {
             mSensorManager.unregisterListener(mHeartRateListener);
+            mSensorManager.unregisterListener(mStepCounterListener);
         }
         unregisterReceiver(dataReceiver);
         handler.removeCallbacks(runnable);

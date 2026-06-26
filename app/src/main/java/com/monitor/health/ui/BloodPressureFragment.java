@@ -657,10 +657,7 @@ public class BloodPressureFragment extends Fragment implements QuickActionsHandl
                                     databaseClient.getAppDatabase().bpJumperDao().insertBPJumper(bpJumper);
                                 }
                             } else {
-                                //binding.tvSystolic.setText("--");
-                                //binding.tvDiastolic.setText("--");
-                                binding.tvStatus.setVisibility(View.VISIBLE);
-                                binding.tvStatus.setText("Please wear the device");
+                                binding.tvStatus.setVisibility(View.GONE);
                             }
 
                             binding.progress.setVisibility(View.GONE);
@@ -684,8 +681,7 @@ public class BloodPressureFragment extends Fragment implements QuickActionsHandl
                             if (binding == null) return;
 
                             binding.progress.setVisibility(View.GONE);
-                            //binding.tvStatus.setText(error);
-                            binding.tvStatus.setText("Please wear the device");
+                            binding.tvStatus.setVisibility(View.GONE);
 
                             // binding.heartRateLine.cancelAnimation();
                             //binding.heartRateLine.setProgress(0f);

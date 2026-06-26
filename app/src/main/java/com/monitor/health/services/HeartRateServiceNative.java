@@ -1,7 +1,5 @@
 package com.monitor.health.services;
 
-import android.annotation.SuppressLint;
-import android.app.HSystemAssistManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -26,29 +24,20 @@ public class HeartRateServiceNative extends Service implements SensorEventListen
     private Sensor mSensor;
     private int mCurrentHeartRate = -1;
 
-    private static final int TYPE_HEART_RATE = 21;
     public static final String ACTION_HEART_RATE = "com.monitor.health.ACTION_HEART_RATE";
     public static final String EXTRA_HEART_RATE = "heart_rate";
 
-    private HSystemAssistManager systemAssistManager;
 
-
-    @SuppressLint("WrongConstant")
     @Override
     public void onCreate() {
         super.onCreate();
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager != null) {
-            mSensor = mSensorManager.getDefaultSensor(TYPE_HEART_RATE);
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
             if (mSensor != null) {
                 mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
             }
         }
-
-
-        //systemAssistManager = (HSystemAssistManager)getSystemService("hsystemassist");
-        //systemAssistManager.getSetpCount();
     }
 
     @Override
@@ -66,22 +55,20 @@ public class HeartRateServiceNative extends Service implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event == null || event.values == null || event.values.length < 2) return;
+        if (event == null || event.values == null || event.values.length < 1) return;
 
-        int heartValue = (int) (event.values[0] + 0.5f); // HEART
-        int bloodValue = (int) (event.values[1] + 0.5f); // BLOOD
+        int heartValue = (int) (event.values[0] + 0.5f);
+        // SpO2 on standard Android: try values[1] if available (some Wear OS devices multiplex it)
+        int bloodValue = (event.values.length > 1) ? (int) (event.values[1] + 0.5f) : 0;
 
-        // Optional: Invalidate if flagged (for either)
+        // Invalidate if flagged (Huawei extended channel, ignored on standard Android)
         if (event.values.length > 7 && (event.values[7] == 1 || event.values[7] == 3)) {
             heartValue = -1;
             bloodValue = -1;
         }
 
         mCurrentHeartRate = heartValue;
-
-        // Send both values to MainActivity
         sendHeartAndBloodToMainActivity(heartValue, bloodValue);
-
     }
 
     @Override

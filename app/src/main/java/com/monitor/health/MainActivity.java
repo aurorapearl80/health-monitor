@@ -10,7 +10,6 @@ import static com.monitor.health.utility.LauncherItems.ACTION_HEART_CLASE;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.HSystemAssistManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -197,8 +196,6 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
     SharedDataViewModel model;
     ReadingsViewModel readingsViewModel;
 
-    private HSystemAssistManager systemAssistManager;
-
     DatabaseClient databaseClient;
 
     private HeartRateSensorService mService;
@@ -214,7 +211,6 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
 
     //Heart rate and
     private SensorManager mSensorManager;
-    private static final int TYPE_HEART_RATE = 21;
 
     // Measurement variables
     private int heartRateValue = 0;
@@ -545,37 +541,21 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
     private SensorEventListener mHeartRateListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
-            steps = (int) (event.values[0] + 0.5f);
+            if (event.values == null || event.values.length == 0) return;
 
-            //Log.d(TAG, "Sensor value received: " + steps);
+            // values[0] from TYPE_HEART_RATE is always heart rate in BPM on standard Android
+            heartRateValue = (int) (event.values[0] + 0.5f);
 
-            // Try to extract both heart rate and blood rate from sensor data
-            heartRateValue = steps; // Primary sensor value as heart rate
-
-            // Check if there are additional values in the sensor event
+            // SpO2: some Wear OS devices (Samsung, Pixel) multiplex blood oxygen on channels 1–4
             if (event.values.length > 1) {
-                bloodRateValue = (int) (event.values[1] + 0.5f);
-                //Log.d(TAG, "Blood rate from sensor[1]: " + bloodRateValue);
+                int candidate = (int) (event.values[1] + 0.5f);
+                if (candidate > 0 && candidate != heartRateValue) bloodRateValue = candidate;
+            }
+            if (event.values.length > 2 && bloodRateValue == 0) {
+                int candidate = (int) (event.values[2] + 0.5f);
+                if (candidate > 0 && candidate != heartRateValue) bloodRateValue = candidate;
             }
 
-            // Alternative: Try to get blood rate from different sensor indices
-            if (event.values.length > 2) {
-                int alternativeBlood = (int) (event.values[2] + 0.5f);
-                if (alternativeBlood > 0 && alternativeBlood != heartRateValue) {
-                    bloodRateValue = alternativeBlood;
-                    //Log.d(TAG, "Blood rate from sensor[2]: " + bloodRateValue);
-                }
-            }
-
-            // Get additional sensor values
-            if (event.values.length > 5) {
-                semaphore = event.values[5];
-            }
-            if (event.values.length > 6) {
-                light = event.values[6];
-            }
-
-            //Log.d(TAG, "Heart Rate: " + heartRateValue + ", Blood Rate: " + bloodRateValue);
             handler.post(runnable);
         }
 
@@ -2268,15 +2248,8 @@ private void startHearRateSensorService() {
     }
 
 
-    @SuppressLint("WrongConstant")
     private void initializeSystemServices() {
-        systemAssistManager = (HSystemAssistManager) getSystemService("hsystemassist");
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (systemAssistManager != null) {
-            systemAssistManager.isEnableAccelerate(this);
-        } else {
-            Log.w(TAG, "HSystemAssistManager unavailable on this device; skipping acceleration init");
-        }
     }
 
     private void setupSensorListener() {
@@ -2284,7 +2257,7 @@ private void startHearRateSensorService() {
             Log.w(TAG, "SensorManager unavailable; skipping heart rate sensor setup");
             return;
         }
-        mSensor = mSensorManager.getDefaultSensor(TYPE_HEART_RATE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         if (mSensor != null) {
             mSensorManager.registerListener(mHeartRateListener, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
             Log.d(TAG, "Heart rate sensor registered successfully");

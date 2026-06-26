@@ -1,7 +1,6 @@
 package com.monitor.health.services;
 
 import android.annotation.SuppressLint;
-import android.app.HSystemAssistManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -36,7 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class HeartRateSensorService extends Service implements HeartRateDataManager.ServerSyncListener {
 
     private static final String TAG = "HeartRateService";
-    private static final int TYPE_HEART_RATE = 21;
     private static final int NOTIFICATION_ID = 1001;
 
     // Heart rate modes
@@ -53,7 +51,6 @@ public class HeartRateSensorService extends Service implements HeartRateDataMana
     // Broadcast actions
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    private HSystemAssistManager mHSystemAssistManager;
     private IBinder mBinder = new HeartRateServiceBinder();
     private boolean isMonitoring = false;
     private int currentMode = MODE_HEART_RATE;
@@ -100,12 +97,10 @@ public class HeartRateSensorService extends Service implements HeartRateDataMana
         return mBinder;
     }
 
-    @SuppressLint("WrongConstant")
     private void initializeSensor() {
         Log.d(TAG, "Initializing sensors");
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(TYPE_HEART_RATE);
-        mHSystemAssistManager = (HSystemAssistManager) getSystemService("hsystemassist");
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
     }
 
     private void initializeDatabase() {
@@ -173,11 +168,6 @@ public class HeartRateSensorService extends Service implements HeartRateDataMana
     private void startMonitoring(int mode) {
         currentMode = mode;
 
-        if (mHSystemAssistManager != null) {
-            mHSystemAssistManager.setHeartrateMode(mode);
-            Log.d(TAG, "Set HSystemAssistManager mode to: " + mode);
-        }
-
         // Update data manager mode
         if (heartRateDataManager != null) {
             heartRateDataManager.setCurrentMode(mode);
@@ -228,7 +218,7 @@ public class HeartRateSensorService extends Service implements HeartRateDataMana
     private final SensorEventListener mHeartRateListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == TYPE_HEART_RATE && event.values.length > 0) {
+            if (event.sensor.getType() == Sensor.TYPE_HEART_RATE && event.values.length > 0) {
                 float heartRate = event.values[0];
                 totalReadingsReceived++;
 
@@ -549,7 +539,6 @@ public class HeartRateSensorService extends Service implements HeartRateDataMana
         // Cleanup resources
         mSensorManager = null;
         mSensor = null;
-        mHSystemAssistManager = null;
 
         Log.d(TAG, "Service destroyed and cleaned up");
         logStatistics();
