@@ -231,8 +231,19 @@ public class HeartRateFragment extends BaseFragment {
                     });
         });
 
+        binding.btnSubmit.setOnClickListener(v -> submitManual());
+
         // If you ALSO had a HealthManager wear listener, remove it to avoid double control.
         // We now rely on the sensor listener above as the single source of truth in this fragment.
+    }
+
+    private void submitManual() {
+        if (binding == null) return;
+        String bpmStr = binding.etBpm.getText().toString().trim();
+        if (bpmStr.isEmpty()) return;
+        int bpm = Integer.parseInt(bpmStr);
+        binding.tvValue.setText(bpm + " BPM");
+        sendHeartRate(bpm);
     }
 
     // Start sensor listening with the Fragment's visible lifecycle

@@ -490,6 +490,7 @@ public class TestService extends Service {
                 return;
             }
 
+            final int finalDelta = delta;
             List<Double> vals = Arrays.asList((double) delta);
 
             Reading reading = new Reading(
@@ -510,14 +511,22 @@ public class TestService extends Service {
                             if (resp.isSuccessful()) {
                                 Log.d(TAG, "âœ… Steps data sent successfully");
                             } else {
-                                Log.e(TAG, "âŒ Server returned error: " + resp.code() + " - " + resp.message());
+                                Log.e(TAG, "â Steps server error: " + resp.code() + " — saving locally");
+                                DatabaseClient.getInstance(getApplicationContext())
+                                        .getAppDatabase().stepDao()
+                                        .insertStep(new StepEntity(finalDelta));
+                                failedUploads.incrementAndGet();
                             }
                             onUploadComplete();
                         }
 
                         @Override
                         public void onFailure(Call<Object> call, Throwable t) {
-                            Log.e(TAG, "âŒ Sync failed", t);
+                            Log.e(TAG, "â Steps upload failed — saving locally", t);
+                            DatabaseClient.getInstance(getApplicationContext())
+                                    .getAppDatabase().stepDao()
+                                    .insertStep(new StepEntity(finalDelta));
+                            failedUploads.incrementAndGet();
                             onUploadComplete();
                         }
                     });

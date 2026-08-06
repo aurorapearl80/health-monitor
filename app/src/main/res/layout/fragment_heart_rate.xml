@@ -91,6 +91,23 @@
                         android:focusable="true"
                         android:layout_marginTop="10dp"/>
 
+                    <EditText
+                        android:id="@+id/et_bpm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="BPM"
+                        android:inputType="number"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="#AAAAAA"
+                        android:layout_marginTop="16dp" />
+
+                    <Button
+                        android:id="@+id/btn_submit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Submit"
+                        android:layout_marginTop="8dp" />
+
                 </LinearLayout>
 
             </RelativeLayout>

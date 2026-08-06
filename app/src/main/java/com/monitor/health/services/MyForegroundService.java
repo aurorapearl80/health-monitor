@@ -70,6 +70,8 @@ public class MyForegroundService extends Service {
     private String token = "";
     private ConnectivityManager connectivityManager;
     private ConnectivityManager.NetworkCallback networkCallback;
+    private volatile Thread syncThread;
+    private volatile boolean syncRunning = false;
 
     @Override
     public void onCreate() {
@@ -105,23 +107,26 @@ public class MyForegroundService extends Service {
         }
 
         // Start a thread to check for internet connectivity and sync data
-        new Thread(() -> {
-            while (true) {
+        syncRunning = true;
+        syncThread = new Thread(() -> {
+            while (syncRunning) {
                 NetworkUtils.ConnectionQuality quality =
                         NetworkUtils.getConnectionQuality(getApplicationContext());
                 if (quality != NetworkUtils.ConnectionQuality.NONE) {
-                    Log.d(TAG, "Connection available (quality: " + quality + ") â€” syncing data");
+                    Log.d(TAG, "Connection available — syncing data");
                     syncData();
                 } else {
-                    Log.d(TAG, "No internet connection â€” skipping sync");
+                    Log.d(TAG, "No internet connection — skipping sync");
                 }
                 try {
-                    Thread.sleep(10 * 60 * 1000); // Check every 10 minutes
+                    Thread.sleep(10 * 60 * 1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    break;
                 }
             }
-        }).start();
+        });
+        syncThread.start();
     }
 
     public void syncData() {
@@ -307,6 +312,8 @@ public class MyForegroundService extends Service {
 
     @Override
     public void onDestroy() {
+        syncRunning = false;
+        if (syncThread != null) { syncThread.interrupt(); syncThread = null; }
         if (networkCallback != null && connectivityManager != null) {
             try {
                 connectivityManager.unregisterNetworkCallback(networkCallback);
@@ -379,7 +386,7 @@ public class MyForegroundService extends Service {
 
 
         // Combine formatted date and offset
-        String finalFormattedDate = formattedDate + "+00:00";
+        String finalFormattedDate = formattedDate + "+08:00";
         return finalFormattedDate;
 
     }
