@@ -4,28 +4,25 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.monitor.health.CallInvitationApi;
 import com.monitor.health.services.IncomingCallService;
-import com.monitor.health.ui.IncomingCallActivity;
 
+/**
+ * Handles the Decline action button on the incoming-call notification.
+ * Accept is deliberately NOT handled here — Android blocks starting an
+ * Activity from a plain background BroadcastReceiver, so Accept is wired as
+ * an Activity PendingIntent straight to IncomingCallActivity (auto-accept)
+ * instead — see IncomingCallService.
+ */
 public class CallActionReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context ctx, Intent intent) {
         String action = intent.getAction();
+        int callInvitationId = intent.getIntExtra(IncomingCallService.EXTRA_CALL_INVITATION_ID, 0);
 
-        if (IncomingCallService.ACTION_ANSWER.equals(action)) {
-            String caller = intent.getStringExtra(IncomingCallService.EXTRA_CALLER);
-            String token  = intent.getStringExtra(IncomingCallService.EXTRA_TOKEN);
-            String room   = intent.getStringExtra(IncomingCallService.EXTRA_ROOM);
-
-            Intent i = new Intent(ctx, IncomingCallActivity.class)
-                    .putExtra(IncomingCallService.EXTRA_CALLER, caller)
-                    .putExtra(IncomingCallService.EXTRA_TOKEN, token)
-                    .putExtra(IncomingCallService.EXTRA_ROOM, room)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_CLEAR_TOP
-                            | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            ctx.startActivity(i);
+        if (IncomingCallService.ACTION_DECLINE.equals(action) && callInvitationId > 0) {
+            CallInvitationApi.respond(ctx, callInvitationId, "declined");
         }
 
         // Stop ringing either way

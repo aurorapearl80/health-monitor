@@ -35,14 +35,19 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
-    <uses-permission
-        android:name="android.permission.USE_FULL_SCREEN_INTENT"
-        tools:node="remove" />
+    <!-- Lets the incoming-call notification launch IncomingCallActivity
+         automatically over the lock screen, no tap needed. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <uses-feature
         android:name="android.hardware.camera.any"
-        android:required="false" /> <!-- android:name="android.permission.CAMERA" -->
+        android:required="false" />
     <!-- tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" /> -->
+    <!-- Needed at runtime by the video call screens (Twilio + LiveKit) — not
+         previously declared, so the ActivityResultContracts permission
+         request for these was silently auto-denied. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -88,6 +93,10 @@
             android:exported="true"
             android:theme="@style/Theme.MyApplication"
             tools:ignore="IntentFilterExportedReceiver" />
+        <activity
+            android:name=".ui.LiveKitCallActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
         <activity
             android:name=".ui.graph.WeightGraphActivity"
             android:exported="false" /> <!-- Activities (only Main is exported for launcher) -->

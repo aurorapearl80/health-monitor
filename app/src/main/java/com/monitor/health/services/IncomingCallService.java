@@ -25,11 +25,12 @@ public class IncomingCallService extends Service {
     public static final String EXTRA_CALLER = "caller_name";
     public static final String EXTRA_TOKEN  = "video_token";
     public static final String EXTRA_ROOM   = "room_name";
+    public static final String EXTRA_CALL_INVITATION_ID = "call_invitation_id";
+    public static final String EXTRA_CALLER_AVATAR_URL = "caller_avatar_url";
 
     public static final String CHANNEL_ID_INCOMING = "incoming_call_channel";
     public static final int    NOTIF_ID_INCOMING   = 1001;
 
-    public static final String ACTION_ANSWER  = "com.monitor.health.ACTION_ANSWER";
     public static final String ACTION_DECLINE = "com.monitor.health.ACTION_DECLINE";
 
     @Override
@@ -37,6 +38,8 @@ public class IncomingCallService extends Service {
         String caller = intent != null ? intent.getStringExtra(EXTRA_CALLER) : "Unknown";
         String token  = intent != null ? intent.getStringExtra(EXTRA_TOKEN)  : null;
         String room   = intent != null ? intent.getStringExtra(EXTRA_ROOM)   : null;
+        String avatarUrl = intent != null ? intent.getStringExtra(EXTRA_CALLER_AVATAR_URL) : null;
+        int callInvitationId = intent != null ? intent.getIntExtra(EXTRA_CALL_INVITATION_ID, 0) : 0;
         Log.wtf("NOTIFICATION", "RUNNING HERE");
 
         createIncomingChannel();
@@ -45,24 +48,41 @@ public class IncomingCallService extends Service {
                 .putExtra(EXTRA_CALLER, caller)
                 .putExtra(EXTRA_TOKEN, token)
                 .putExtra(EXTRA_ROOM, room)
+                .putExtra(EXTRA_CALL_INVITATION_ID, callInvitationId)
+                .putExtra(EXTRA_CALLER_AVATAR_URL, avatarUrl)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                         | Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        // Actions -> BroadcastReceiver
-        Intent answerI = new Intent(this, CallActionReceiver.class)
-                .setAction(ACTION_ANSWER)
+        PendingIntent fsPendingIntent = PendingIntent.getActivity(
+                this, 0, fsIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        // Accept must be an Activity PendingIntent, not a broadcast — Android
+        // blocks starting an Activity from a plain background
+        // BroadcastReceiver, so routing Accept through CallActionReceiver
+        // silently did nothing. Targeting IncomingCallActivity directly with
+        // auto-accept skips the ring UI and jumps straight into the call.
+        Intent answerI = new Intent(this, IncomingCallActivity.class)
                 .putExtra(EXTRA_CALLER, caller)
                 .putExtra(EXTRA_TOKEN, token)
-                .putExtra(EXTRA_ROOM, room);
+                .putExtra(EXTRA_ROOM, room)
+                .putExtra(EXTRA_CALL_INVITATION_ID, callInvitationId)
+                .putExtra(EXTRA_CALLER_AVATAR_URL, avatarUrl)
+                .putExtra(IncomingCallActivity.EXTRA_AUTO_ACCEPT, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent answerPi = PendingIntent.getBroadcast(
+        PendingIntent answerPi = PendingIntent.getActivity(
                 this, 1, answerI,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         Intent declineI = new Intent(this, CallActionReceiver.class)
-                .setAction(ACTION_DECLINE);
+                .setAction(ACTION_DECLINE)
+                .putExtra(EXTRA_CALL_INVITATION_ID, callInvitationId);
 
         PendingIntent declinePi = PendingIntent.getBroadcast(
                 this, 2, declineI,
@@ -88,6 +108,7 @@ public class IncomingCallService extends Service {
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(rv)
                 .setCustomBigContentView(rv)
+                .setFullScreenIntent(fsPendingIntent, true)
                 .build();
 
         startForeground(NOTIF_ID_INCOMING, n);

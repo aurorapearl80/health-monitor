@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "171983255182",
-    "project_id": "dr-watch",
-    "storage_bucket": "dr-watch.firebasestorage.app"
+    "project_number": "312446509105",
+    "project_id": "familywatchtoday-web",
+    "storage_bucket": "familywatchtoday-web.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:171983255182:android:11821a97cf1c88ee47bbdf",
+        "mobilesdk_app_id": "1:312446509105:android:889a795913afcc711a7510",
         "android_client_info": {
           "package_name": "com.monitor.health"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA7Yb52kwsK56B7F0qj83lbJW1wnnuU2KE"
+          "current_key": "AIzaSyABwjdWkFeTVlLdjJO_1w8Kz6Onc7yy4I4"
         }
       ],
       "services": {

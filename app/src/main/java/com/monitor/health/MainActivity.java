@@ -109,6 +109,7 @@ import com.monitor.health.utility.BodyComposition;
 import com.monitor.health.utility.DateUtils;
 import com.monitor.health.utility.DeviceUtils;
 import com.monitor.health.utility.PreferenceHelper;
+import com.onesignal.OneSignal;
 import com.monitor.health.utility.SmartWatchAlertDialog;
 import com.monitor.health.utility.TimeAgo;
 import com.monitor.health.utility.TimeConverter;
@@ -590,6 +591,17 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
 
 
         setContentView(R.layout.activity_main);
+
+        // Re-assert the OneSignal identity on every app start (not just at
+        // login) — the local OneSignal SDK state can be cleared (reinstall,
+        // app-data clear) while the stored auth session survives, silently
+        // stopping this device from ever receiving call pushes again unless
+        // the user happens to log out and back in.
+        String userId = PreferenceHelper.getInstance(this).getString(Constant.USER_ID, null);
+        if (userId != null) {
+            OneSignal.login("user_" + userId);
+        }
+
         model = new ViewModelProvider(this).get(SharedDataViewModel.class);
         readingsViewModel = new ViewModelProvider(this).get(ReadingsViewModel.class);
 //        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

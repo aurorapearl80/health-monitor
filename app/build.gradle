@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -26,6 +27,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
     }
     buildFeatures {
         viewBinding true
@@ -65,8 +69,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
     implementation 'com.airbnb.android:lottie:6.0.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.12'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     implementation 'org.conscrypt:conscrypt-android:2.5.1'
 
     implementation 'androidx.work:work-runtime:2.9.1'
@@ -83,6 +87,14 @@ dependencies {
 
     // Twilio Voice Android SDK (VoIP)
     implementation 'com.twilio:voice-android:6.3.0'
+
+    // LiveKit Android SDK — verify this is still the current release before building:
+    // https://github.com/livekit/client-sdk-android/releases
+    implementation 'io.livekit:livekit-android:2.11.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // OneSignal Android SDK — same version-range convention OneSignal's own docs recommend.
+    implementation 'com.onesignal:OneSignal:[5.1.0, 5.99.99]'
 
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'

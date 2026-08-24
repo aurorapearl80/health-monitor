@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.monitor.health.utility.PreferenceHelper;
+import com.onesignal.OneSignal;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -104,6 +105,18 @@ public class LoginActivity extends AppCompatActivity {
                                 && response.body().getToken() != null) {
                             PreferenceHelper.getInstance(getApplicationContext())
                                     .putString(Constant.AUTH_TOKEN, response.body().getToken());
+
+                            // The API returns the user id as JSON key "id" (a
+                            // number), not "_id" — get_id() would always be null.
+                            String userId = response.body().getId();
+                            if (userId != null) {
+                                PreferenceHelper.getInstance(getApplicationContext())
+                                        .putString(Constant.USER_ID, userId);
+                                // Same "user_{id}" external-id convention familyhealth-app
+                                // uses — lets the backend ring both devices with one push.
+                                OneSignal.login("user_" + userId);
+                            }
+
                             launchMain();
                         } else {
                             tvError.setText("Invalid email or password");

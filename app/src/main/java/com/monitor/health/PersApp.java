@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.work.Configuration;
 
 import com.monitor.health.receiver.HourlyKickReceiver;
+import com.monitor.health.services.OneSignalCallListener;
+import com.onesignal.OneSignal;
+import com.onesignal.debug.LogLevel;
 
 public class PersApp  extends Application implements Configuration.Provider {
 
@@ -22,6 +25,13 @@ public class PersApp  extends Application implements Configuration.Provider {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // ── OneSignal: initialize + wire the incoming-call push listener ────
+        // (POST_NOTIFICATIONS is already requested at runtime in MainActivity
+        // for the existing call-notification channel — no separate prompt needed.)
+        OneSignal.getDebug().setLogLevel(LogLevel.WARN);
+        OneSignal.initWithContext(this, Constant.ONESIGNAL_APP_ID);
+        OneSignalCallListener.register(this);
 
         // Load the saved value
         SharedPreferences sp = getSharedPreferences("kick_prefs", MODE_PRIVATE);

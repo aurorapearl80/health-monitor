@@ -16,6 +16,7 @@ import com.monitor.health.model.healthscore.UserDrWatch;
 import com.monitor.health.response.ble.BleUserData;
 import com.monitor.health.response.ble.BleUserProfileResponse;
 import com.monitor.health.utility.PreferenceHelper;
+import com.onesignal.OneSignal;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -96,6 +97,11 @@ public class ProfileViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null
                         && response.body().getUser() != null) {
                     Log.d(TAG, "Profile API success — user=" + response.body().getUser().getFullName());
+                    // This device is bound to a patient by serial/IMEI, not by
+                    // a personal login — this is the only place we learn which
+                    // patient it is, so it's also the right place to register
+                    // the OneSignal identity that lets the backend ring it.
+                    OneSignal.login("user_" + response.body().getUser().getId());
                     saveAndPost(response.body().getUser());
                 } else {
                     String errBody = "";

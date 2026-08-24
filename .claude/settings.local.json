@@ -18,7 +18,11 @@
       "Bash(Get-ChildItem -Directory)",
       "Bash(Select-Object -ExpandProperty Name)",
       "Bash(python3 *)",
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\DeeDee\\\\AndroidStudioProjects\\\\monitor-your-health\" -Recurse -Filter \"ProfileFragment.java\")"
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\DeeDee\\\\AndroidStudioProjects\\\\monitor-your-health\" -Recurse -Filter \"ProfileFragment.java\")",
+      "Bash(brew list *)",
+      "Bash(/Applications/Google Chrome.app/Contents/MacOS/Google Chrome *)",
+      "Bash(pip3 install *)",
+      "Bash(pip3 show *)"
     ]
   }
 }

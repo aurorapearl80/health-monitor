@@ -92,6 +92,12 @@ public class Constant {
 
     //auth
     public static final String AUTH_TOKEN = "auth_token";
+    public static final String USER_ID = "user_id";
+
+    // Same OneSignal App ID familyhealth-app uses — this device's Android
+    // platform config (Firebase sender/server key) must be added under the
+    // same OneSignal App in the OneSignal dashboard for pushes to reach it.
+    public static final String ONESIGNAL_APP_ID = "0ce649bf-09e9-4c3c-9985-651a34983b0b";
 
     // Measurement unit preference keys
     public static final String PREF_UNIT_HEIGHT_VALUE       = "unit_height_value";

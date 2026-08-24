@@ -148,17 +148,6 @@ public class TestService extends Service {
     };
 
     private void startInForeground() {
-        // Android 14+ enforces that foregroundServiceType=health requires at least one
-        // prerequisite runtime permission (ACTIVITY_RECOGNITION, health.READ_HEART_RATE, etc.).
-        // After clearing app data, these are revoked — stop gracefully instead of crashing.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            Log.w(TAG, "ACTIVITY_RECOGNITION not granted — skipping TestService startup");
-            stopSelf();
-            return;
-        }
-
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationChannel ch = new NotificationChannel(
                 NOTIF_CH_ID, "Health Uploads", NotificationManager.IMPORTANCE_LOW);
@@ -170,6 +159,22 @@ public class TestService extends Service {
                 .setSmallIcon(android.R.drawable.stat_sys_upload)
                 .setOngoing(true)
                 .build();
+
+        // Android 14+ enforces that foregroundServiceType=health requires ACTIVITY_RECOGNITION.
+        // After clearing app data these are revoked — must still call startForeground() before
+        // stopSelf() to satisfy the OS contract (else ForegroundServiceDidNotStartInTimeException).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "ACTIVITY_RECOGNITION not granted — stopping TestService");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                startForeground(NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE);
+            } else {
+                startForeground(NOTIF_ID, notif);
+            }
+            stopSelf();
+            return;
+        }
 
         try {
             // Android 14+ (API 34) requires the service type in the startForeground() call

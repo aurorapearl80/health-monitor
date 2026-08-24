@@ -35,6 +35,7 @@ import com.monitor.health.ApiClient;
 import com.monitor.health.Constant;
 import com.monitor.health.LoginActivity;
 import com.monitor.health.MainActivity;
+import com.onesignal.OneSignal;
 import com.monitor.health.NetworkUtils;
 import com.monitor.health.R;
 import com.monitor.health.adapter.StatsAdapter;
@@ -384,6 +385,8 @@ public class ProfileFragment extends Fragment {
 
     private void logout() {
         PreferenceHelper.getInstance(requireContext()).remove(Constant.AUTH_TOKEN);
+        PreferenceHelper.getInstance(requireContext()).remove(Constant.USER_ID);
+        OneSignal.logout();
         Intent intent = new Intent(requireContext(), LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
