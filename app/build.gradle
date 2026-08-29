@@ -7,13 +7,14 @@ plugins {
 android {
     namespace 'com.monitor.health'
     compileSdk 36
+    ndkVersion "27.0.12077973"
 
     defaultConfig {
         applicationId "com.monitor.health"
         minSdk 26
         targetSdk 36
-        versionCode 13
-        versionName "13.0"
+        versionCode 15
+        versionName "15.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,7 +60,7 @@ dependencies {
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
     implementation libs.wear
-    implementation fileTree(dir: 'C:\\Users\\DeeDee\\Documents\\ReliableResponse\\FirmWare\\20-08-2025\\javalib', include: ['*.aar', '*.jar'], exclude: [])
+
     implementation libs.firebase.messaging
 
     testImplementation libs.junit
@@ -71,7 +72,7 @@ dependencies {
     implementation 'com.airbnb.android:lottie:6.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
-    implementation 'org.conscrypt:conscrypt-android:2.5.1'
+    implementation 'org.conscrypt:conscrypt-android:2.6.3'
 
     implementation 'androidx.work:work-runtime:2.9.1'
     implementation 'com.google.android.gms:play-services-location:21.0.1'  // or latest
@@ -86,7 +87,7 @@ dependencies {
     implementation 'com.twilio:video-android:7.9.0'
 
     // Twilio Voice Android SDK (VoIP)
-    implementation 'com.twilio:voice-android:6.3.0'
+    implementation 'com.twilio:voice-android:6.10.4'
 
     // LiveKit Android SDK — verify this is still the current release before building:
     // https://github.com/livekit/client-sdk-android/releases

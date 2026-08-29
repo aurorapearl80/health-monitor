@@ -99,7 +99,6 @@ import com.monitor.health.services.FallDetectionService;
 import com.monitor.health.services.HeartRateSensorService;
 import com.monitor.health.services.HeartRateServiceNative;
 import com.monitor.health.services.HomeDoubleTapService;
-import com.monitor.health.services.KeyMonitorAccessibilityService;
 import com.monitor.health.services.LocationService;
 import com.monitor.health.services.StepsService;
 import com.monitor.health.services.TestService;
@@ -149,9 +148,7 @@ import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity  implements StepsService.SensorDataListener {
 
-    /** True only while MainActivity is in the resumed (visible) state.
-     *  Read by KeyMonitorAccessibilityService to avoid launching the SOS dialog
-     *  when the app is no longer in the foreground. */
+    /** True only while MainActivity is in the resumed (visible) state. */
     public static volatile boolean isInForeground = false;
 
     private PowerManager.WakeLock wakeLock;
@@ -911,72 +908,6 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
             }
         });
 
-        //Please don't forget this to upload -- Warning
-//       if (!isAccessibilityServiceEnabled(this, KeyMonitorAccessibilityService.class)) {
-//            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-//        } else {
-//            Log.d("Key-change", "Accessibility already enabled. No popup.");
-//        }
-        //databaseClient.getAppDatabase().bleDeviceDao().deleteAll();
-        //getAssignDevices();
-        //databaseClient.getAppDatabase().bleDeviceDao().resetAllConnections();
-
-        checkAccessibilityServices();
-
-    }
-
-    private void checkAccessibilityServices() {
-        String service = getPackageName() + "/" +
-                KeyMonitorAccessibilityService.class.getCanonicalName();
-
-        String enabledServices = Settings.Secure.getString(
-                getContentResolver(),
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        );
-
-        Log.d("AccessibilityCheck", "Enabled services: " + enabledServices);
-
-        boolean isEnabled = false;
-
-        if (enabledServices != null) {
-            isEnabled = enabledServices.contains(service);
-        }
-
-        Log.d("AccessibilityCheck", "KeyMonitorAccessibilityService enabled: " + isEnabled);
-    }
-
-    public static boolean isAccessibilityServiceEnabled(Context context, Class<?> serviceClass) {
-        String expected = context.getPackageName() + "/" + serviceClass.getName();
-
-        int enabled = 0;
-        try {
-            enabled = Settings.Secure.getInt(
-                    context.getContentResolver(),
-                    Settings.Secure.ACCESSIBILITY_ENABLED
-            );
-        } catch (Settings.SettingNotFoundException e) {
-            return false;
-        }
-
-        if (enabled != 1) return false;
-
-        String enabledServices = Settings.Secure.getString(
-                context.getContentResolver(),
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        );
-
-        if (enabledServices == null) return false;
-
-        TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(':');
-        splitter.setString(enabledServices);
-
-        while (splitter.hasNext()) {
-            String s = splitter.next();
-            if (s.equalsIgnoreCase(expected)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -2213,9 +2144,6 @@ private void startHearRateSensorService() {
     protected void onPause() {
         super.onPause();
         isInForeground = false;
-        // Key 139 is the back button on this device. Cancel any running SOS timer
-        // immediately so it can't fire if the user reopens the app within 5 seconds.
-        KeyMonitorAccessibilityService.cancelSosTimer();
          //unregisterReceiver(heartRateReceiverOutside);
     }
 

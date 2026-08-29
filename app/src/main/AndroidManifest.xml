@@ -30,6 +30,12 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" /> <!-- Add these ONLY if you actually run FGS for mic/camera at runtime -->
+
+    <!-- Not used: this app has no screen-sharing feature. Strip the unused LiveKit
+         screen-capture service so FOREGROUND_SERVICE_MEDIA_PROJECTION isn't pulled in. -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"
+        tools:node="remove" />
     <!-- Android 14+ (API 34) more specific FGS type -->
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -248,18 +254,6 @@
             </intent-filter>
         </service>
         <service
-            android:name=".services.KeyMonitorAccessibilityService"
-            android:exported="false"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_key_monitor" />
-        </service>
-        <service
             android:name=".services.BleScanService"
             android:enabled="true"
             android:exported="false"
@@ -307,6 +301,11 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+
+        <!-- Not used: this app has no screen-sharing feature. -->
+        <service
+            android:name="io.livekit.android.room.track.screencapture.ScreenCaptureService"
+            tools:node="remove" />
     </application>
 
 </manifest>
