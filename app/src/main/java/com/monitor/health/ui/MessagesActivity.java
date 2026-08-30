@@ -4,32 +4,31 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableRecyclerView;
 
+import com.google.gson.Gson;
 import com.monitor.health.ApiClient;
 import com.monitor.health.Constant;
-import com.monitor.health.NetworkUtils;
 import com.monitor.health.R;
 import com.monitor.health.adapter.MessagesAdapter;
-import com.monitor.health.dto.ApiResponseDTO;
+import com.monitor.health.chat.ChatSocketManager;
+import com.monitor.health.chat.dto.ChatMessageDTO;
+import com.monitor.health.chat.dto.ChatMessagePageDTO;
 import com.monitor.health.entity.MessageEntity;
 import com.monitor.health.model.MessageThread;
-import com.monitor.health.response.bledevice.DeviceResponseList;
 import com.monitor.health.ui.service.MessageService;
 import com.monitor.health.utility.DeviceUtils;
+import com.monitor.health.utility.PreferenceHelper;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +39,15 @@ import retrofit2.Response;
 
 public class MessagesActivity extends AppCompatActivity {
     private static final String TAG = "MessagesActivity";
+    private static final int PER_PAGE = 50;
+
     private MessageService messageService;
     private MessagesAdapter adapter;
     private List<MessageThread> messageThreadList;
     private WearableRecyclerView rv;
     private ProgressBar progressBar;
     private TextView loadingText;
-    private ImageButton btnCompose;
+    private Button btnCompose;
     private TextView tabRead;
     private TextView tabUnread;
 
@@ -55,7 +56,8 @@ public class MessagesActivity extends AppCompatActivity {
     private boolean hasMore = true; // Whether there are more pages to load
     private boolean selectedIsRead = true; // Tab state: true = Read, false = Unread
 
-    // Pagination disabled (rolled back)
+    private long myUserId = -1;
+    private String watchSerial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,46 +65,43 @@ public class MessagesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_messages);
 
         rv = findViewById(R.id.messages_recycler);
-       // btnCompose = findViewById(R.id.btn_compose);
+        btnCompose = findViewById(R.id.btn_compose);
         progressBar = findViewById(R.id.progress_bar);
         loadingText = findViewById(R.id.loading_text);
         tabRead = findViewById(R.id.tab_read);
         tabUnread = findViewById(R.id.tab_unread);
 
-        // Initialize service
         messageService = new MessageService(this);
+        watchSerial = DeviceUtils.resolveWatchSerial(this);
+
+        // Optional: only used to register for live push (see onStart) — chat itself works
+        // purely off watchSerial regardless of whether this device has ever logged in.
+        String userIdStr = PreferenceHelper.getInstance(this).getString(Constant.USER_ID, null);
+        if (userIdStr != null) {
+            try {
+                myUserId = Long.parseLong(userIdStr);
+            } catch (NumberFormatException ignored) {
+                Log.w(TAG, "Stored USER_ID is not numeric: " + userIdStr);
+            }
+        }
 
         final androidx.wear.widget.WearableLinearLayoutManager wlm = new androidx.wear.widget.WearableLinearLayoutManager(this);
         rv.setLayoutManager(wlm);
 
-        // Initialize empty list
         messageThreadList = new ArrayList<>();
-
-        // Setup adapter
         adapter = new MessagesAdapter(messageThreadList, item -> {
             // Click handled in adapter now
         });
-
         rv.setAdapter(adapter);
 
-       // btnCompose.setOnClickListener(v -> startActivity(new Intent(this, ComposeMessageActivity.class)));
+        btnCompose.setOnClickListener(v -> startActivity(new Intent(this, ComposeMessageActivity.class)));
 
-        // Show loader initially
+        ChatSocketManager.getInstance().setListener(this::onIncomingMessage);
+
         showLoader("Loading messages...");
-
-        // Load messages from database (filtered by current tab)
         loadMessagesFromDatabaseFiltered();
+        fetchMessages(1, PER_PAGE, false);
 
-        if (NetworkUtils.isInternetConnected(getApplicationContext())){
-            Log.d(TAG, "Network connection available, deleting all messages.");
-            messageService.deleteAllMessages();
-        } else {
-            Log.d(TAG, "No network connection, skipping deleteAllMessages.");
-        }
-        // Fetch first page from API using current tab filter
-        fetchInboxPage(1, 10, selectedIsRead, false);
-
-        // Setup tabs behavior
         setupTabs();
 
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -119,21 +118,45 @@ public class MessagesActivity extends AppCompatActivity {
                 int totalItemCount = adapter.getItemCount();
                 if (totalItemCount == 0) return;
 
-                // Compute last visible item position without assuming a specific LayoutManager type
                 int childCount = recyclerView.getChildCount();
                 int lastVisibleItemPosition = childCount > 0
                         ? recyclerView.getChildAdapterPosition(recyclerView.getChildAt(childCount - 1))
                         : RecyclerView.NO_POSITION;
 
-                // Trigger when within threshold from the end to reduce sensitivity
                 int threshold = 3; // load more when 3 items from bottom
                 if (lastVisibleItemPosition != RecyclerView.NO_POSITION && lastVisibleItemPosition >= totalItemCount - 1 - threshold) {
                     onBottomReached();
                 }
             }
         });
-        
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Connect only while this screen is visible — avoids an always-on socket
+        // draining the wearable's battery.
+        if (myUserId > 0) {
+            ChatSocketManager.getInstance().connect(myUserId);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        ChatSocketManager.getInstance().disconnect();
+    }
+
+    private void onIncomingMessage(JSONObject messageJson) {
+        try {
+            ChatMessageDTO dto = new Gson().fromJson(messageJson.toString(), ChatMessageDTO.class);
+            new Thread(() -> {
+                messageService.saveMessage(dto);
+                runOnUiThread(this::loadMessagesFromDatabaseFiltered);
+            }).start();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to handle incoming private_message", e);
+        }
     }
 
     private void onBottomReached() {
@@ -153,7 +176,7 @@ public class MessagesActivity extends AppCompatActivity {
             rv.post(() -> adapter.setLoading(true));
         }
         int nextPage = currentPage + 1;
-        fetchInboxPage(nextPage, 10, selectedIsRead, true);
+        fetchMessages(nextPage, PER_PAGE, true);
     }
 
     /**
@@ -214,19 +237,10 @@ public class MessagesActivity extends AppCompatActivity {
     }
 
     private void onTabChanged() {
-        // Update visual state
+        // Both tabs are filtered client-side from the same local cache — unlike the old
+        // DrWatch inbox endpoint, the real chat API has no per-request read/unread filter.
         updateTabUI();
-        // Reset pagination state
-        currentPage = 1;
-        hasMore = true;
-        isLoading = false;
-        // Clear current list
-        messageThreadList.clear();
-        adapter.notifyDataSetChanged();
-        // Show loader and fetch first page for selected tab
         showLoader("Loading messages...");
-        fetchInboxPage(1, 10, selectedIsRead, false);
-        // Also refresh from DB to show cached items matching the filter
         loadMessagesFromDatabaseFiltered();
     }
 
@@ -250,59 +264,12 @@ public class MessagesActivity extends AppCompatActivity {
                     messageThreadList.clear();
                     messageThreadList.addAll(threads);
                     adapter.notifyDataSetChanged();
+                    hideLoader();
 
-                    int unreadCount = messageService.getUnreadCount();
-                    getSharedPreferences("msg_prefs", MODE_PRIVATE)
-                            .edit()
-                            .putInt("unread_count", unreadCount)
-                            .apply();
-
-                    Log.d(TAG, "âœ… Loaded " + threads.size() + " messages from database (" + (selectedIsRead ? "read" : "unread") + ")");
-
-                    if (!threads.isEmpty()) {
-                        hideLoader();
-                    }
+                    Log.d(TAG, "Loaded " + threads.size() + " messages from database (" + (selectedIsRead ? "read" : "unread") + ")");
                 });
             } catch (Exception e) {
-                Log.e(TAG, "âŒ Error loading messages from database", e);
-            }
-        }).start();
-    }
-
-    /**
-     * Load messages from local database and display them
-     */
-    private void loadMessagesFromDatabase() {
-        new Thread(() -> {
-            try {
-                // Get all messages from database
-                List<MessageEntity> messages = messageService.getAllMessages();
-
-                // Convert Message entities to MessageThread objects
-                List<MessageThread> threads = convertMessagesToThreads(messages);
-
-                // Update UI on main thread
-                runOnUiThread(() -> {
-                    messageThreadList.clear();
-                    messageThreadList.addAll(threads);
-                    adapter.notifyDataSetChanged();
-
-                    // Update unread count
-                    int unreadCount = messageService.getUnreadCount();
-                    getSharedPreferences("msg_prefs", MODE_PRIVATE)
-                            .edit()
-                            .putInt("unread_count", unreadCount)
-                            .apply();
-
-                    Log.d(TAG, "âœ… Loaded " + threads.size() + " messages from database");
-
-                    // Hide loader if we have messages
-                    if (!threads.isEmpty()) {
-                        hideLoader();
-                    }
-                });
-            } catch (Exception e) {
-                Log.e(TAG, "âŒ Error loading messages from database", e);
+                Log.e(TAG, "Error loading messages from database", e);
             }
         }).start();
     }
@@ -314,74 +281,55 @@ public class MessagesActivity extends AppCompatActivity {
         List<MessageThread> threads = new ArrayList<>();
 
         for (MessageEntity message : messages) {
-            MessageThread thread = new MessageThread(
-                    R.drawable.ic_profile,  // Default profile icon
-                    message.getSubject(),
-                    message.getBody(),
-                    message.getMessageDate()
-            );
-            threads.add(thread);
+            String name = message.isMine()
+                    ? "You"
+                    : (message.getSenderName() != null ? message.getSenderName() : "Care Team");
+            String preview = message.getBody() != null
+                    ? message.getBody()
+                    : (message.getAttachmentName() != null ? "📎 " + message.getAttachmentName() : "");
+
+            // Always the OTHER party's photo — the care team contact's for messages I sent,
+            // the sender's for messages I received.
+            String avatarUrl = message.isMine()
+                    ? message.getRecipientProfileImageUrl()
+                    : message.getSenderProfileImageUrl();
+
+            threads.add(new MessageThread(
+                    R.drawable.ic_profile,
+                    name,
+                    preview,
+                    message.getCreatedAt(),
+                    message.getApiId(),
+                    message.isMine(),
+                    message.isRead(),
+                    avatarUrl
+            ));
         }
 
         return threads;
     }
 
     /**
-     * Fetch messages from API and save to database
+     * Fetch a page of the patient's chat thread and upsert it into the local cache.
      */
-    private void fetchInboxPage(int page, int perPage, Boolean isRead, boolean loadMore) {
+    private void fetchMessages(int page, int perPage, boolean loadMore) {
         if (!loadMore) {
             showLoader("Syncing messages...");
-        } else {
-            // keep list visible; footer is already shown by onBottomReached
         }
 
-        ApiClient.getUserService(
-                Constant.BASE_URL_BGM,
-                Constant.TOKEN_DR_WATCH_API,
-                DeviceUtils.getIMEI(getApplicationContext())
-        ).getInboxMessage(page, perPage, isRead).enqueue(new Callback<ApiResponseDTO>() {
+        ApiClient.getChatService().getMessages(watchSerial, page, perPage).enqueue(new Callback<ChatMessagePageDTO>() {
             @Override
-            public void onResponse(Call<ApiResponseDTO> call, Response<ApiResponseDTO> response) {
-                Log.d(TAG, "âœ… API Response received for page: " + page + ", perPage: " + perPage + ", isRead: " + isRead);
-                Log.d(TAG, "Response Data: " + response.body());
-
+            public void onResponse(Call<ChatMessagePageDTO> call, Response<ChatMessagePageDTO> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "API Response OK");
+                    ChatMessagePageDTO body = response.body();
 
-                    // Save to database in background thread
                     new Thread(() -> {
-                        if (!loadMore) {
-                            showLoader("Saving messages...");
-                        }
-                        ApiResponseDTO body = response.body();
-                        messageService.saveApiMessages(body);
-                        Log.d(TAG, "âœ… Messages saved to database");
+                        messageService.saveMessages(body.getData());
 
-                        // Determine hasMore using metadata or data size with safe fallbacks
-                        boolean moreAvailable;
-                        try {
-                            if (body.getMeta() != null) {
-                                int lastPage = body.getMeta().getLastPage();
-                                int current = body.getMeta().getCurrentPage();
-                                if (lastPage > 0 && current > 0) {
-                                    moreAvailable = current < lastPage;
-                                } else {
-                                    // Fallback if meta fields are not populated correctly
-                                    moreAvailable = body.getData() != null && body.getData().size() >= perPage;
-                                }
-                                Log.d(TAG, "[Paging] meta: current=" + current + ", last=" + lastPage + ", computed hasMore=" + moreAvailable);
-                            } else {
-                                moreAvailable = body.getData() != null && body.getData().size() >= perPage;
-                                Log.d(TAG, "[Paging] no meta, dataSize=" + (body.getData() == null ? 0 : body.getData().size()) + ", perPage=" + perPage + ", hasMore=" + moreAvailable);
-                            }
-                        } catch (Exception e) {
-                            Log.w(TAG, "[Paging] meta evaluation failed, defaulting heuristic", e);
-                            moreAvailable = body.getData() != null && body.getData().size() >= perPage;
-                        }
-                        boolean finalMoreAvailable = moreAvailable;
+                        boolean moreAvailable = body.getMeta() != null
+                                && body.getMeta().getLastPage() > 0
+                                && body.getMeta().getCurrentPage() < body.getMeta().getLastPage();
 
-                        // Reload messages from database to display updated data (respect current tab)
                         loadMessagesFromDatabaseFiltered();
 
                         runOnUiThread(() -> {
@@ -390,39 +338,49 @@ public class MessagesActivity extends AppCompatActivity {
                             } else if (adapter != null) {
                                 adapter.setLoading(false);
                             }
-                            // advance currentPage only after successful load
                             currentPage = page;
-                            hasMore = finalMoreAvailable;
-                            isLoading = false; // Reset loading state
+                            hasMore = moreAvailable;
+                            isLoading = false;
                         });
                     }).start();
-                } else {
-                    Log.e(TAG, "âŒ Server error: " + response.code() + " - " + response.message());
+                } else if (response.code() == 422) {
+                    // Serial isn't linked to a patient account yet — not an error worth alarming over.
+                    Log.w(TAG, "This watch's serial isn't linked to a patient account yet.");
                     runOnUiThread(() -> {
                         if (!loadMore) {
                             hideLoader();
-                            showLoader("Failed to fetch messages");
                         } else if (adapter != null) {
                             adapter.setLoading(false);
                         }
-                        isLoading = false; // Reset loading state
+                        isLoading = false;
+                        hasMore = false;
+                    });
+                } else {
+                    Log.e(TAG, "Server error: " + response.code() + " - " + response.message());
+                    runOnUiThread(() -> {
+                        if (!loadMore) {
+                            hideLoader();
+                        } else if (adapter != null) {
+                            adapter.setLoading(false);
+                        }
+                        isLoading = false;
                     });
                 }
             }
 
             @Override
-            public void onFailure(Call<ApiResponseDTO> call, Throwable t) {
-                Log.e(TAG, "âŒ API Sync failed", t);
+            public void onFailure(Call<ChatMessagePageDTO> call, Throwable t) {
+                Log.e(TAG, "Chat sync failed", t);
                 runOnUiThread(() -> {
                     if (!loadMore) {
-                        showLoader("Connection error. Loading cached messages...");
+                        hideLoader();
                     } else if (adapter != null) {
                         adapter.setLoading(false);
                     }
+                    isLoading = false;
                 });
-                // Load cached messages from database if API fails
-                loadMessagesFromDatabase();
-                isLoading = false; // Reset loading state
+                // Fall back to whatever is already cached
+                loadMessagesFromDatabaseFiltered();
             }
         });
     }

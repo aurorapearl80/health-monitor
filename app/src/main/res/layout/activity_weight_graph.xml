@@ -4,9 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2E7D32">
+    android:background="@color/dark_background">
 
-    <!-- Main Content -->
     <androidx.wear.widget.BoxInsetLayout
         android:id="@+id/mainLayout"
         android:layout_width="match_parent"
@@ -23,10 +22,10 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#2E7D32"
-                app:tabTextColor="#CCCCCC"
-                app:tabSelectedTextColor="#FFFFFF"
-                app:tabIndicatorColor="#FFFFFF"
+                android:background="@color/dark_background"
+                app:tabTextColor="@color/text_muted"
+                app:tabSelectedTextColor="@color/accent_gold"
+                app:tabIndicatorColor="@color/accent_gold"
                 app:tabIndicatorHeight="2dp"
                 app:tabMode="fixed"
                 app:tabGravity="fill"
@@ -40,12 +39,11 @@
         </LinearLayout>
     </androidx.wear.widget.BoxInsetLayout>
 
-    <!-- Loading Overlay - OUTSIDE BoxInsetLayout -->
     <FrameLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000"
+        android:background="#CC050506"
         android:visibility="gone"
         android:clickable="true"
         android:focusable="true"
@@ -61,20 +59,20 @@
 
             <ProgressBar
                 android:id="@+id/mainProgressBar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:indeterminate="true"
-                android:indeterminateTint="@android:color/white" />
+                android:indeterminateTint="@color/accent_gold" />
 
             <TextView
                 android:id="@+id/tvLoadingMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fetching data from server..."
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
+                android:text="Fetching data..."
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
                 android:fontFamily="sans-serif"
-                android:letterSpacing="0.02"
+                android:letterSpacing="0.04"
                 android:layout_marginTop="12dp" />
         </LinearLayout>
     </FrameLayout>

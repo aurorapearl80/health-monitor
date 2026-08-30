@@ -1,5 +1,11 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="metric_item_gap">10dp</dimen>          <!-- vertical space between rows -->
-    <dimen name="metric_card_margin_h">6dp</dimen>      <!-- tiny left/right breathing room -->
+    <dimen name="metric_item_gap">8dp</dimen>
+    <dimen name="metric_card_margin_h">6dp</dimen>
+    <dimen name="card_radius">16dp</dimen>
+    <dimen name="card_spacing">8dp</dimen>
+    <dimen name="watch_inset_horizontal">12dp</dimen>
+    <dimen name="watch_inset_vertical">14dp</dimen>
+    <dimen name="hero_value_size">36sp</dimen>
+    <dimen name="metric_panel_inset">4dp</dimen>
 </resources>

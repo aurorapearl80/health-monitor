@@ -97,6 +97,14 @@
                 android:lineSpacingExtra="3dp"/>
         </ScrollView>
 
+        <Button
+            android:id="@+id/btn_reply"
+            style="@style/Watch.Button.Measure"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="Reply"
+            android:layout_marginTop="10dp"/>
+
     </LinearLayout>
 
 </androidx.wear.widget.BoxInsetLayout>

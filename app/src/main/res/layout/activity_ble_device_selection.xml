@@ -29,12 +29,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Select BLE Device"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
+                    android:text="Select Device"
+                    android:textSize="12sp"
+                    android:letterSpacing="0.16"
+                    android:textAllCaps="true"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="8dp" />
+                    android:textColor="@color/accent_gold"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -42,18 +44,17 @@
                     android:text="Available Devices"
                     android:textSize="12sp"
                     android:gravity="center"
-                    android:textColor="@color/accent_green"
+                    android:textColor="@color/text_muted"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Search for Devices Button -->
                 <Button
                     android:id="@+id/btn_search_devices"
+                    style="@style/Watch.Button.Measure"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
                     android:text="Search for Devices"
                     android:textSize="10sp"
-                    android:textColor="@android:color/white"
-                    android:background="@color/accent_green"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:minHeight="36dp"

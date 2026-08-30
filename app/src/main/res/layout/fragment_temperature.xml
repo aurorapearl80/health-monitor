@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Use this version for a more focused weight monitoring experience -->
-
 <androidx.wear.widget.BoxInsetLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#AD1457"
+    android:background="@color/dark_background"
     app:boxedEdges="all">
 
     <androidx.wear.widget.SwipeDismissFrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Add inset padding so content stays readable on round screens -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -22,17 +19,17 @@
             android:paddingRight="@dimen/watch_inset_horizontal"
             android:paddingTop="@dimen/watch_inset_vertical"
             android:paddingBottom="@dimen/watch_inset_vertical"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideInset">
+            android:clipToPadding="true"
+            android:scrollbarStyle="outsideInset"
+            android:scrollbars="none">
 
             <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="20dp">
+            android:padding="4dp">
 
-            <!-- Main Weight Display -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -40,69 +37,56 @@
                 android:gravity="center"
                 android:layout_weight="1">
 
-                <!-- Page Title for Focused Version -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="2dp">
 
                     <TextView
                         android:id="@+id/tvTitle"
+                        style="@style/Watch.Label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Temperature"
-                        android:textSize="11sp"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
+                        android:text="Temperature" />
                 </LinearLayout>
 
-                <!-- Weight Value with Unit -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="2dp">
 
                     <TextView
                         android:id="@+id/tv_value_bg"
+                        style="@style/Watch.Hero"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
-                        android:textSize="32sp"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
+                        android:textColor="@color/accent_magenta" />
 
                     <TextView
-                        android:layout_width="14dp"
-                        android:layout_height="18dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:layout_marginBottom="8dp"
                         android:id="@+id/tvUnit"
-                        android:textSize="12sp"
-                        android:textColor="@color/white"
-                        app:tint="@android:color/white" />
+                        style="@style/Watch.Unit" />
 
                 </LinearLayout>
 
-                <!-- Time Ago -->
                 <TextView
                     android:id="@+id/tv_time_ago"
+                    style="@style/Watch.Meta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="--"
-                    android:textSize="10sp"
-                    android:textColor="@android:color/white"
-                    android:layout_marginTop="2dp" />
-
-                <!-- BMI Status (Optional) -->
+                    android:layout_marginTop="4dp" />
 
             </LinearLayout>
 
-            <!-- Status Info -->
-            <!-- Status Info -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -112,54 +96,50 @@
 
                 <TextView
                     android:id="@+id/tvBPM"
+                    style="@style/Watch.Meta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="10sp"
-                    android:textColor="@android:color/white"
                     android:layout_marginEnd="8dp"
                     android:gravity="center" />
 
                 <ImageView
                     android:id="@+id/heartIcon"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
                     android:src="@drawable/ic_temperature1_foreground"
                     android:layout_marginEnd="8dp"
-                    android:textColor="@android:color/white"
+                    app:tint="@color/accent_magenta"
                     tools:ignore="UseAppTint" />
 
                 <TextView
                     android:id="@+id/tvOutcome"
+                    style="@style/Watch.Meta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="10sp"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/accent_gold"
                     android:gravity="center" />
                 <ImageView
                     android:id="@+id/chartIcon"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_chart"
                     android:clickable="true"
                     android:focusable="true"
-                    android:layout_marginLeft="16dp"
-                    app:tint="@android:color/white" />
+                    android:layout_marginStart="12dp"
+                    app:tint="@color/accent_gold" />
 
             </LinearLayout>
-                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@android:color/white"
-                    android:alpha="0.3"
+                    android:background="@drawable/watch_hairline"
                     android:layout_marginVertical="@dimen/card_spacing"/>
                 <include
                     android:id="@+id/metricsPanel"
                     layout="@layout/layout_metrics_panel" />
 
-                <!-- Add this before the closing tag of your main layout -->
                 <include layout="@layout/include_quick_actions" />
 
         </LinearLayout>
@@ -169,11 +149,11 @@
 
     <ImageView
         android:id="@+id/ivConnectionStatus"
-        android:layout_width="31dp"
-        android:layout_height="31dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
         android:contentDescription="Connection status"
-        app:tint="@android:color/white"
-        android:visibility="invisible" />
+        app:tint="@color/accent_gold" />
 </androidx.wear.widget.BoxInsetLayout>

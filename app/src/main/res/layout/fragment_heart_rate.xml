@@ -37,12 +37,10 @@
 
                     <TextView
                         android:id="@+id/blood_result"
+                        style="@style/Watch.Label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="BPM"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
+                        android:text="Heart Rate"
                         android:gravity="center"
                         android:layout_marginBottom="4dp" />
 
@@ -58,10 +56,11 @@
 
                     <TextView
                         android:id="@+id/tv_status"
+                        style="@style/Watch.Meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Idle"
-                        android:textStyle="bold"/>
+                        android:textColor="@color/accent_gold"/>
 
                     <ProgressBar
                         android:id="@+id/progress"
@@ -69,21 +68,23 @@
                         android:layout_width="match_parent"
                         android:layout_height="6dp"
                         android:indeterminate="true"
+                        android:indeterminateTint="@color/accent_gold"
                         android:visibility="gone"
                         android:layout_marginTop="8dp"/>
 
                     <TextView
                         android:id="@+id/tv_value"
+                        style="@style/Watch.Hero"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="24sp"
                         android:text="--"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/accent_rose"
                         android:gravity="center"
-                        android:layout_marginTop="12dp"/>
+                        android:layout_marginTop="8dp"/>
 
                     <Button
                         android:id="@+id/btn_measure"
+                        style="@style/Watch.Button.Measure"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Measure"
@@ -317,7 +318,7 @@
         android:layout_height="22dp"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
         android:contentDescription="Connection status"
-        app:tint="@android:color/white"
-        android:visibility="invisible" />
+        app:tint="@android:color/white" />
 </androidx.wear.widget.BoxInsetLayout>

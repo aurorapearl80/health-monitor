@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.ScrollView;
@@ -17,7 +18,15 @@ import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.monitor.health.ApiClient;
 import com.monitor.health.R;
+import com.monitor.health.chat.dto.ChatSerialRequestDTO;
+import com.monitor.health.ui.service.MessageService;
+import com.monitor.health.utility.DeviceUtils;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MessageDetailActivity extends AppCompatActivity {
     private static final String TAG = "MessageDetailActivity";
@@ -29,6 +38,7 @@ public class MessageDetailActivity extends AppCompatActivity {
     private WebView webView;
     private ScrollView scrollView;
     private ImageButton btnBack;
+    private Button btnReply;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,16 +52,25 @@ public class MessageDetailActivity extends AppCompatActivity {
         webView = findViewById(R.id.web_view);
         scrollView = findViewById(R.id.scroll_view);
         btnBack = findViewById(R.id.btn_back);
+        btnReply = findViewById(R.id.btn_reply);
 
         btnBack.setOnClickListener(v -> finish());
+        btnReply.setOnClickListener(v -> startActivity(new Intent(this, ComposeMessageActivity.class)));
 
         Intent intent = getIntent();
         String sender = intent.getStringExtra("sender_name");
         String date = intent.getStringExtra("message_date");
         String body = intent.getStringExtra("message_body");
+        long apiId = intent.getLongExtra("message_api_id", -1);
+        boolean isMine = intent.getBooleanExtra("is_mine", false);
+        boolean isRead = intent.getBooleanExtra("is_read", true);
 
         senderName.setText(sender != null ? sender : "Unknown");
         messageDate.setText(date != null ? date : "");
+
+        if (apiId > 0 && !isMine && !isRead) {
+            markRead(apiId);
+        }
 
         if (body != null && isVideoLink(body)) {
             Log.d(TAG, "Video link detected: " + body);
@@ -60,6 +79,26 @@ public class MessageDetailActivity extends AppCompatActivity {
             Log.d(TAG, "Text message");
             displayText(body);
         }
+    }
+
+    /** Fire-and-forget, same pattern as CallInvitationApi.respond() — optimistic local update first. */
+    private void markRead(long apiId) {
+        new MessageService(this).markReadLocally(apiId);
+
+        String watchSerial = DeviceUtils.resolveWatchSerial(this);
+        ApiClient.getChatService().markRead(apiId, new ChatSerialRequestDTO(watchSerial)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (!response.isSuccessful()) {
+                    Log.w(TAG, "markRead(" + apiId + ") failed: HTTP " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.w(TAG, "markRead(" + apiId + ") network error: " + t.getMessage());
+            }
+        });
     }
 
     private boolean isVideoLink(String text) {

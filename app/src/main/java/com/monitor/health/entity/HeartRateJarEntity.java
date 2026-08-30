@@ -2,6 +2,7 @@ package com.monitor.health.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "heart_rate_jar")
@@ -33,6 +34,7 @@ public class HeartRateJarEntity {
     }
 
     // Constructor with essential fields
+    @Ignore
     public HeartRateJarEntity(double value, int bloodOxygen, long epochMillis, int mode) {
         this.value = value;
         this.bloodOxygen = bloodOxygen;
@@ -43,6 +45,7 @@ public class HeartRateJarEntity {
     }
 
     // Constructor with all fields
+    @Ignore
     public HeartRateJarEntity(long id, double value, int bloodOxygen, long epochMillis,
                               int mode, int status, int syncAttempts) {
         this.id = id;

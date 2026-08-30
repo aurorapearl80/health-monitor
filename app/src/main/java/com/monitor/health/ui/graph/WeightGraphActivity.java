@@ -108,17 +108,17 @@ public class WeightGraphActivity extends AppCompatActivity {
     private void applyThemeForReadingType(String readingType) {
         if (readingType != null) {
             if (readingType.contains("BloodGlucose")) {
-                changeTheme("#2196F3", "#2196F3", "#2196F3");
+                changeTheme("#050506", "#14161E", "#7EB8FF");
             } else if (readingType.contains("WeightFragment")) {
-                changeTheme("#2E7D32", "#4CAF50", "#EF5350");
+                changeTheme("#050506", "#14161E", "#8FCB9B");
             } else if (readingType.contains("BloodPressureFragment")) {
-                changeTheme("#FF7043", "#FF7043", "#FF7043");
+                changeTheme("#050506", "#14161E", "#E8A07A");
             } else if (readingType.contains("BloodOxygenFragment")) {
-                changeTheme("#f186c0", "#f186c0", "#f186c0");
+                changeTheme("#050506", "#14161E", "#5EC8D8");
             } else if (readingType.contains("TemperatureFragment")) {
-                changeTheme("#AD1457", "#AD1457", "#AD1457");
+                changeTheme("#050506", "#14161E", "#E07A9A");
             } else if (readingType.contains("ElectrocardiogramFragment")) {
-                changeTheme("#AA00FF", "#AA00FF", "#AA00FF");
+                changeTheme("#050506", "#14161E", "#FF5A6A");
             }
 
 

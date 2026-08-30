@@ -32,9 +32,9 @@
                     android:layout_height="31dp"
                     android:layout_gravity="top|center_horizontal"
                     android:layout_marginBottom="10dp"
+                    android:visibility="gone"
                     android:contentDescription="Connection status"
-                    app:tint="@android:color/white"
-                    android:visibility="invisible" />
+                    app:tint="@android:color/white" />
 
                 <ImageView
                     android:id="@+id/profile_image"
@@ -51,8 +51,9 @@
                     android:layout_height="wrap_content"
                     android:text="User Name"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.04"
                     android:layout_marginBottom="4dp" />
 
                 <TextView
@@ -60,8 +61,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Active"
-                    android:textColor="@color/accent_green"
-                    android:textSize="12sp"
+                    android:textColor="@color/accent_gold"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.12"
+                    android:textAllCaps="true"
                     android:background="@drawable/status_background"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp" />
@@ -92,7 +95,7 @@
                     android:background="@drawable/action_button_background"
                     android:padding="8dp"
                     android:layout_margin="8dp"
-                    app:tint="@color/text_primary" />
+                    app:tint="@color/accent_gold" />
 
                 <ImageView
                     android:id="@+id/action_health"
@@ -102,7 +105,7 @@
                     android:background="@drawable/action_button_background"
                     android:padding="8dp"
                     android:layout_margin="8dp"
-                    app:tint="@color/text_primary" />
+                    app:tint="@color/accent_gold" />
 
                 <FrameLayout
                     android:layout_width="wrap_content"
@@ -118,7 +121,7 @@
                         android:src="@drawable/ic_message"
                         android:background="@drawable/action_button_background"
                         android:padding="8dp"
-                        app:tint="@color/text_primary" />
+                        app:tint="@color/accent_gold" />
 
                     <TextView
                         android:id="@+id/message_badge"

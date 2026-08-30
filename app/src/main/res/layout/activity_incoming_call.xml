@@ -27,9 +27,11 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:text="Incoming call"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        android:textStyle="normal" />
+        android:textColor="@color/accent_gold"
+        android:textSize="11sp"
+        android:letterSpacing="0.16"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-medium" />
 
     <!-- Caller Name -->
     <TextView

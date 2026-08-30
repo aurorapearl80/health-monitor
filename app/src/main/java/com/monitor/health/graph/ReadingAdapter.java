@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.ViewHolder> {
     private List<ReadingData> data = new ArrayList<>();
-    private String backgroundColor = "#2E7D32"; // Default color
+    private String backgroundColor = "#050506";
 
     public void setData(List<ReadingData> data) {
         this.data = data;
@@ -85,10 +85,9 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.ViewHold
 //        }
 //        holder.tvBmi.setText("mmHg");
 //        holder.tvStatus.setText(reading.status);
-        // Set background color for each item
-        int bgColor = Color.parseColor(backgroundColor);
-        holder.itemView.setBackgroundColor(bgColor);
-        applyAccessibleTextColors(holder, bgColor);
+        // Keep reading rows on the dark glass cards from item_reading.xml
+        holder.itemView.setBackgroundResource(R.drawable.bg_card);
+        applyAccessibleTextColors(holder, Color.parseColor("#050506"));
     }
 
     private void applyAccessibleTextColors(@NonNull ViewHolder holder, int background) {

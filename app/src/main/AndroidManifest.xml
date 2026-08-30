@@ -95,21 +95,12 @@
             android:launchMode="singleInstance"
             android:theme="@style/Theme.DRWatch.Alert" />
         <activity
-            android:name=".ui.VideoActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MyApplication"
-            tools:ignore="IntentFilterExportedReceiver" />
-        <activity
             android:name=".ui.LiveKitCallActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
         <activity
             android:name=".ui.graph.WeightGraphActivity"
             android:exported="false" /> <!-- Activities (only Main is exported for launcher) -->
-        <activity
-            android:name=".ui.CallActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyApplication" />
         <activity
             android:name=".ui.IncomingCallActivity"
             android:exported="true"

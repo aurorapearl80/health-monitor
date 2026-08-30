@@ -558,15 +558,11 @@ public class ProfileFragment extends Fragment {
         android.widget.ImageView iv = rootView.findViewById(R.id.ivConnectionStatus);
         if (iv == null) return;
         NetworkUtils.ConnectionQuality quality = NetworkUtils.getConnectionQuality(requireContext());
-        if (quality == NetworkUtils.ConnectionQuality.STRONG) {
-            iv.setImageResource(R.drawable.ic_signal_strong);
-            iv.setVisibility(android.view.View.VISIBLE);
-        } else if (quality == NetworkUtils.ConnectionQuality.WEAK) {
-            iv.setImageResource(R.drawable.ic_signal_weak);
-            iv.setVisibility(android.view.View.VISIBLE);
+        if (iv != null) {
+            iv.setVisibility(android.view.View.GONE);
+        }
+        if (quality == NetworkUtils.ConnectionQuality.WEAK) {
             NetworkUtils.showSlowConnectionToast(requireContext());
-        } else {
-            iv.setVisibility(android.view.View.INVISIBLE);
         }
     }
 

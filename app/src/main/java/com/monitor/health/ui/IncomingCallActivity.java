@@ -33,8 +33,6 @@ public class IncomingCallActivity extends AppCompatActivity {
     private Ringtone ringtone;
     private String callerName;
     private String callerNumber;
-    private String token;
-    private String roomName;
     private int callInvitationId;
     private String callerAvatarUrl;
 
@@ -84,8 +82,6 @@ public class IncomingCallActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         callerName = intent.getStringExtra("caller_name");  // from participant
-        token      = intent.getStringExtra("video_token");  // JWT (Twilio path only)
-        roomName   = intent.getStringExtra("room_name");    // optional
         callInvitationId = intent.getIntExtra(IncomingCallService.EXTRA_CALL_INVITATION_ID, 0);
         callerAvatarUrl = intent.getStringExtra(IncomingCallService.EXTRA_CALLER_AVATAR_URL);
 
@@ -146,19 +142,16 @@ public class IncomingCallActivity extends AppCompatActivity {
         dismissNotification();
 
         if (callInvitationId > 0) {
-            // New LiveKit flow (call-invitations raised from the admin/web side) —
-            // fetches its own join token, so no video_token extra needed.
+            // Call-invitations raised from the admin/web side — LiveKitCallActivity fetches
+            // its own join token from /api/patient/livekit/token, no token extra needed.
             CallInvitationApi.respond(this, callInvitationId, "accepted");
             Intent callIntent = new Intent(this, LiveKitCallActivity.class);
             callIntent.putExtra("caller_name", callerName);
             startActivity(callIntent);
         } else {
-            // Legacy Twilio path (raw FCM push, no call_invitation_id).
-            Intent callIntent = new Intent(this, VideoActivity.class);
-            callIntent.putExtra("caller_name", callerName);
-            callIntent.putExtra("video_token", token);
-            callIntent.putExtra("room_name", roomName);
-            startActivity(callIntent);
+            // The live push path (OneSignal) always sets call_invitation_id — this
+            // shouldn't happen, but there's no invitation to accept without it.
+            Log.w("IncomingCallActivity", "No call_invitation_id on this incoming call — cannot start a call.");
         }
         finish();
     }

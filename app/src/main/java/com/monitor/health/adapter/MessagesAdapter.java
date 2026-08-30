@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.monitor.health.R;
 import com.monitor.health.model.MessageThread;
 import com.monitor.health.ui.MessageDetailActivity;
@@ -107,7 +109,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         public void bind(MessageThread thread, OnItemClickListener listener) {
-            profileIcon.setImageResource(thread.iconResId);
+            if (thread.avatarUrl != null && !thread.avatarUrl.isEmpty()) {
+                Glide.with(itemView.getContext())
+                        .load(thread.avatarUrl)
+                        .placeholder(thread.iconResId)
+                        .error(thread.iconResId)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .circleCrop()
+                        .into(profileIcon);
+            } else {
+                profileIcon.setImageResource(thread.iconResId);
+            }
             senderName.setText(thread.name);
             messagePreview.setText(thread.preview);
             timestamp.setText(TimeUtils.getRelativeTime(thread.timestamp));
@@ -119,6 +131,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     intent.putExtra("sender_name", thread.name);
                     intent.putExtra("message_body", thread.preview);
                     intent.putExtra("message_date", TimeUtils.formatFullDateTime(thread.timestamp));
+                    intent.putExtra("message_api_id", thread.apiId);
+                    intent.putExtra("is_mine", thread.isMine);
+                    intent.putExtra("is_read", thread.isRead);
                     itemView.getContext().startActivity(intent);
                 }
             });

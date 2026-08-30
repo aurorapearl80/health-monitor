@@ -5,14 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2196F3"
+    android:background="@color/dark_background"
     app:boxedEdges="all">
 
     <androidx.wear.widget.SwipeDismissFrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Add inset padding so content stays readable on round screens -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -20,15 +19,15 @@
             android:paddingRight="@dimen/watch_inset_horizontal"
             android:paddingTop="@dimen/watch_inset_vertical"
             android:paddingBottom="@dimen/watch_inset_vertical"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideInset">
+            android:clipToPadding="true"
+            android:scrollbarStyle="outsideInset"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Blood Glucose Section -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -36,63 +35,55 @@
                     android:gravity="center_horizontal"
                     android:layout_marginBottom="@dimen/card_spacing">
 
-                    <!-- Main Value Display -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="6dp"
+                        android:layout_marginBottom="4dp"
                         android:gravity="center"
                         android:orientation="vertical">
 
                         <ImageView
                             android:id="@+id/ivConnectionStatus"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
                             android:layout_gravity="top|center_horizontal"
                             android:contentDescription="Connection status"
-                            app:tint="@android:color/white"
-                            android:visibility="invisible" />
+                            app:tint="@color/accent_gold"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/tvTitle"
+                            style="@style/Watch.Label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
-                            android:alpha="0.9"
-                            android:text="Blood Glucose"
-                            android:textColor="@android:color/white"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
+                            android:layout_marginBottom="2dp"
+                            android:text="Glucose" />
 
                         <TextView
                             android:id="@+id/tvValueBG"
+                            style="@style/Watch.Hero"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="---"
-                            android:textColor="@android:color/white"
-                            android:textSize="32sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/accent_blue" />
 
                         <TextView
                             android:id="@+id/tvUnit"
+                            style="@style/Watch.Unit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="--"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
+                            android:text="--" />
 
                         <TextView
                             android:id="@+id/tvTimeAgo"
+                            style="@style/Watch.Meta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="---"
-                            android:textColor="@android:color/white"
-                            android:textSize="10sp" />
+                            android:layout_marginTop="4dp"
+                            android:text="---" />
                     </LinearLayout>
 
-                    <!-- Status Info -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -101,53 +92,50 @@
 
                         <TextView
                             android:id="@+id/tvBPM"
+                            style="@style/Watch.Meta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text=""
-                            android:textSize="10sp"
-                            android:textColor="@android:color/white"
                             android:layout_marginEnd="8dp"/>
 
                         <ImageView
                             android:id="@+id/heartIcon"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
                             android:src="@drawable/ic_blood_drop_foreground"
                             android:layout_marginEnd="8dp"
+                            app:tint="@color/accent_blue"
                             tools:ignore="UseAppTint"/>
 
                         <TextView
                             android:id="@+id/tvOutcome"
+                            style="@style/Watch.Meta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text=""
-                            android:textSize="10sp"
-                            android:textColor="@android:color/white"/>
+                            android:textColor="@color/accent_gold"/>
 
                         <ImageView
                             android:id="@+id/chartIcon"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
                             android:src="@drawable/ic_chart"
                             android:clickable="true"
                             android:focusable="true"
-                            android:layout_marginLeft="16dp"
-                            app:tint="@android:color/white" />
+                            android:layout_marginStart="12dp"
+                            app:tint="@color/accent_gold" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@android:color/white"
-                    android:alpha="0.3"
+                    android:background="@drawable/watch_hairline"
                     android:layout_marginVertical="@dimen/card_spacing"/>
                 <include
                     android:id="@+id/metricsPanel"
                     layout="@layout/layout_metrics_panel" />
 
-                <!-- Add this before the closing tag of your main layout -->
                 <include layout="@layout/include_quick_actions" />
             </LinearLayout>
         </ScrollView>

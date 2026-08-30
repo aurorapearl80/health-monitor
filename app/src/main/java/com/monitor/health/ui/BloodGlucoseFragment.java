@@ -633,7 +633,12 @@ public class BloodGlucoseFragment extends Fragment  implements QuickActionsHandl
         TextView tvTime  = row.findViewById(R.id.tvTime);
         TextView tvValue = row.findViewById(R.id.tvValue);
 
-        if (ivIcon != null) ivIcon.setImageResource(iconRes);
+        if (ivIcon != null) {
+            ivIcon.setImageResource(iconRes);
+            ivIcon.setColorFilter(
+                    androidx.core.content.ContextCompat.getColor(row.getContext(), R.color.accent_gold),
+                    android.graphics.PorterDuff.Mode.SRC_IN);
+        }
         if (tvTitle != null) tvTitle.setText(title);
         if (tvTime  != null) tvTime.setText(timeAgo);
         if (tvValue != null) tvValue.setText(value);
@@ -843,15 +848,11 @@ public class BloodGlucoseFragment extends Fragment  implements QuickActionsHandl
         android.widget.ImageView iv = requireView().findViewById(R.id.ivConnectionStatus);
         if (iv == null) return;
         NetworkUtils.ConnectionQuality quality = NetworkUtils.getConnectionQuality(requireContext());
-        if (quality == NetworkUtils.ConnectionQuality.STRONG) {
-            iv.setImageResource(R.drawable.ic_signal_strong);
-            iv.setVisibility(android.view.View.VISIBLE);
-        } else if (quality == NetworkUtils.ConnectionQuality.WEAK) {
-            iv.setImageResource(R.drawable.ic_signal_weak);
-            iv.setVisibility(android.view.View.VISIBLE);
+        if (iv != null) {
+            iv.setVisibility(android.view.View.GONE);
+        }
+        if (quality == NetworkUtils.ConnectionQuality.WEAK) {
             NetworkUtils.showSlowConnectionToast(requireContext());
-        } else {
-            iv.setVisibility(android.view.View.INVISIBLE);
         }
     }
 
