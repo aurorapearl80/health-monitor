@@ -52,6 +52,9 @@ public class StatsAdapter extends RecyclerView.Adapter<StatsAdapter.StatViewHold
 
         public void bind(ProfileFragment.StatItem stat) {
             iconView.setImageResource(stat.getIconRes());
+            iconView.setColorFilter(
+                    androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.accent_gold),
+                    android.graphics.PorterDuff.Mode.SRC_IN);
             titleView.setText(stat.getTitle());
             valueView.setText(stat.getValue());
         }

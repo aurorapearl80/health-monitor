@@ -21,7 +21,7 @@
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000"
+        android:background="#CC050506"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -41,18 +41,18 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:indeterminate="true"
-                android:indeterminateTint="@android:color/white"/>
+                android:indeterminateTint="@color/accent_gold"/>
 
             <TextView
                 android:id="@+id/loadingText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Fetching data from server..."
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
+                android:text="Fetching data..."
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
                 android:fontFamily="sans-serif"
-                android:letterSpacing="0.02"/>
+                android:letterSpacing="0.04"/>
 
         </LinearLayout>
 

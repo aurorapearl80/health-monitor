@@ -40,14 +40,6 @@ android {
             useLegacyPackaging = false
         }
     }
-    // Add this inside android block
-    applicationVariants.all { variant ->
-        variant.javaCompileProvider.get().options.compilerArgs += [
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'
-        ]
-    }
 
 }
 
@@ -69,6 +61,13 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
+
+    // Chat real-time delivery — connects to the same socketio relay familyhealth-app/the React
+    // SPA use. Exclude org.json: Android already ships it on the boot classpath, and without this
+    // exclude the two collide at build time ("duplicate class org.json.*").
+    implementation('io.socket:socket.io-client:2.1.1') {
+        exclude group: 'org.json', module: 'json'
+    }
     implementation 'com.airbnb.android:lottie:6.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'

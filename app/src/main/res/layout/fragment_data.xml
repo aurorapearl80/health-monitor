@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2E7D32"
+    android:background="@color/dark_background"
     android:fillViewport="true">
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="4dp"
                 android:text="41 readings"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_primary"
                 android:textSize="10sp" />
         </RelativeLayout>
         <LinearLayout
@@ -41,21 +41,21 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="106.7 lb\nAVERAGE"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:lineSpacingExtra="2dp" />
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="#66FFFFFF" />
+                android:background="@drawable/watch_hairline" />
             <TextView
                 android:id="@+id/tvInRange"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="2.4 %\nIN RANGE"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:lineSpacingExtra="2dp" />
@@ -73,7 +73,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#66FFFFFF"
+            android:background="@drawable/watch_hairline"
             android:layout_marginBottom="8dp" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,14 +86,14 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Date / Time"
-                android:textColor="#CCCCCC"
+                android:textColor="@color/text_muted"
                 android:textSize="10sp" />
             <TextView
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Reading Values"
-                android:textColor="#CCCCCC"
+                android:textColor="@color/text_muted"
                 android:textSize="10sp"
                 android:gravity="center" />
             <TextView
@@ -101,7 +101,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Goal Achieved"
-                android:textColor="#CCCCCC"
+                android:textColor="@color/text_muted"
                 android:textSize="10sp"
                 android:gravity="end" />
         </LinearLayout>

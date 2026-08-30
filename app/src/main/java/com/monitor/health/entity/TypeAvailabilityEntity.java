@@ -2,6 +2,7 @@ package com.monitor.health.entity;
 
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 @Entity(tableName = "TypeAvailability")
 public class TypeAvailabilityEntity {
@@ -22,6 +23,7 @@ public class TypeAvailabilityEntity {
     public TypeAvailabilityEntity() {
     }
 
+    @Ignore
     public TypeAvailabilityEntity(boolean bloodGlucose, boolean bloodPressure, boolean weight, boolean bloodOxygen, boolean electrocardiogram, boolean temperature) {
         this.bloodGlucose = bloodGlucose;
         this.bloodPressure = bloodPressure;

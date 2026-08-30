@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/dark_background">
 
-    <!-- Main Content with BoxInsetLayout for circular watch -->
     <androidx.wear.widget.BoxInsetLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,7 +13,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#2E7D32"
+            android:background="@color/dark_background"
             android:fillViewport="true"
             app:boxedEdges="all">
 
@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="5dp">
+                android:padding="8dp">
 
 
                 <TextView
@@ -30,21 +30,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="start"
                     android:layout_marginBottom="10dp"
                     android:lineSpacingExtra="2dp" />
 
-                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="#FFFFFF"
+                    android:layout_height="1dp"
+                    android:background="@drawable/watch_hairline"
                     android:layout_marginBottom="8dp" />
 
-                <!-- RecyclerView -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
@@ -54,12 +52,11 @@
         </ScrollView>
     </androidx.wear.widget.BoxInsetLayout>
 
-    <!-- Loading Overlay -->
     <FrameLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000"
+        android:background="#CC050506"
         android:visibility="gone"
         android:clickable="true"
         android:focusable="true"
@@ -76,17 +73,18 @@
 
             <ProgressBar
                 android:id="@+id/progressBar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:indeterminateTint="#2E7D32" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:indeterminateTint="@color/accent_gold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Loading..."
-                android:textColor="#333333"
-                android:textSize="12sp"
-                android:textStyle="bold"
+                android:textColor="@color/accent_gold"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
                 android:layout_marginTop="12dp" />
         </LinearLayout>
     </FrameLayout>

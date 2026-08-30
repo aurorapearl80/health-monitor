@@ -1,6 +1,7 @@
 package com.monitor.health.model;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -23,6 +24,7 @@ public class BleDeviceModel {
          // Default to not connected
     }
 
+    @Ignore
     public BleDeviceModel(long id, String serial, String deviceId, String serverId, String deviceName, String deviceAddress) {
         this.id = id;
         this.serial = serial;
@@ -32,6 +34,7 @@ public class BleDeviceModel {
         this.deviceAddress = deviceAddress;
     }
 
+    @Ignore
     public BleDeviceModel(long id, String serial, String deviceId, String serverId, String deviceName, String deviceAddress, boolean isConnected) {
         this.id = id;
         this.serial = serial;

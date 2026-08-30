@@ -38,9 +38,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Sleep"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
+                        android:textColor="@color/accent_violet"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.18"
+                        android:textAllCaps="true"
+                        android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:layout_marginBottom="4dp" />
 
@@ -59,7 +61,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Idle"
-                        android:textStyle="bold"/>
+                        android:textColor="@color/accent_gold"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.08"/>
 
                     <ProgressBar
                         android:id="@+id/progress"
@@ -74,19 +78,21 @@
                         android:id="@+id/tv_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="32sp"
+                        android:textSize="36sp"
+                        android:fontFamily="sans-serif-light"
                         android:text="--"
-                        android:textColor="@android:color/white"
-                        android:layout_marginTop="24dp"/>
+                        android:textColor="@color/accent_violet"
+                        android:layout_marginTop="12dp"/>
 
                     <Button
                         android:id="@+id/btn_measure"
+                        style="@style/Watch.Button.Measure"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Measure"
                         android:clickable="true"
                         android:focusable="true"
-                        android:layout_marginTop="24dp"/>
+                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
 

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Use this version for a more focused weight monitoring experience -->
-
 <androidx.wear.widget.BoxInsetLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#81C784"
+    android:background="@color/dark_background"
     app:boxedEdges="all">
 
     <androidx.wear.widget.SwipeDismissFrameLayout
@@ -21,8 +19,9 @@
             android:paddingRight="@dimen/watch_inset_horizontal"
             android:paddingTop="@dimen/watch_inset_vertical"
             android:paddingBottom="@dimen/watch_inset_vertical"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideInset">
+            android:clipToPadding="true"
+            android:scrollbarStyle="outsideInset"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -31,73 +30,65 @@
                 android:gravity="center"
                 android:padding="4dp">
 
-                <!-- Main Weight Display -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center">
 
-                    <!-- Page Title -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center"
-                        android:layout_marginBottom="4dp">
+                        android:layout_marginBottom="2dp">
 
                         <TextView
                             android:id="@+id/tvTitle"
+                            style="@style/Watch.Label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Weight Monitor"
-                            android:textSize="11sp"
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold" />
+                            android:text="Weight" />
                     </LinearLayout>
 
-                    <!-- Weight Value with Unit -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="6dp">
 
                         <TextView
                             android:id="@+id/tv_value_bg"
+                            style="@style/Watch.Hero"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="--"
-                            android:textSize="32sp"
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold" />
+                            android:textColor="@color/accent_green" />
 
                         <TextView
                             android:id="@+id/tvUnit"
+                            style="@style/Watch.Unit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text=""
-                            android:textSize="12sp"
-                            android:textColor="@android:color/white"
                             android:layout_marginStart="6dp"
                             android:layout_marginBottom="4dp" />
 
                     </LinearLayout>
 
-                    <!-- Estimated Body Composition -->
                     <TextView
                         android:id="@+id/tv_body_composition_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Estimated Body Composition"
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:layout_marginTop="4dp"
-                        android:textStyle="bold"
+                        android:text="Body composition"
+                        android:textSize="9sp"
+                        android:textColor="@color/accent_gold"
+                        android:letterSpacing="0.12"
+                        android:textAllCaps="true"
+                        android:layout_marginTop="2dp"
                         android:gravity="center" />
 
-                    <!-- Body Composition Row — equal-weight columns filling full width -->
                     <LinearLayout
                         android:id="@+id/bodyCompositionRow"
                         android:layout_width="match_parent"
@@ -105,7 +96,6 @@
                         android:orientation="horizontal"
                         android:layout_marginTop="6dp">
 
-                        <!-- Body Water -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -118,23 +108,22 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:textSize="11sp"
+                                android:textColor="@color/text_primary"
+                                android:fontFamily="sans-serif-medium"
                                 android:maxLines="1"
                                 android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="BODY WATER"
+                                android:text="WATER"
                                 android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
+                                android:letterSpacing="0.08"
+                                android:textColor="@color/text_muted"
                                 android:gravity="center" />
                         </LinearLayout>
 
-                        <!-- Lean Mass -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -147,23 +136,22 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:textSize="11sp"
+                                android:textColor="@color/text_primary"
+                                android:fontFamily="sans-serif-medium"
                                 android:maxLines="1"
                                 android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="LEAN MASS"
+                                android:text="LEAN"
                                 android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
+                                android:letterSpacing="0.08"
+                                android:textColor="@color/text_muted"
                                 android:gravity="center" />
                         </LinearLayout>
 
-                        <!-- Fat Mass -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -176,23 +164,22 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:textSize="11sp"
+                                android:textColor="@color/text_primary"
+                                android:fontFamily="sans-serif-medium"
                                 android:maxLines="1"
                                 android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="FAT MASS"
+                                android:text="FAT"
                                 android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
+                                android:letterSpacing="0.08"
+                                android:textColor="@color/text_muted"
                                 android:gravity="center" />
                         </LinearLayout>
 
-                        <!-- Body Fat % -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -205,48 +192,42 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:textSize="11sp"
+                                android:textColor="@color/text_primary"
+                                android:fontFamily="sans-serif-medium"
                                 android:maxLines="1"
                                 android:gravity="center" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="BODY FAT %"
+                                android:text="FAT %"
                                 android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
+                                android:letterSpacing="0.08"
+                                android:textColor="@color/text_muted"
                                 android:gravity="center" />
                         </LinearLayout>
 
                     </LinearLayout>
 
-                    <!-- Time Ago -->
                     <TextView
                         android:id="@+id/tv_time_ago"
+                        style="@style/Watch.Meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:layout_marginTop="2dp" />
+                        android:layout_marginTop="4dp" />
 
-                    <!-- BMI Status -->
                     <TextView
                         android:id="@+id/tvBMIStatus"
+                        style="@style/Watch.Meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:layout_marginTop="4dp"
-                        android:alpha="0.8" />
+                        android:layout_marginTop="2dp" />
 
                 </LinearLayout>
 
-                <!-- Status Info -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -256,48 +237,46 @@
 
                     <TextView
                         android:id="@+id/tvBPM"
+                        style="@style/Watch.Meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BMI: "
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
                         android:layout_marginEnd="8dp"
                         android:gravity="center" />
 
                     <ImageView
                         android:id="@+id/heartIcon"
-                        android:layout_width="18dp"
+                        android:layout_width="16dp"
                         android:layout_height="match_parent"
                         android:layout_marginEnd="8dp"
                         android:src="@drawable/ic_weight_foreground"
+                        app:tint="@color/accent_green"
                         tools:ignore="UseAppTint" />
 
                     <TextView
                         android:id="@+id/tvOutcome"
+                        style="@style/Watch.Meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/accent_gold"
                         android:gravity="center" />
 
                     <ImageView
                         android:id="@+id/chartIcon"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:src="@drawable/ic_chart"
                         android:clickable="true"
                         android:focusable="true"
-                        android:layout_marginLeft="16dp"
-                        app:tint="@android:color/white" />
+                        android:layout_marginStart="12dp"
+                        app:tint="@color/accent_gold" />
                 </LinearLayout>
 
-                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@android:color/white"
-                    android:alpha="0.3"
+                    android:background="@drawable/watch_hairline"
                     android:layout_marginVertical="@dimen/card_spacing"/>
 
                 <include
@@ -314,12 +293,12 @@
 
     <ImageView
         android:id="@+id/ivConnectionStatus"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
         android:contentDescription="Connection status"
-        app:tint="@android:color/white"
-        android:visibility="invisible" />
+        app:tint="@color/accent_gold" />
 
 </androidx.wear.widget.BoxInsetLayout>

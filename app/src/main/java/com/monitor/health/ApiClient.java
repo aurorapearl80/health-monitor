@@ -1,5 +1,6 @@
 package com.monitor.health;
 
+import com.monitor.health.chat.ChatService;
 import com.monitor.health.utility.AuthInterceptor;
 
 import org.conscrypt.Conscrypt;
@@ -63,6 +64,20 @@ public class ApiClient {
 
     public static UserService getUserService(String baseUrl, String authToken, String watchSerial) {
         return getRetrofit(baseUrl, authToken, "RFAY81MT22A").create(UserService.class);
+    }
+
+    /**
+     * patient-monitoring-web's serial-only doctor-watch chat API — no auth headers, the watch's
+     * serial (passed per-call, see DeviceUtils.resolveWatchSerial) is the credential.
+     */
+    public static ChatService getChatService() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(Constant.BASE_URL)
+                .client(getSharedHttpClient())
+                .build();
+
+        return retrofit.create(ChatService.class);
     }
 
     private static SSLSocketFactory getSSLSocketFactory() {

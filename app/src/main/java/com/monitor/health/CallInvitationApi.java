@@ -3,7 +3,7 @@ package com.monitor.health;
 import android.content.Context;
 import android.util.Log;
 
-import com.monitor.health.utility.PreferenceHelper;
+import com.monitor.health.utility.DeviceUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -16,8 +16,11 @@ import okhttp3.Response;
 
 /**
  * Accept/decline an incoming video-call invitation raised by the admin side
- * (see patient-monitoring-web's CallInvitationController). Fire-and-forget —
- * failures are logged, never block the call/decline UX.
+ * (see patient-monitoring-web's CallInvitationController). Identified by this
+ * watch's serial — same serial-only auth as the doctor-watch chat/readings/
+ * livekit-token endpoints, since this device never completes the email/
+ * password login the bearer-authed /api/patient/call-invitations expects.
+ * Fire-and-forget — failures are logged, never block the call/decline UX.
  */
 public class CallInvitationApi {
 
@@ -29,17 +32,13 @@ public class CallInvitationApi {
             .build();
 
     public static void respond(Context context, int callInvitationId, String status) {
-        String authToken = PreferenceHelper.getInstance(context).getString(Constant.AUTH_TOKEN, null);
-        if (authToken == null) {
-            Log.w(TAG, "No auth token stored; cannot respond to call invitation.");
-            return;
-        }
+        String serial = DeviceUtils.resolveWatchSerial(context);
 
-        RequestBody body = RequestBody.create("{\"status\":\"" + status + "\"}", JSON);
+        RequestBody body = RequestBody.create(
+                "{\"serial\":\"" + serial + "\",\"status\":\"" + status + "\"}", JSON);
         Request request = new Request.Builder()
-                .url(Constant.BASE_URL + "api/patient/call-invitations/" + callInvitationId)
+                .url(Constant.BASE_URL + "api/doctor-watches/call-invitations/" + callInvitationId)
                 .patch(body)
-                .addHeader("Authorization", "Bearer " + authToken)
                 .addHeader("Accept", "application/json")
                 .build();
 

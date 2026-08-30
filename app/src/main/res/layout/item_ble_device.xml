@@ -24,7 +24,7 @@
             android:layout_marginEnd="8dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:buttonTint="@color/accent_green" />
+            android:buttonTint="@color/accent_gold" />
 
         <!-- Device Name -->
         <TextView
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:text="MAC:"
                 android:textSize="10sp"
-                android:textColor="@color/accent_green"
+                android:textColor="@color/accent_gold"
                 android:layout_marginEnd="4dp"
                 android:visibility="gone"/>
 
@@ -71,7 +71,7 @@
                 android:layout_weight="1"
                 android:text="00:00:00:00:00:00"
                 android:textSize="10sp"
-                android:textColor="@color/accent_green"
+                android:textColor="@color/accent_gold"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:visibility="gone"/>
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:text="SN:"
                 android:textSize="10sp"
-                android:textColor="@color/accent_green"
+                android:textColor="@color/accent_gold"
                 android:layout_marginEnd="4dp"
                 android:visibility="gone"/>
 
@@ -101,7 +101,7 @@
                 android:layout_weight="1"
                 android:text="XXXXX"
                 android:textSize="10sp"
-                android:textColor="@color/accent_green"
+                android:textColor="@color/accent_gold"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:visibility="gone"/>

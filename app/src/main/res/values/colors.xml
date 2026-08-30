@@ -1,34 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="dark_background">#121212</color>
-    <color name="surface_color">#1E1E1E</color>
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#B3B3B3</color>
-    <color name="accent_blue">#2196F3</color>
-    <color name="accent_green">#4CAF50</color>
-    <color name="accent_green_transparent">#334CAF50</color>
-    <color name="border_color">#333333</color>
+    <color name="black">#FF050506</color>
+    <color name="white">#FFF7F4EE</color>
+    <color name="dark_background">#FF050506</color>
+    <color name="surface_color">#FF14161E</color>
+    <color name="surface_elevated">#FF1C2030</color>
+    <color name="text_primary">#FFF4F0E8</color>
+    <color name="text_secondary">#FF9A958A</color>
+    <color name="text_muted">#FF6B675E</color>
+    <color name="accent_gold">#FFD4AF77</color>
+    <color name="accent_gold_pressed">#FFB8945C</color>
+    <color name="accent_gold_dim">#33D4AF77</color>
+    <color name="watch_on_gold">#FF1A140C</color>
+    <color name="accent_blue">#FF7EB8FF</color>
+    <color name="accent_green">#FF8FCB9B</color>
+    <color name="accent_green_transparent">#338FCB9B</color>
+    <color name="accent_teal">#FF5EC8D8</color>
+    <color name="accent_rose">#FFFF5A6A</color>
+    <color name="accent_coral">#FFE8A07A</color>
+    <color name="accent_magenta">#FFE07A9A</color>
+    <color name="accent_violet">#FF8B8FD9</color>
+    <color name="border_color">#FF2A2F42</color>
+    <color name="hairline">#22D4AF77</color>
+
     <!-- Dialog Colors -->
-    <color name="dialog_background">#2D2D2D</color>
-    <color name="dialog_border">#404040</color>
-    <color name="dialog_text_primary">#FFFFFF</color>
-    <color name="dialog_text_secondary">#CCCCCC</color>
-    <color name="dialog_accent">#FF9800</color>
+    <color name="dialog_background">#FF14161E</color>
+    <color name="dialog_border">#FF2A2F42</color>
+    <color name="dialog_text_primary">#FFF4F0E8</color>
+    <color name="dialog_text_secondary">#FF9A958A</color>
+    <color name="dialog_accent">#FFD4AF77</color>
 
     <!-- Button Colors -->
-    <color name="button_ok_normal">#4CAF50</color>
-    <color name="button_ok_pressed">#45A049</color>
-    <color name="button_cancel_normal">#424242</color>
-    <color name="button_cancel_pressed">#616161</color>
+    <color name="button_ok_normal">#FFD4AF77</color>
+    <color name="button_ok_pressed">#FFB8945C</color>
+    <color name="button_cancel_normal">#FF1C2030</color>
+    <color name="button_cancel_pressed">#FF2A2F42</color>
 
     <!-- Video call -->
-    <color name="dark_grey">#121212</color>
-    <color name="light_grey">#BBBBBB</color>
-    <color name="green">#4CAF50</color>
-    <color name="red">#F44336</color>
-    <color name="blue">#2196F3</color>
+    <color name="dark_grey">#FF050506</color>
+    <color name="light_grey">#FF9A958A</color>
+    <color name="green">#FF8FCB9B</color>
+    <color name="red">#FFE24A4A</color>
+    <color name="blue">#FF7EB8FF</color>
 
-    <color name="call_background">#1E1E1E</color>
+    <color name="call_background">#FF050506</color>
 </resources>

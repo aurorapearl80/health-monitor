@@ -3,10 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="52dp"
+    android:minHeight="48dp"
     android:orientation="horizontal"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="6dp">
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="6dp"
+    android:background="@drawable/bg_card"
+    android:layout_marginBottom="6dp">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -18,16 +20,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sep 29"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium" />
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="11:00 PM"
-            android:textColor="#CCCCCC"
-            android:textSize="12sp" />
+            android:textColor="@color/text_muted"
+            android:textSize="10sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -41,16 +43,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="48.3"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textColor="@color/accent_gold"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium" />
         <TextView
             android:id="@+id/tvBmi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="8.6"
-            android:textColor="#CCCCCC"
-            android:textSize="12sp" />
+            android:textColor="@color/text_secondary"
+            android:textSize="10sp" />
     </LinearLayout>
 
     <TextView
@@ -59,8 +61,8 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:text="Normal"
-        android:textColor="#CCCCCC"
-        android:textSize="13sp"
-        android:textStyle="bold"
+        android:textColor="@color/text_secondary"
+        android:textSize="11sp"
+        android:letterSpacing="0.04"
         android:gravity="end" />
 </LinearLayout>
