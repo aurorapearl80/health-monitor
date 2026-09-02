@@ -96,9 +96,8 @@
             android:theme="@style/Theme.DRWatch.Alert" />
         <activity
             android:name=".ui.VideoActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MyApplication"
-            tools:ignore="IntentFilterExportedReceiver" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
         <activity
             android:name=".ui.LiveKitCallActivity"
             android:exported="false"
@@ -112,29 +111,19 @@
             android:theme="@style/Theme.MyApplication" />
         <activity
             android:name=".ui.IncomingCallActivity"
-            android:exported="true"
+            android:exported="false"
             android:launchMode="singleTop"
             android:showOnLockScreen="true"
-            android:turnScreenOn="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:turnScreenOn="true" />
 
         <!-- Incoming Voice (Twilio Voice) full-screen UI -->
         <activity
             android:name=".ui.IncomingVoiceActivity"
-            android:exported="true"
+            android:exported="false"
             android:launchMode="singleTop"
             android:showOnLockScreen="true"
             android:turnScreenOn="true"
-            android:taskAffinity="">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:taskAffinity="" />
 
         <!-- Ongoing Voice Call screen -->
         <activity

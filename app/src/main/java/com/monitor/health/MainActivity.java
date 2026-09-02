@@ -91,7 +91,6 @@ import com.monitor.health.response.bledevice.DeviceDetails;
 import com.monitor.health.response.bledevice.DeviceResponse;
 import com.monitor.health.response.bledevice.DeviceResponseList;
 import com.monitor.health.response.user.UserProfileResponse;
-import com.monitor.health.services.BackButtonInterceptorService;
 import com.monitor.health.services.BleScanService;
 import com.monitor.health.services.MyForegroundService;
 import com.monitor.health.services.BloodOxygenSensorService;
@@ -2294,15 +2293,6 @@ private void startHearRateSensorService() {
     // Show modal dialog
     private void showBluetoothOffDialog() {
        Toast.makeText(this, "Please keep Bluetooth turned on, as turning it off may affect the Dr Watch app.", Toast.LENGTH_LONG).show();
-    }
-
-    private boolean isAccessibilityServiceEnabled() {
-        String service = getPackageName() + "/" + BackButtonInterceptorService.class.getCanonicalName();
-        String enabledServices = Settings.Secure.getString(
-                getContentResolver(),
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        );
-        return enabledServices != null && enabledServices.contains(service);
     }
 
 //    @Override
