@@ -170,7 +170,7 @@ public class BloodPressureNativeFragment extends BaseFragment {
                 serial,
                 systolic,
                 diastolic,
-                "66437be266c8833a1c42d7aa",
+                androidId,
                 bpm,
                 "Asia/Manila"
         );

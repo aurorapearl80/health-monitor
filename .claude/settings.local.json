@@ -22,7 +22,8 @@
       "Bash(brew list *)",
       "Bash(/Applications/Google Chrome.app/Contents/MacOS/Google Chrome *)",
       "Bash(pip3 install *)",
-      "Bash(pip3 show *)"
+      "Bash(pip3 show *)",
+      "Bash(xargs cat)"
     ]
   }
 }

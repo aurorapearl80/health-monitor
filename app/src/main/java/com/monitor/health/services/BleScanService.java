@@ -823,6 +823,8 @@ public class BleScanService extends Service {
             String deviceName = device.getName();
             String deviceAddress = device.getAddress();
 
+            Log.d(TAG, "BLE device found: name=" + deviceName + " address=" + deviceAddress);
+
             if (deviceName == null || deviceName.isEmpty()) {
                 return;
             }
@@ -1118,6 +1120,7 @@ public class BleScanService extends Service {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 isConnecting = false;
                 connectRetry = 0;
+                Log.d(TAG, "GATT connected to: " + gatt.getDevice().getName() + " (" + gatt.getDevice().getAddress() + ")");
 
                 // Discover services after a short delay (helps some thermometers)
                 bleHandler.postDelayed(() -> {
@@ -1146,8 +1149,10 @@ public class BleScanService extends Service {
                 // Get the device associated with the GATT connection
                 BluetoothDevice device = gatt.getDevice();
 
+
                 // Get the device name
                 String deviceName = device.getName();
+                Log.d(TAG, "Device Name: " + deviceName);
 
                 // Log the device name
                 if (deviceName != null) {
@@ -1245,10 +1250,19 @@ public class BleScanService extends Service {
             super.onCharacteristicChanged(gatt, characteristic);
             byte[] value = characteristic.getValue();
             BluetoothDevice device = gatt.getDevice();
+
+            // Log all raw BLE notifications for debugging
+            if (value != null) {
+                StringBuilder hexStr = new StringBuilder();
+                for (byte b : value) hexStr.append(String.format("%02X ", b));
+                Log.d(TAG, "onCharacteristicChanged device=" + (device != null ? device.getName() : "null")
+                        + " uuid=" + characteristic.getUuid()
+                        + " len=" + value.length + " data=" + hexStr.toString().trim());
+            }
+
             if (device.getName().contains("PD_86B5")) {
                 parseDeviceStatus(gatt, characteristic, value);
             }
-            //Log.d(TAG, "Characteristic device name: "+device.getName());
 
             if (device != null && value != null) {
                 String deviceName = device.getName();
@@ -1485,53 +1499,45 @@ public class BleScanService extends Service {
                 "Asia/Manila",
                 "jtm00025b94050c",
                 temperature,
-                Constant.DEVICE_TEMPERATURE,
+                androidId,
                 "5bb306382598931ffbd1b628",
                 getDate(),
                 androidId
         );
-        Log.d(TAG, "sendTemperature POST → url=" + Constant.BASE_URL_BGM + "api/temperatures"
-                + " | temperature=" + reading.getTemperature()
-                + " | serial=" + androidId
-                + " | device_id=" + reading.getDevice_id()
-                + " | timezone=" + reading.getTimezone()
-                + " | measured_at=" + reading.getMeasured_at());
+        String endpoint = Constant.BASE_URL_BGM + "api/temperatures";
+        String payloadJson = new com.google.gson.Gson().toJson(reading);
+        Log.d(TAG, "sendTemperature → POST " + endpoint);
+        Log.d(TAG, "sendTemperature payload: " + payloadJson);
 
         Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM,token, androidId).sendTemperature(reading);
         call.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-                Log.d(TAG, response+"");
-                Log.d(TAG, "Temperature Success 1 : "+response);
+                Log.d(TAG, "sendTemperature response code=" + response.code() + " success=" + response.isSuccessful());
                 if (response.isSuccessful()) {
-                    // Request successful
-                    // Handle response if needed
-                    //saveTemperatureData(temperature);
-
-
+                    Log.d(TAG, "sendTemperature response body: " + response.body());
                     playNotificationSound();
-
                     Log.d(TAG, "Sending data "+temperature);
-
                     saveTemperatureData((double)temperature, 1, serial);
                     Intent fallIntent = new Intent(Constant.ACTION_TEMPERATURE);
                     fallIntent.setPackage(getPackageName());
                     fallIntent.putExtra(Constant.VALUE_TEMPERATURE, (double) temperature);
                     sendBroadcast(fallIntent);
                     restartBle();
-
                 } else {
-                    // Request failed
-                    // Handle error
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                        Log.e(TAG, "sendTemperature error body: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e(TAG, "sendTemperature failed to read error body: " + e.getMessage());
+                    }
                     restartBle();
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                // Request failed
-                // Handle failure
-                Log.d(TAG, "Temperature Error 1 : "+t.toString());
+                Log.e(TAG, "sendTemperature network failure: " + t.getMessage());
                 restartBle();
             }
         });
@@ -1555,25 +1561,38 @@ public class BleScanService extends Service {
                 serial,
                 systolic,
                 diastolic,
-                "66437be266c8833a1c42d7aa",
+                androidId,
                 bpm,
                 "Asia/Manila"
         );
+
+        String endpoint = Constant.BASE_URL_BGM + "api/blood-pressures";
+        String requestJson = new com.google.gson.Gson().toJson(request);
+        Log.d(TAG, "sendBPJumper endpoint: POST " + endpoint);
+        Log.d(TAG, "sendBPJumper request body: " + requestJson);
 
         Call<BloodPressureResponse> call = ApiClient.getUserService(Constant.BASE_URL_BGM, token, androidId).sendBloodPressure(request);
         call.enqueue(new Callback<BloodPressureResponse>() {
             @Override
             public void onResponse(Call<BloodPressureResponse> call, Response<BloodPressureResponse> response) {
-                Log.d(TAG, "sendBPJumper server response success=" + response.isSuccessful() + " code=" + response.code());
-                if (response.isSuccessful()) {
+                Log.d(TAG, "sendBPJumper response code=" + response.code() + " success=" + response.isSuccessful());
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "sendBPJumper response body: " + response.body().getMessage());
                     playNotificationSound();
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                        Log.e(TAG, "sendBPJumper error body: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e(TAG, "sendBPJumper failed to read error body: " + e.getMessage());
+                    }
                 }
                 restartBle();
             }
 
             @Override
             public void onFailure(Call<BloodPressureResponse> call, Throwable t) {
-                Log.e(TAG, "sendBPJumper server error: " + t.getMessage());
+                Log.e(TAG, "sendBPJumper network failure: " + t.getMessage());
                 restartBle();
             }
         });
@@ -1650,7 +1669,7 @@ public class BleScanService extends Service {
                 getDate(),
                 serial,
                 oxygen,
-                "5bc3cb14cba82b066cae7bc2",
+                androidId,
                 "Asia/Manila",
                 (int) pulseRate
         );

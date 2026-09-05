@@ -641,9 +641,9 @@ public class BloodOxygenFragment extends Fragment implements QuickActionsHandler
 
         // 3. Send to server
         OximeterRequest request = new OximeterRequest(
-                getTodayDate(), serial, spo2, "5bc3cb14cba82b066cae7bc2", "Asia/Manila", pulseRate);
+                getTodayDate(), serial, spo2, androidId, "Asia/Manila", pulseRate);
         Call<OximeterResponse> call = ApiClient
-                .getUserService(Constant.BASE_URL_BGM, Constant.TOKEN_DR_WATCH_API, serial)
+                .getUserService(Constant.BASE_URL_BGM, Constant.TOKEN_DR_WATCH_API, androidId)
                 .sendOximeterReading(request);
         call.enqueue(new Callback<OximeterResponse>() {
             @Override

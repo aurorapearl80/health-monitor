@@ -68,6 +68,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import com.google.gson.Gson;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -680,29 +682,40 @@ public class TemperatureFragment extends Fragment implements QuickActionsHandler
                 "Asia/Manila",
                 "jtm00025b94050c",
                 Arrays.asList(temperature),
-                "5bc3cb14cba82b066cae7bc1",
+                androidId,
                 "5bb306382598931ffbd1b628",
                 DateUtils.getDate(),
-                "5bc3cb14cba82b066cae7bc1"
+                androidId
         );
         List<Reading> readingsList = Arrays.asList(reading);
         ReadingsRequest readingsRequest = new ReadingsRequest(readingsList);
+
+        String endpoint = Constant.BASE_URL_BGM + "api/temperatures";
+        String payloadJson = new Gson().toJson(readingsRequest);
+        Log.d(TAG, "sendTemperature → POST " + endpoint);
+        Log.d(TAG, "sendTemperature payload: " + payloadJson);
 
         Call<Object> call = ApiClient.getUserService(Constant.BASE_URL_BGM,"bNWZsV#BeZvaNb*gF@3Z^7tCNhCT29Vw8Vi%4T%", DeviceUtils.getIMEI(getActivity())).sendReadings(readingsRequest);
         call.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-                Log.d(TAG, "Date - "+response.toString());
+                Log.d(TAG, "sendTemperature response code=" + response.code() + " success=" + response.isSuccessful());
                 if (response.isSuccessful()) {
+                    Log.d(TAG, "sendTemperature response body: " + response.body());
                     databaseClient.getAppDatabase().temperatureDao().deleteById(id);
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                        Log.e(TAG, "sendTemperature error body: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e(TAG, "sendTemperature failed to read error body: " + e.getMessage());
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                // Request failed
-                // Handle failure
-                Log.d(TAG, "Date - "+t.toString());
+                Log.e(TAG, "sendTemperature network failure: " + t.getMessage());
             }
         });
     }
