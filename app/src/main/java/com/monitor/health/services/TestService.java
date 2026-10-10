@@ -107,9 +107,22 @@ public class TestService extends Service {
         @Override public void onAccuracyChanged(Sensor s, int a) {}
     };
 
+    public static void startIfPermitted(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACTIVITY_RECOGNITION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "ACTIVITY_RECOGNITION not granted — not starting TestService");
+            return;
+        }
+        ContextCompat.startForegroundService(context, new Intent(context, TestService.class));
+    }
+
     @Override public void onCreate() {
         super.onCreate();
-        startInForeground();
+        if (!startInForeground()) {
+            stopSelf();
+            return;
+        }
         initSystem();
         registerSensor();
 
@@ -147,7 +160,7 @@ public class TestService extends Service {
         @Override public void onAccuracyChanged(Sensor s, int a) {}
     };
 
-    private void startInForeground() {
+    private boolean startInForeground() {
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationChannel ch = new NotificationChannel(
                 NOTIF_CH_ID, "Health Uploads", NotificationManager.IMPORTANCE_LOW);
@@ -160,20 +173,14 @@ public class TestService extends Service {
                 .setOngoing(true)
                 .build();
 
-        // Android 14+ enforces that foregroundServiceType=health requires ACTIVITY_RECOGNITION.
-        // After clearing app data these are revoked — must still call startForeground() before
-        // stopSelf() to satisfy the OS contract (else ForegroundServiceDidNotStartInTimeException).
+        // foregroundServiceType=health requires ACTIVITY_RECOGNITION, and type NONE is prohibited
+        // on targetSdk 34+, so without the permission there is no valid startForeground() call.
+        // Callers go through startIfPermitted(); this guards restarts and revoked permissions.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION)
                         != PackageManager.PERMISSION_GRANTED) {
             Log.w(TAG, "ACTIVITY_RECOGNITION not granted — stopping TestService");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE);
-            } else {
-                startForeground(NOTIF_ID, notif);
-            }
-            stopSelf();
-            return;
+            return false;
         }
 
         try {
@@ -183,9 +190,10 @@ public class TestService extends Service {
             } else {
                 startForeground(NOTIF_ID, notif);
             }
-        } catch (SecurityException e) {
-            Log.e(TAG, "startForeground failed — prerequisite permission not granted", e);
-            stopSelf();
+            return true;
+        } catch (RuntimeException e) {
+            Log.e(TAG, "startForeground failed", e);
+            return false;
         }
     }
 

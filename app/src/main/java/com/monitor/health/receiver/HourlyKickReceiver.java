@@ -41,12 +41,7 @@ public class HourlyKickReceiver extends BroadcastReceiver {
         scheduleNext(context);
 
         // 2) Start your service (foreground on O+)
-        Intent svc = new Intent(context, TestService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(context, svc);
-        } else {
-            context.startService(svc);
-        }
+        TestService.startIfPermitted(context);
     }
 
     // ---------- Public API ----------

@@ -41,12 +41,7 @@ public class HeartRateMonitorWorker extends Worker {
             setForegroundAsync(createForegroundInfo("Preparing heart-rate syncâ€¦"));
 
             // 2) Start your long-running ForegroundService (BLE, uploads, etc.)
-            Intent svc = new Intent(getApplicationContext(), TestService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                ContextCompat.startForegroundService(getApplicationContext(), svc);
-            } else {
-                getApplicationContext().startService(svc);
-            }
+            TestService.startIfPermitted(getApplicationContext());
 
             Log.d(TAG, "Foreground service dispatched. Worker done. elapsed=" +
                     (System.currentTimeMillis() - start) + "ms");

@@ -223,6 +223,10 @@ public class BleScanService extends Service {
     @SuppressLint("MissingPermission")
     private void startScanDynamic(android.bluetooth.le.ScanSettings scanSettings) {
         if (bluetoothLeScanner == null) return;
+        if (!hasBtScanPerm()) {
+            Log.w(TAG, "BLUETOOTH_SCAN not granted — skipping scan");
+            return;
+        }
 
         // Screen ON: keep previous behavior (unfiltered scan) so we can discover devices by name like before.
         if (isScreenOn()) {
