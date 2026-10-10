@@ -939,7 +939,7 @@ public class MainActivity extends AppCompatActivity  implements StepsService.Sen
 
             new AlertDialog.Builder(this)
                     .setTitle("Enable Continuous Monitoring")
-                    .setMessage("This medical device app needs to run continuously. Please disable battery optimization.")
+                    .setMessage("Monitor Health needs to run continuously to keep tracking your heart rate, SpO2, and other readings. Please disable battery optimization.")
                     .setPositiveButton("Go to Settings", (dialog, which) -> {
                         prefs.edit().putBoolean("battery_opt_prompted", true).apply();
                         try {

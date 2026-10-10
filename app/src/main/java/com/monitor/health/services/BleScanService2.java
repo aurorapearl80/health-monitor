@@ -718,8 +718,8 @@ public class BleScanService2 extends Service {
 
             if (!pm.isIgnoringBatteryOptimizations(packageName)) {
                 new AlertDialog.Builder(this)
-                        .setTitle("Medical Device Monitoring")
-                        .setMessage("This medical monitoring app requires:\n\n" +
+                        .setTitle("Continuous Health Monitoring")
+                        .setMessage("For reliable health monitoring, this app requires:\n\n" +
                                 "1. Battery optimization: DISABLED\n" +
                                 "2. Close after screen lock: DISABLED\n" +
                                 "3. Auto-launch: ENABLED\n\n" +

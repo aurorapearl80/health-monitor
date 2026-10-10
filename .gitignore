@@ -19,3 +19,8 @@ local.properties
 *.aab
 /app/release/
 /app/debug/
+
+# Signing credentials — never commit
+/keystore.properties
+*.jks
+*.keystore
