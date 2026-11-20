@@ -31,8 +31,8 @@ public class CombinedFragment extends Fragment {
     private SharedDataViewModel sharedViewModel;
     private ReadingsViewModel vm;
 
-    private static final String BACKGROUND_COLOR = "#2E7D32";
-    private static final String CHART_BACKGROUND_COLOR = "#4CAF50";
+    private static final String BACKGROUND_COLOR = "#000000";
+    private static final String CHART_BACKGROUND_COLOR = "#14171C";
     private static final String GAUGE_ARC_CHART_BACKGROUND_COLOR = "#EF5350";
 
     private LinearLayout rootLayout;

@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.wear.widget.WearableLinearLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.wear.widget.WearableRecyclerView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -130,10 +131,12 @@ public class BleDeviceSelectionActivity extends AppCompatActivity {
 
         databaseClient = DatabaseClient.getInstance(getApplicationContext());
 
-        WearableLinearLayoutManager layoutManager = new WearableLinearLayoutManager(this);
+        // The whole screen scrolls as one page (ScrollView), so the list itself must not scroll
+        // or centre edge items: that gave two nested scrollers and a second, hidden scrollbar.
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setItemPrefetchEnabled(true);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setEdgeItemsCenteringEnabled(true);
+        recyclerView.setNestedScrollingEnabled(false);
 
         // Adapter uses "toggle request" pattern (checkbox does NOT toggle until user confirms)
         adapter = new BleDeviceAdapter(deviceList, this::onToggleRequested);

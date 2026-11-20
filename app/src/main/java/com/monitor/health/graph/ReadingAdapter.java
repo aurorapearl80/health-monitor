@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.ViewHolder> {
     private List<ReadingData> data = new ArrayList<>();
-    private String backgroundColor = "#2E7D32"; // Default color
+    private String backgroundColor = "#000000"; // Default color
 
     public void setData(List<ReadingData> data) {
         this.data = data;

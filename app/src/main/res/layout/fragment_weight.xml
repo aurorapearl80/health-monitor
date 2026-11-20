@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Use this version for a more focused weight monitoring experience -->
-
 <androidx.wear.widget.BoxInsetLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#81C784"
-    app:boxedEdges="all">
+    android:background="@color/dark_background"
+    android:theme="@style/ThemeOverlay.Vital.Weight">
+
+    <!-- Accent glow + bezel arc, fixed behind the scrolling content -->
+    <com.monitor.health.ui.widget.VitalBezelView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <androidx.wear.widget.SwipeDismissFrameLayout
         android:layout_width="match_parent"
@@ -19,286 +22,291 @@
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/watch_inset_horizontal"
             android:paddingRight="@dimen/watch_inset_horizontal"
-            android:paddingTop="@dimen/watch_inset_vertical"
-            android:paddingBottom="@dimen/watch_inset_vertical"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideInset">
+            android:paddingTop="@dimen/page_top_inset"
+            android:paddingBottom="@dimen/page_bottom_inset"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbarSize="4dp"
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            android:scrollbarFadeDuration="400"
+            android:scrollbarDefaultDelayBeforeFade="1800"
+            android:overScrollMode="ifContentScrolls"
+            android:requiresFadingEdge="vertical"
+            android:fadingEdgeLength="@dimen/scroll_fade_length"
+            android:clipToPadding="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:padding="4dp">
+                android:gravity="center_horizontal">
 
-                <!-- Main Weight Display -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvTitle"
+                    style="@style/Vital.Text.Label"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:text="Weight" />
 
-                    <!-- Page Title -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_value_bg"
+                        style="@style/Vital.Text.Hero"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_marginBottom="4dp">
+                        android:text="--" />
 
-                        <TextView
-                            android:id="@+id/tvTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Weight Monitor"
-                            android:textSize="11sp"
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvUnit"
+                        style="@style/Vital.Text.Unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="" />
+                </LinearLayout>
 
-                    <!-- Weight Value with Unit -->
+                <TextView
+                    android:id="@+id/tv_time_ago"
+                    style="@style/Vital.Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/tvBMIStatus"
+                    style="@style/Vital.Text.Body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:gravity="center"
+                    android:text="" />
+
+                <!-- Reading status + history shortcut -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:minHeight="30dp"
+                        android:background="@drawable/bg_chip"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
+                        android:orientation="horizontal"
+                        android:paddingStart="9dp"
+                        android:paddingEnd="11dp">
+
+                        <ImageView
+                            android:id="@+id/heartIcon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_weight_foreground"
+                            android:contentDescription="@null"
+                            app:tint="?attr/vitalAccent" />
 
                         <TextView
-                            android:id="@+id/tv_value_bg"
+                            android:id="@+id/tvBPM"
+                            style="@style/Vital.Text.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="--"
-                            android:textSize="32sp"
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvUnit"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:textSize="12sp"
-                            android:textColor="@android:color/white"
                             android:layout_marginStart="6dp"
-                            android:layout_marginBottom="4dp" />
+                            android:text="BMI: " />
 
+                        <TextView
+                            android:id="@+id/tvOutcome"
+                            style="@style/Vital.Text.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:textColor="?attr/vitalAccent"
+                            android:text="" />
                     </LinearLayout>
 
-                    <!-- Estimated Body Composition -->
-                    <TextView
-                        android:id="@+id/tv_body_composition_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Estimated Body Composition"
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:layout_marginTop="4dp"
-                        android:textStyle="bold"
-                        android:gravity="center" />
+                    <ImageView
+                        android:id="@+id/chartIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/action_button_background"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_chart"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="History"
+                        app:tint="?attr/vitalAccent" />
+                </LinearLayout>
 
-                    <!-- Body Composition Row — equal-weight columns filling full width -->
+                <TextView
+                    android:id="@+id/tv_body_composition_title"
+                    style="@style/Vital.Text.Section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="Estimated body composition" />
+
+                <!-- 2 x 2 grid: readable on a small round screen -->
+                <LinearLayout
+                    android:id="@+id/bodyCompositionRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="vertical">
+
                     <LinearLayout
-                        android:id="@+id/bodyCompositionRow"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="6dp">
+                        android:orientation="horizontal">
 
-                        <!-- Body Water -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_margin="2dp"
+                            android:background="@drawable/bg_tile"
+                            android:gravity="center"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:paddingVertical="7dp">
 
                             <TextView
                                 android:id="@+id/tvBodyWater"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:fontFeatureSettings="tnum"
                                 android:maxLines="1"
-                                android:gravity="center" />
+                                android:text="--"
+                                android:textColor="@color/text_primary"
+                                android:textSize="13sp" />
 
                             <TextView
+                                style="@style/Vital.Text.Section"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="BODY WATER"
-                                android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
-                                android:gravity="center" />
+                                android:layout_marginTop="1dp"
+                                android:letterSpacing="0.08"
+                                android:text="Body water"
+                                android:textSize="8sp" />
                         </LinearLayout>
 
-                        <!-- Lean Mass -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_margin="2dp"
+                            android:background="@drawable/bg_tile"
+                            android:gravity="center"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:paddingVertical="7dp">
 
                             <TextView
                                 android:id="@+id/tvLeanMass"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:fontFeatureSettings="tnum"
                                 android:maxLines="1"
-                                android:gravity="center" />
+                                android:text="--"
+                                android:textColor="@color/text_primary"
+                                android:textSize="13sp" />
 
                             <TextView
+                                style="@style/Vital.Text.Section"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="LEAN MASS"
-                                android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
-                                android:gravity="center" />
+                                android:layout_marginTop="1dp"
+                                android:letterSpacing="0.08"
+                                android:text="Lean mass"
+                                android:textSize="8sp" />
                         </LinearLayout>
 
-                        <!-- Fat Mass -->
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_margin="2dp"
+                            android:background="@drawable/bg_tile"
+                            android:gravity="center"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:paddingVertical="7dp">
 
                             <TextView
                                 android:id="@+id/tvFatMass"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:fontFeatureSettings="tnum"
                                 android:maxLines="1"
-                                android:gravity="center" />
+                                android:text="--"
+                                android:textColor="@color/text_primary"
+                                android:textSize="13sp" />
 
                             <TextView
+                                style="@style/Vital.Text.Section"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="FAT MASS"
-                                android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
-                                android:gravity="center" />
+                                android:layout_marginTop="1dp"
+                                android:letterSpacing="0.08"
+                                android:text="Fat mass"
+                                android:textSize="8sp" />
                         </LinearLayout>
 
-                        <!-- Body Fat % -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_margin="2dp"
+                            android:background="@drawable/bg_tile"
+                            android:gravity="center"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:paddingVertical="7dp">
 
                             <TextView
                                 android:id="@+id/tvBodyFatPercent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="--"
-                                android:textSize="10sp"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:fontFeatureSettings="tnum"
                                 android:maxLines="1"
-                                android:gravity="center" />
+                                android:text="--"
+                                android:textColor="@color/text_primary"
+                                android:textSize="13sp" />
 
                             <TextView
+                                style="@style/Vital.Text.Section"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="BODY FAT %"
-                                android:textSize="7sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.8"
-                                android:gravity="center" />
+                                android:layout_marginTop="1dp"
+                                android:letterSpacing="0.08"
+                                android:text="Body fat %"
+                                android:textSize="8sp" />
                         </LinearLayout>
 
                     </LinearLayout>
-
-                    <!-- Time Ago -->
-                    <TextView
-                        android:id="@+id/tv_time_ago"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:layout_marginTop="2dp" />
-
-                    <!-- BMI Status -->
-                    <TextView
-                        android:id="@+id/tvBMIStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:layout_marginTop="4dp"
-                        android:alpha="0.8" />
-
                 </LinearLayout>
 
-                <!-- Status Info -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    style="@style/Vital.Text.Section"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginBottom="6dp">
-
-                    <TextView
-                        android:id="@+id/tvBPM"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="BMI: "
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:layout_marginEnd="8dp"
-                        android:gravity="center" />
-
-                    <ImageView
-                        android:id="@+id/heartIcon"
-                        android:layout_width="18dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp"
-                        android:src="@drawable/ic_weight_foreground"
-                        tools:ignore="UseAppTint" />
-
-                    <TextView
-                        android:id="@+id/tvOutcome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="10sp"
-                        android:textColor="@android:color/white"
-                        android:gravity="center" />
-
-                    <ImageView
-                        android:id="@+id/chartIcon"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/ic_chart"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:layout_marginLeft="16dp"
-                        app:tint="@android:color/white" />
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:color/white"
-                    android:alpha="0.3"
-                    android:layout_marginVertical="@dimen/card_spacing"/>
+                    android:layout_marginTop="18dp"
+                    android:text="All vitals" />
 
                 <include
                     android:id="@+id/metricsPanel"
@@ -307,19 +315,16 @@
                 <include layout="@layout/include_quick_actions" />
 
             </LinearLayout>
-
         </ScrollView>
-
     </androidx.wear.widget.SwipeDismissFrameLayout>
 
     <ImageView
         android:id="@+id/ivConnectionStatus"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="9dp"
         android:contentDescription="Connection status"
-        app:tint="@android:color/white"
         android:visibility="invisible" />
 
 </androidx.wear.widget.BoxInsetLayout>

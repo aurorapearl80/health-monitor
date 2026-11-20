@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Watches 210dp wide and up have room for the larger numerals. -->
+    <dimen name="hero_text">42sp</dimen>
+    <dimen name="hero_text_small">34sp</dimen>
+</resources>

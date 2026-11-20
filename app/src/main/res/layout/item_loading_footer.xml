@@ -12,14 +12,15 @@
         style="?android:attr/progressBarStyleSmall"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:indeterminate="true" />
+        android:indeterminate="true"
+        android:indeterminateTint="@color/brand" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="Loading..."
-        android:textColor="@android:color/white"
+        android:textColor="@color/text_secondary"
         android:textSize="12sp" />
 
 </LinearLayout>

@@ -1,34 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- ===== Core surfaces (true black for OLED watch displays) ===== -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="dark_background">#121212</color>
-    <color name="surface_color">#1E1E1E</color>
+    <color name="dark_background">#000000</color>
+    <color name="surface_color">#14171C</color>
+    <color name="surface_high">#1F242B</color>
+    <color name="surface_pressed">#2A3038</color>
+    <color name="border_color">#262B33</color>
+    <color name="scrim">#E6000000</color>
+
+    <!-- ===== Text ===== -->
     <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#B3B3B3</color>
-    <color name="accent_blue">#2196F3</color>
-    <color name="accent_green">#4CAF50</color>
-    <color name="accent_green_transparent">#334CAF50</color>
-    <color name="border_color">#333333</color>
-    <!-- Dialog Colors -->
-    <color name="dialog_background">#2D2D2D</color>
-    <color name="dialog_border">#404040</color>
+    <color name="text_secondary">#A3ACB9</color>
+    <color name="text_tertiary">#6E7783</color>
+    <color name="on_accent">#06090C</color>
+
+    <!-- ===== Brand ===== -->
+    <color name="brand">#4FE3C1</color>
+    <color name="brand_soft">#294FE3C1</color>
+
+    <!-- ===== One accent per vital ===== -->
+    <color name="vital_heart">#FF5470</color>
+    <color name="vital_heart_soft">#29FF5470</color>
+    <color name="vital_glucose">#5AA9FF</color>
+    <color name="vital_glucose_soft">#295AA9FF</color>
+    <color name="vital_pressure">#FF8F52</color>
+    <color name="vital_pressure_soft">#29FF8F52</color>
+    <color name="vital_weight">#5FE08A</color>
+    <color name="vital_weight_soft">#295FE08A</color>
+    <color name="vital_oxygen">#3FD9F2</color>
+    <color name="vital_oxygen_soft">#293FD9F2</color>
+    <color name="vital_temperature">#FFBE4D</color>
+    <color name="vital_temperature_soft">#29FFBE4D</color>
+    <color name="vital_ecg">#B692FF</color>
+    <color name="vital_ecg_soft">#29B692FF</color>
+    <color name="vital_steps">#C9F25C</color>
+    <color name="vital_steps_soft">#29C9F25C</color>
+    <color name="vital_sleep">#8F99FF</color>
+    <color name="vital_sleep_soft">#298F99FF</color>
+
+    <!-- ===== Semantic ===== -->
+    <color name="success">#34D36B</color>
+    <color name="success_pressed">#2AB159</color>
+    <color name="danger">#FF453A</color>
+    <color name="danger_pressed">#D6382F</color>
+    <color name="warning">#FFB020</color>
+
+    <!-- ===== Legacy names kept for existing code/layouts ===== -->
+    <color name="accent_blue">#5AA9FF</color>
+    <color name="accent_green">#4FE3C1</color>
+    <color name="accent_green_transparent">#294FE3C1</color>
+    <color name="dialog_background">#101317</color>
+    <color name="dialog_border">#262B33</color>
     <color name="dialog_text_primary">#FFFFFF</color>
-    <color name="dialog_text_secondary">#CCCCCC</color>
-    <color name="dialog_accent">#FF9800</color>
-
-    <!-- Button Colors -->
-    <color name="button_ok_normal">#4CAF50</color>
-    <color name="button_ok_pressed">#45A049</color>
-    <color name="button_cancel_normal">#424242</color>
-    <color name="button_cancel_pressed">#616161</color>
-
-    <!-- Video call -->
-    <color name="dark_grey">#121212</color>
-    <color name="light_grey">#BBBBBB</color>
-    <color name="green">#4CAF50</color>
-    <color name="red">#F44336</color>
-    <color name="blue">#2196F3</color>
-
-    <color name="call_background">#1E1E1E</color>
+    <color name="dialog_text_secondary">#A3ACB9</color>
+    <color name="dialog_accent">#FFB020</color>
+    <color name="button_ok_normal">#34D36B</color>
+    <color name="button_ok_pressed">#2AB159</color>
+    <color name="button_cancel_normal">#1F242B</color>
+    <color name="button_cancel_pressed">#2A3038</color>
+    <color name="dark_grey">#000000</color>
+    <color name="light_grey">#A3ACB9</color>
+    <color name="green">#34D36B</color>
+    <color name="red">#FF453A</color>
+    <color name="blue">#5AA9FF</color>
+    <color name="call_background">#000000</color>
 </resources>

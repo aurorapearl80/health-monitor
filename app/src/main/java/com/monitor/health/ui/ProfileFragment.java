@@ -366,8 +366,9 @@ public class ProfileFragment extends Fragment {
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             WindowManager.LayoutParams params = window.getAttributes();
-            params.width = (int) (requireContext().getResources().getDisplayMetrics().widthPixels * 0.9);
-            params.height = (int) (requireContext().getResources().getDisplayMetrics().heightPixels * 0.85);
+            android.util.DisplayMetrics dm = requireContext().getResources().getDisplayMetrics();
+            params.width = (int) (Math.min(dm.widthPixels, dm.heightPixels) * 0.84);
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(params);
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             window.setDimAmount(0.7f);

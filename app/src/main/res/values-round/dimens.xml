@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <dimen name="watch_inset_horizontal" tools:ignore="MissingDefaultResource">14dp</dimen>
-    <dimen name="watch_inset_vertical" tools:ignore="MissingDefaultResource">18dp</dimen>
-    <dimen name="card_spacing" tools:ignore="MissingDefaultResource">6dp</dimen>
-    <dimen name="card_radius" tools:ignore="MissingDefaultResource">12dp</dimen>
-    <dimen name="metric_item_gap">5dp</dimen>
-    <dimen name="metric_card_margin_h">4dp</dimen>
+<resources>
+    <!-- Round screens: keep every view inside the circle. At 225dp the scrolling viewport is
+         a ~177 x 145dp rectangle whose corners sit on the circle, so nothing is ever drawn
+         under the curved edge. Content fades out at the top and bottom instead of being cut. -->
+    <dimen name="watch_inset_horizontal">24dp</dimen>
+    <dimen name="watch_inset_vertical">28dp</dimen>
+    <dimen name="page_top_inset">36dp</dimen>
+    <dimen name="page_bottom_inset">36dp</dimen>
+    <dimen name="tab_top_inset">30dp</dimen>
+    <dimen name="scroll_fade_length">20dp</dimen>
+    <dimen name="card_spacing">8dp</dimen>
+    <dimen name="card_radius">18dp</dimen>
+    <dimen name="metric_item_gap">6dp</dimen>
+    <dimen name="metric_card_margin_h">0dp</dimen>
 </resources>

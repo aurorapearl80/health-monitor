@@ -148,18 +148,18 @@ public class DataFragment extends Fragment {
         chart.setDragEnabled(false);
         chart.setScaleEnabled(false);
         chart.setDrawGridBackground(true);
-        chart.setGridBackgroundColor(Color.parseColor("#4CAF50"));
+        chart.setGridBackgroundColor(Color.parseColor("#14171C"));
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(true);
-        xAxis.setGridColor(Color.parseColor("#66FFFFFF"));
+        xAxis.setGridColor(Color.parseColor("#1FFFFFFF"));
         xAxis.setTextColor(Color.WHITE);
         xAxis.setDrawLabels(false);
 
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
-        leftAxis.setGridColor(Color.parseColor("#66FFFFFF"));
+        leftAxis.setGridColor(Color.parseColor("#1FFFFFFF"));
         leftAxis.setTextColor(Color.WHITE);
         leftAxis.setAxisMinimum(0f);
         leftAxis.setAxisMaximum(250f);

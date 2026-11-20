@@ -51,9 +51,18 @@ public class MessageService {
             try {
 
 
-                MessageEntity message = convertDTOToEntity(dto);
-                newMessages.add(message);
-                Log.w(TAG, "API response is null body: "+message.getBody());
+                // Skip messages already stored (the @Insert has no conflict strategy, so without
+                // this every refresh would add the whole inbox again); refresh the read flag.
+                MessageEntity existing = dto.getId() == null ? null : messageDAO.getMessageByApiId(dto.getId());
+                if (existing == null) {
+                    newMessages.add(convertDTOToEntity(dto));
+                } else {
+                    duplicateCount++;
+                    if (existing.isRead() != dto.isRead()) {
+                        existing.setRead(dto.isRead());
+                        messageDAO.updateMessage(existing);
+                    }
+                }
                 // Normalize id to String to match entity/DAO contract
 //                String apiId = dto.getId();
 //                MessageEntity existingMessage = messageDAO.getMessageByApiId(apiId);
@@ -75,8 +84,10 @@ public class MessageService {
                 Log.e(TAG, "Error processing DTO: " + (dto != null ? dto.getId() : "<null>") , e);
             }
         }
-        Log.w(TAG, "[Save] Empty data to be save "+newMessages.toString());
-        messageDAO.insertMessages(newMessages);
+        Log.d(TAG, "[Save] new=" + newMessages.size() + ", already stored=" + duplicateCount);
+        if (!newMessages.isEmpty()) {
+            messageDAO.insertMessages(newMessages);
+        }
 
 //        if (!newMessages.isEmpty()) {
 //            try {

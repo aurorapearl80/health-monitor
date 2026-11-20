@@ -1,56 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/metricRowRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:minHeight="46dp"
     android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:background="@drawable/bg_card"
-    android:padding="7dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="14dp"
+    android:paddingVertical="6dp"
     android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:focusable="true">
 
     <ImageView
         android:id="@+id/ivIcon"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:padding="3dp"
-        android:layout_marginEnd="6dp" />
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_icon_well"
+        android:padding="7dp"
+        android:contentDescription="@null"
+        app:tint="?attr/vitalAccent" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textStyle="bold"
-            android:textSize="11sp" />
-    </LinearLayout>
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="2"
+        android:text=""
+        android:textColor="@color/text_primary"
+        android:textSize="12sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:gravity="end"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:fontFeatureSettings="tnum"
             android:text=""
-            android:textStyle="bold"
-            android:textSize="10sp" />
+            android:textColor="@color/text_primary"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textSize="9sp"
-            android:alpha="0.7" />
+            android:textColor="@color/text_tertiary"
+            android:textSize="9sp" />
     </LinearLayout>
 </LinearLayout>

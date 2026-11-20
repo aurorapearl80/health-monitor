@@ -5,153 +5,155 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2196F3"
-    app:boxedEdges="all">
+    android:background="@color/dark_background"
+    android:theme="@style/ThemeOverlay.Vital.Glucose">
+
+    <!-- Accent glow + bezel arc, fixed behind the scrolling content -->
+    <com.monitor.health.ui.widget.VitalBezelView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <androidx.wear.widget.SwipeDismissFrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Add inset padding so content stays readable on round screens -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/watch_inset_horizontal"
             android:paddingRight="@dimen/watch_inset_horizontal"
-            android:paddingTop="@dimen/watch_inset_vertical"
-            android:paddingBottom="@dimen/watch_inset_vertical"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideInset">
+            android:paddingTop="@dimen/page_top_inset"
+            android:paddingBottom="@dimen/page_bottom_inset"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbarSize="4dp"
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            android:scrollbarFadeDuration="400"
+            android:scrollbarDefaultDelayBeforeFade="1800"
+            android:overScrollMode="ifContentScrolls"
+            android:requiresFadingEdge="vertical"
+            android:fadingEdgeLength="@dimen/scroll_fade_length"
+            android:clipToPadding="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
 
-                <!-- Blood Glucose Section -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvTitle"
+                    style="@style/Vital.Text.Label"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal"
-                    android:layout_marginBottom="@dimen/card_spacing">
+                    android:text="Blood Glucose" />
 
-                    <!-- Main Value Display -->
+                <TextView
+                    android:id="@+id/tvValueBG"
+                    style="@style/Vital.Text.Hero"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="---" />
+
+                <TextView
+                    android:id="@+id/tvUnit"
+                    style="@style/Vital.Text.Unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="--" />
+
+                <TextView
+                    android:id="@+id/tvTimeAgo"
+                    style="@style/Vital.Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="---" />
+
+                <!-- Reading status + history shortcut -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="6dp"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/ivConnectionStatus"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_gravity="top|center_horizontal"
-                            android:contentDescription="Connection status"
-                            app:tint="@android:color/white"
-                            android:visibility="invisible" />
-
-                        <TextView
-                            android:id="@+id/tvTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
-                            android:alpha="0.9"
-                            android:text="Blood Glucose"
-                            android:textColor="@android:color/white"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvValueBG"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="---"
-                            android:textColor="@android:color/white"
-                            android:textSize="32sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvUnit"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="--"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvTimeAgo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="---"
-                            android:textColor="@android:color/white"
-                            android:textSize="10sp" />
-                    </LinearLayout>
-
-                    <!-- Status Info -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:minHeight="30dp"
+                        android:background="@drawable/bg_chip"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:gravity="center">
-
-                        <TextView
-                            android:id="@+id/tvBPM"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:textSize="10sp"
-                            android:textColor="@android:color/white"
-                            android:layout_marginEnd="8dp"/>
+                        android:paddingStart="9dp"
+                        android:paddingEnd="11dp">
 
                         <ImageView
                             android:id="@+id/heartIcon"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
                             android:src="@drawable/ic_blood_drop_foreground"
-                            android:layout_marginEnd="8dp"
-                            tools:ignore="UseAppTint"/>
+                            android:contentDescription="@null"
+                            app:tint="?attr/vitalAccent" />
+
+                        <TextView
+                            android:id="@+id/tvBPM"
+                            style="@style/Vital.Text.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="" />
 
                         <TextView
                             android:id="@+id/tvOutcome"
+                            style="@style/Vital.Text.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text=""
-                            android:textSize="10sp"
-                            android:textColor="@android:color/white"/>
-
-                        <ImageView
-                            android:id="@+id/chartIcon"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@drawable/ic_chart"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:layout_marginLeft="16dp"
-                            app:tint="@android:color/white" />
+                            android:layout_marginStart="4dp"
+                            android:textColor="?attr/vitalAccent"
+                            android:text="" />
                     </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/chartIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/action_button_background"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_chart"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="History"
+                        app:tint="?attr/vitalAccent" />
                 </LinearLayout>
 
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:color/white"
-                    android:alpha="0.3"
-                    android:layout_marginVertical="@dimen/card_spacing"/>
+                <TextView
+                    style="@style/Vital.Text.Section"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="All vitals" />
+
                 <include
                     android:id="@+id/metricsPanel"
                     layout="@layout/layout_metrics_panel" />
 
-                <!-- Add this before the closing tag of your main layout -->
                 <include layout="@layout/include_quick_actions" />
+
             </LinearLayout>
         </ScrollView>
     </androidx.wear.widget.SwipeDismissFrameLayout>
 
+    <ImageView
+        android:id="@+id/ivConnectionStatus"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="9dp"
+        android:contentDescription="Connection status"
+        android:visibility="invisible" />
 
 </androidx.wear.widget.BoxInsetLayout>

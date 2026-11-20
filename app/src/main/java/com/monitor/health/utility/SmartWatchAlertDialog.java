@@ -97,7 +97,9 @@ public class SmartWatchAlertDialog extends Dialog {
 
             // Set dialog size for smartwatch (smaller screen)
             WindowManager.LayoutParams params = window.getAttributes();
-            params.width = (int) (getContext().getResources().getDisplayMetrics().widthPixels * 0.9);
+            // Narrower than before so the rounded panel stays inside a round display
+            android.util.DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+            params.width = (int) (Math.min(dm.widthPixels, dm.heightPixels) * 0.84);
             params.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(params);
 

@@ -1,5 +1,17 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="metric_item_gap">10dp</dimen>          <!-- vertical space between rows -->
-    <dimen name="metric_card_margin_h">6dp</dimen>      <!-- tiny left/right breathing room -->
+    <dimen name="metric_item_gap">6dp</dimen>
+    <dimen name="metric_card_margin_h">0dp</dimen>
+    <!-- Page geometry. Overridden for round / non-round screens in values-round and values-notround. -->
+    <dimen name="watch_inset_horizontal">16dp</dimen>
+    <dimen name="watch_inset_vertical">12dp</dimen>
+    <dimen name="page_top_inset">24dp</dimen>
+    <dimen name="page_bottom_inset">24dp</dimen>
+    <dimen name="tab_top_inset">8dp</dimen>
+    <dimen name="scroll_fade_length">16dp</dimen>
+    <dimen name="card_spacing">10dp</dimen>
+    <dimen name="card_radius">18dp</dimen>
+    <!-- Type -->
+    <dimen name="hero_text">36sp</dimen>
+    <dimen name="hero_text_small">30sp</dimen>
 </resources>
