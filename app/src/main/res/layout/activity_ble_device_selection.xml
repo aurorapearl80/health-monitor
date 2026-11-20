@@ -4,92 +4,104 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_background"
-    app:boxedEdges="all">
+    android:background="@color/dark_background">
+
+    <com.monitor.health.ui.widget.VitalBezelView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:paddingLeft="@dimen/watch_inset_horizontal"
+        android:paddingRight="@dimen/watch_inset_horizontal"
+        android:paddingTop="@dimen/page_top_inset"
+        android:paddingBottom="@dimen/page_bottom_inset"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbarSize="4dp"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        android:scrollbarFadeDuration="400"
+        android:scrollbarDefaultDelayBeforeFade="1800"
+        android:overScrollMode="ifContentScrolls"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="@dimen/scroll_fade_length"
+        android:clipToPadding="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <!-- Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="12dp">
 
                 <TextView
+                    style="@style/Vital.Text.Label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Select BLE Device"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="8dp" />
+                    android:text="Devices"
+                    android:gravity="center" />
 
                 <TextView
+                    style="@style/Vital.Text.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Available Devices"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/accent_green"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginTop="4dp"
+                    android:text="Select a device"
+                    android:gravity="center" />
 
-                <!-- Search for Devices Button -->
+                <TextView
+                    style="@style/Vital.Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Bluetooth devices nearby"
+                    android:gravity="center"
+                    android:layout_marginBottom="10dp" />
+
                 <Button
                     android:id="@+id/btn_search_devices"
+                    style="@style/Widget.Vital.Button"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Search for Devices"
-                    android:textSize="10sp"
-                    android:textColor="@android:color/white"
-                    android:background="@color/accent_green"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:minHeight="36dp"
-                    android:layout_marginBottom="8dp" />
-
+                    android:layout_height="wrap_content"
+                    android:text="Search for devices"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
-            <!-- Progress Bar -->
             <ProgressBar
                 android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
+                android:indeterminateTint="@color/brand"
                 android:visibility="visible" />
 
-            <!-- RecyclerView for BLE Devices -->
             <androidx.wear.widget.WearableRecyclerView
                 android:id="@+id/recycler_view_devices"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:scrollbars="vertical"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:scrollbars="none" />
 
-            <!-- Empty State Text -->
             <TextView
                 android:id="@+id/empty_state_text"
+                style="@style/Vital.Text.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Searching for devices..."
-                android:textSize="12sp"
                 android:gravity="center"
-                android:textColor="@color/accent_green"
                 android:visibility="gone"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="12dp" />
 
         </LinearLayout>
 

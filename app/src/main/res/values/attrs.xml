@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Accent of the vital the current screen is about. Set per screen with a
+         ThemeOverlay.Vital.* on the layout root (or on an <include>). -->
+    <attr name="vitalAccent" format="color" />
+    <!-- Same accent at low opacity, for chips and icon wells. -->
+    <attr name="vitalAccentSoft" format="color" />
+
+    <declare-styleable name="VitalBezelView">
+        <!-- Defaults to ?attr/vitalAccent. -->
+        <attr name="bezelColor" format="color" />
+        <!-- Length of the bright arc, in degrees, centred on 12 o'clock. -->
+        <attr name="bezelSweep" format="float" />
+        <attr name="bezelStrokeWidth" format="dimension" />
+        <attr name="bezelShowGlow" format="boolean" />
+    </declare-styleable>
+</resources>

@@ -23,8 +23,55 @@ source/target compatibility. Retrofit 2.8.1 + Gson + OkHttp 3.12.12 + logging-in
 Conscrypt (custom TLS provider), Room 2.6.1, WorkManager 2.9.1, Firebase Cloud Messaging, Twilio
 Video & Voice Android SDKs, MPAndroidChart, Glide, Play Services Location.
 
-**Build gotcha:** `app/build.gradle` has a `fileTree` dependency on a hardcoded Windows path
-(`C:\Users\DeeDee\...`) — will break the build on macOS/Linux until fixed/removed.
+**Build gotcha:** the machine's default JDK may be too new for Gradle 8.13 — build with JDK 17
+(`JAVA_HOME=$(/usr/libexec/java_home -v 17) ./gradlew assembleDebug`).
+
+## Wear OS distribution
+
+The app is declared as a **standalone Wear OS app**: `AndroidManifest.xml` has
+`<uses-feature android:name="android.hardware.type.watch" />` (required) and the
+`com.google.android.wearable.standalone` meta-data. That is what makes Google Play treat the
+bundle as a watch app — it is no longer installable on phones from Play. Hardware implied by
+permissions (camera, microphone, Wi-Fi, GPS, telephony) is marked `required="false"` so watches
+without it are not filtered out; keep that list in sync when adding permissions. Releases go to the
+**Wear OS track** in Play Console (Form factors → Wear OS), not the phone track.
+
+## UI design system
+
+Dark-only, true-black UI for round OLED watches. Defined in `res/values/`:
+- `colors.xml` — surfaces, text tiers, `brand`, and one accent per vital (`vital_heart`,
+  `vital_glucose`, `vital_pressure`, `vital_weight`, `vital_oxygen`, `vital_temperature`,
+  `vital_ecg`, `vital_steps`, `vital_sleep`).
+- `attrs.xml` / `themes.xml` — `?attr/vitalAccent` + `?attr/vitalAccentSoft`, set per screen by
+  putting `android:theme="@style/ThemeOverlay.Vital.*"` on the layout root (or an `<include>`).
+  Drawables (`bg_chip`, `bg_icon_well`, `circle_background`, …) and styles read those attrs, so
+  **layouts using them must be inflated with an activity context whose theme defines the attrs**
+  (the app theme, `Theme.DRWatch.Alert` and `AlertDialogTheme` all do) — never the application
+  context or `RemoteViews`.
+- `styles.xml` — `Vital.Text.*` (Label, Hero, Unit, Title, Body, Caption, Chip, Section),
+  `Widget.Vital.Button` (+ `.Tonal`, `.Success`, `.Danger`), `Widget.Vital.Field`.
+- `ui/widget/VitalBezelView` — decorative accent glow + bezel arc behind each screen (arc only on
+  round displays). `values-round/` vs `values-notround/` `dimens.xml` hold the screen insets.
+
+When restyling, keep every view `android:id` and widget class: fragments use view binding and
+`findViewById`, so a dropped ID fails at runtime, not compile time.
+
+## Wear OS quality rules (Play rejects releases that break these)
+
+Play reviews every Wear OS release against the Wear App Quality Guidelines. The Nov 2026 release was
+rejected for exactly these three; keep them true:
+- **Scrollbar:** every scrolling view must show a vertical scrollbar (`android:scrollbars="vertical"`,
+  `scrollbarStyle="outsideOverlay"`, fading edge). Never set `scrollbars="none"` on a ScrollView,
+  NestedScrollView or WearableRecyclerView. A screen should have one scroller, not nested ones.
+- **Watch shapes:** nothing may be cut off by the round edge. Scrollers use
+  `@dimen/page_top_inset` / `page_bottom_inset` / `watch_inset_horizontal` (larger in
+  `values-round/`) with `clipToPadding="true"` and a fading edge, so content never passes under the
+  curve. Dialogs are ≤ 84% of the screen's short side with a large corner radius.
+- **Screenshots:** the Wear OS store listing needs 1:1 screenshots of the *current* UI
+  (≥ 384 px, PNG/JPEG). Refresh them whenever the UI changes. Last set: `play-store/wear-screenshots/`.
+
+Every Play upload needs a higher `versionCode` than any bundle ever uploaded, rejected ones included
+(23 is the next free number after the rejected 22).
 
 ## Layout
 

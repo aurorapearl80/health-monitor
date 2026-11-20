@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -95,6 +96,27 @@ public class WeightGraphActivity extends AppCompatActivity {
             findViewById(R.id.mainLayout).setBackgroundColor(Color.parseColor(color));
             tabLayout.setBackgroundColor(Color.parseColor(color));
         });
+
+        // A failed request (no network, timeout, non-2xx, bad JSON) only sets `error` in the
+        // ViewModel and never posts data, so without this the loader overlay stays up forever.
+        vm.getError().observe(this, message -> {
+            if (message == null) return;
+            Log.e(TAG, "[ERROR] history request failed: " + message);
+            switch (currentTab) {
+                case "WEEK":
+                    sharedViewModel.setWeekData(new ArrayList<>());
+                    break;
+                case "MONTH":
+                    sharedViewModel.setMonthData(new ArrayList<>());
+                    break;
+                default:
+                    sharedViewModel.setDayData(new ArrayList<>());
+                    break;
+            }
+            showLoading(false, "");
+            Toast.makeText(this, "Couldn't load data. Check your connection.",
+                    Toast.LENGTH_SHORT).show();
+        });
     }
 
     private String getReadingTypeFromIntent() {
@@ -107,18 +129,19 @@ public class WeightGraphActivity extends AppCompatActivity {
 
     private void applyThemeForReadingType(String readingType) {
         if (readingType != null) {
+            // Black canvas + dark chart surface for every vital; only the accent differs.
             if (readingType.contains("BloodGlucose")) {
-                changeTheme("#2196F3", "#2196F3", "#2196F3");
+                changeTheme("#000000", "#14171C", "#5AA9FF");
             } else if (readingType.contains("WeightFragment")) {
-                changeTheme("#2E7D32", "#4CAF50", "#EF5350");
+                changeTheme("#000000", "#14171C", "#5FE08A");
             } else if (readingType.contains("BloodPressureFragment")) {
-                changeTheme("#FF7043", "#FF7043", "#FF7043");
+                changeTheme("#000000", "#14171C", "#FF8F52");
             } else if (readingType.contains("BloodOxygenFragment")) {
-                changeTheme("#f186c0", "#f186c0", "#f186c0");
+                changeTheme("#000000", "#14171C", "#3FD9F2");
             } else if (readingType.contains("TemperatureFragment")) {
-                changeTheme("#AD1457", "#AD1457", "#AD1457");
+                changeTheme("#000000", "#14171C", "#FFBE4D");
             } else if (readingType.contains("ElectrocardiogramFragment")) {
-                changeTheme("#AA00FF", "#AA00FF", "#AA00FF");
+                changeTheme("#000000", "#14171C", "#B692FF");
             }
 
 

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2E7D32">
+    android:background="@color/black">
 
     <!-- Main Content -->
     <androidx.wear.widget.BoxInsetLayout
@@ -17,18 +17,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:boxedEdges="all">
+            android:paddingTop="@dimen/tab_top_inset">
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#2E7D32"
-                app:tabTextColor="#CCCCCC"
-                app:tabSelectedTextColor="#FFFFFF"
-                app:tabIndicatorColor="#FFFFFF"
+                android:layout_marginHorizontal="@dimen/watch_inset_horizontal"
+                android:background="@color/black"
+                app:tabTextColor="@color/text_tertiary"
+                app:tabSelectedTextColor="@color/text_primary"
+                app:tabIndicatorColor="@color/brand"
+                app:tabIndicatorFullWidth="false"
                 app:tabIndicatorHeight="2dp"
+                app:tabRippleColor="@null"
                 app:tabMode="fixed"
+                app:tabMinWidth="0dp"
+                app:tabPaddingStart="2dp"
+                app:tabPaddingEnd="2dp"
                 app:tabGravity="fill"
                 app:tabTextAppearance="@style/TabTextStyle" />
 
@@ -45,7 +51,7 @@
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000"
+        android:background="@color/scrim"
         android:visibility="gone"
         android:clickable="true"
         android:focusable="true"
@@ -61,18 +67,19 @@
 
             <ProgressBar
                 android:id="@+id/mainProgressBar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:indeterminate="true"
-                android:indeterminateTint="@android:color/white" />
+                android:indeterminateTint="@color/brand" />
 
             <TextView
                 android:id="@+id/tvLoadingMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fetching data from server..."
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:gravity="center"
+                android:textSize="12sp"
                 android:fontFamily="sans-serif"
                 android:letterSpacing="0.02"
                 android:layout_marginTop="12dp" />

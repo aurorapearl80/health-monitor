@@ -1,9 +1,81 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Watch UI is dark-only: true black saves power on OLED and matches Wear OS guidance. -->
+    <style name="Base.Theme.MyApplication" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/brand</item>
+        <item name="colorOnPrimary">@color/on_accent</item>
+        <item name="colorPrimaryContainer">@color/brand_soft</item>
+        <item name="colorOnPrimaryContainer">@color/brand</item>
+        <item name="colorSecondary">@color/brand</item>
+        <item name="colorOnSecondary">@color/on_accent</item>
+        <item name="colorSurface">@color/surface_color</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorOutline">@color/border_color</item>
+        <item name="colorError">@color/danger</item>
+        <item name="android:colorBackground">@color/black</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_tertiary</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="materialButtonStyle">@style/Widget.Vital.Button</item>
+        <item name="vitalAccent">@color/brand</item>
+        <item name="vitalAccentSoft">@color/brand_soft</item>
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
+
+    <!-- Per-vital accents. Apply with android:theme on a layout root or <include>. -->
+    <style name="ThemeOverlay.Vital" parent="" />
+    <style name="ThemeOverlay.Vital.Heart">
+        <item name="vitalAccent">@color/vital_heart</item>
+        <item name="vitalAccentSoft">@color/vital_heart_soft</item>
+        <item name="colorPrimary">@color/vital_heart</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Glucose">
+        <item name="vitalAccent">@color/vital_glucose</item>
+        <item name="vitalAccentSoft">@color/vital_glucose_soft</item>
+        <item name="colorPrimary">@color/vital_glucose</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Pressure">
+        <item name="vitalAccent">@color/vital_pressure</item>
+        <item name="vitalAccentSoft">@color/vital_pressure_soft</item>
+        <item name="colorPrimary">@color/vital_pressure</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Weight">
+        <item name="vitalAccent">@color/vital_weight</item>
+        <item name="vitalAccentSoft">@color/vital_weight_soft</item>
+        <item name="colorPrimary">@color/vital_weight</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Oxygen">
+        <item name="vitalAccent">@color/vital_oxygen</item>
+        <item name="vitalAccentSoft">@color/vital_oxygen_soft</item>
+        <item name="colorPrimary">@color/vital_oxygen</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Temperature">
+        <item name="vitalAccent">@color/vital_temperature</item>
+        <item name="vitalAccentSoft">@color/vital_temperature_soft</item>
+        <item name="colorPrimary">@color/vital_temperature</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Ecg">
+        <item name="vitalAccent">@color/vital_ecg</item>
+        <item name="vitalAccentSoft">@color/vital_ecg_soft</item>
+        <item name="colorPrimary">@color/vital_ecg</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Steps">
+        <item name="vitalAccent">@color/vital_steps</item>
+        <item name="vitalAccentSoft">@color/vital_steps_soft</item>
+        <item name="colorPrimary">@color/vital_steps</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Sleep">
+        <item name="vitalAccent">@color/vital_sleep</item>
+        <item name="vitalAccentSoft">@color/vital_sleep_soft</item>
+        <item name="colorPrimary">@color/vital_sleep</item>
+    </style>
+    <style name="ThemeOverlay.Vital.Danger">
+        <item name="vitalAccent">@color/danger</item>
+        <item name="vitalAccentSoft">#29FF453A</item>
+        <item name="colorPrimary">@color/danger</item>
+    </style>
 </resources>

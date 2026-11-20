@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FFFFFF">
+    android:background="@color/black">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,34 +11,33 @@
         android:orientation="vertical"
         android:gravity="center"
         android:layout_gravity="center"
-        android:padding="24dp">
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Please wear the device"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="@color/dark_background"/>
-
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="During measurement please stay still"
-            android:textSize="14sp"
-            android:textColor="@color/dark_background"/>
+        android:paddingHorizontal="22dp">
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/heart_rate_line"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_marginBottom="8dp"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
             android:layout_gravity="center"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/fitness_watch" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            style="@style/Vital.Text.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="Please wear the device" />
+
+        <TextView
+            android:id="@+id/tvMessage"
+            style="@style/Vital.Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="During measurement please stay still" />
     </LinearLayout>
 </FrameLayout>

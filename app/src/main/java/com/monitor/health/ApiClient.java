@@ -51,7 +51,7 @@ public class ApiClient {
     private static Retrofit getRetrofit(String baseUrl, String authToken, String watchSerial) {
         // Add per-call interceptor without rebuilding the whole client
         OkHttpClient client = getSharedHttpClient().newBuilder()
-                .addInterceptor(new AuthInterceptor(authToken, "RFAY81MT22A"))
+                .addInterceptor(new AuthInterceptor(authToken, resolveSerial(watchSerial)))
                 .build();
 
         return new Retrofit.Builder()
@@ -62,7 +62,15 @@ public class ApiClient {
     }
 
     public static UserService getUserService(String baseUrl, String authToken, String watchSerial) {
-        return getRetrofit(baseUrl, authToken, "RFAY81MT22A").create(UserService.class);
+        return getRetrofit(baseUrl, authToken, watchSerial).create(UserService.class);
+    }
+
+    // Legacy placeholder that used to be sent for every request. Kept only as a fallback for
+    // callers that pass no serial (e.g. login); the history endpoints identify the user by it.
+    private static final String FALLBACK_WATCH_SERIAL = "RFAY81MT22A";
+
+    private static String resolveSerial(String watchSerial) {
+        return (watchSerial == null || watchSerial.trim().isEmpty()) ? FALLBACK_WATCH_SERIAL : watchSerial;
     }
 
     private static SSLSocketFactory getSSLSocketFactory() {
